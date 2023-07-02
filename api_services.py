@@ -2,8 +2,8 @@ import os
 
 from flask import Flask, jsonify, request
 
-from awattar_service import AwattarService
-from control import BulbControl
+from backend_services import AwattarService
+from raspberrypi_controller import BulbControl
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -18,6 +18,11 @@ data = [
 ]
 
 
+@app.route('/api/', methods=['GET'])
+def get_items():
+    return jsonify("You're accessing the Enermizer API Services.")
+
+
 # Endpoint to get all items
 @app.route('/api/items', methods=['GET'])
 def get_items():
@@ -26,7 +31,7 @@ def get_items():
 
 @app.route('/api/bulbon', methods=['GET'])
 def get_bulbon():
-    #    with open('smart_plug/control.py') as control:
+    #    with open('smart_plug/raspberrypi_controller.py') as control:
     #        exec(control.read())
     bulb = BulbControl()
     bulb.bulb_on()

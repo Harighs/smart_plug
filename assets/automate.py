@@ -6,7 +6,7 @@ import datetime
 import os
 
 
-from control import BulbControl
+from raspberrypi_controller import BulbControl
 import RPi.GPIO as GPIO
 
 GPIO.setwarnings(False)

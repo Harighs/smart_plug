@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 import os
 from control import BulbControl
 import RPi.GPIO as GPIO
-
+from awattar_service import AwattarService
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -35,7 +35,22 @@ def get_bulboff():
     bulb.bulb_off()
     return jsonify("Executed sucessful..")
 
+# According to market price
+@app.route('/api/lessthen/<string:eur>', methods=['GET'])
+def control_bulb_market(eur):
+    bulb = BulbControl()
+    market_status = AwattarService()
+    market_status.check_market_price(eur)
+    return jsonify("Executed sucessful..")
 
+
+@app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
+def update_socket_controller(switchNumber, switchStatus):
+    bulb = BulbControl()
+    bulb.socket_controller(switchNumber, switchStatus)
+    return jsonify("Executed sucessful..")
+
+    
 # Endpoint to get a specific item by ID
 @app.route('/api/items/<int:item_id>', methods=['GET'])
 def get_item(item_id):

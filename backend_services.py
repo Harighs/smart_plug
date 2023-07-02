@@ -2,7 +2,14 @@ import datetime
 
 import pandas as pd
 
-from raspberrypi_controller import BulbControl
+from raspberrypi_controller import BulbControl, enable_relay1, disable_relay1
+
+"""
+    This class is responsible for handling and accessing the backend services.
+    For example: 
+        - Accessing the awattar api services and retrieves the next 24 hours price dataset
+        - Based on the market price trigger the relays and change it status
+"""
 
 
 class AwattarService:
@@ -16,28 +23,31 @@ class AwattarService:
         self.marketdata_df = marketdata_df
         self.bulb = BulbControl()
 
-    def check_market_price(self, eur: str):
-        # This code runs whene current day max() price is less then 25% off
+    def check_market_price(self, euro: str):
+        # This code runs when current day max() price is less than 25% offer
         # creterion_timestamp = self.marketdata_df[self.marketdata_df['marketprice'] <= self.marketdata_df['marketprice'].max()*0.75]
-        creterion_timestamp = self.marketdata_df[self.marketdata_df['marketprice'] <= int(eur)]
+
+        # Base on the euro parameter the relays will be activated
+        creterion_timestamp = self.marketdata_df[self.marketdata_df['marketprice'] <= int(euro)]
         # Get the current time
         current_time = datetime.datetime.now().time()
-        print(current_time)
-        print(creterion_timestamp)
-        print(int(eur))
+
+        print("Current Time: ", current_time)
+        print("Current Data-set: ", creterion_timestamp)
+        print("Chosen Euro: ", int(euro))
+
         # Iterate over the rows of the DataFrame
         for _, row in creterion_timestamp.iterrows():
             start_time = row['start_timestamp'].time()
             end_time = row['end_timestamp'].time()
 
             # Check if the current time is within the start and end time for the current row
-
             if start_time <= current_time <= end_time:
                 print('Current time is between start and end time for row', _)
-                self.bulb.bulb_on()
+                enable_relay1()
                 break
                 # bulb on
             else:
                 print('Price is too high')
-                self.bulb.bulb_off()
+                disable_relay1()
                 continue

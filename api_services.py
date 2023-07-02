@@ -3,7 +3,7 @@ import os
 from flask import Flask, jsonify, request
 
 from backend_services import AwattarService
-from raspberrypi_controller import BulbControl
+from raspberrypi_controller import BulbControl, enable_relay1, disable_relay1, relay_switch_controller
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -33,22 +33,22 @@ def get_items():
 def get_bulbon():
     #    with open('smart_plug/raspberrypi_controller.py') as control:
     #        exec(control.read())
-    bulb = BulbControl()
-    bulb.bulb_on()
+    BulbControl().__init__()
+    enable_relay1()
     return jsonify("Executed sucessful..")
 
 
 @app.route('/api/bulboff', methods=['GET'])
 def get_bulboff():
-    bulb = BulbControl()
-    bulb.bulb_off()
+    BulbControl().__init__()
+    disable_relay1()
     return jsonify("Executed sucessful..")
 
 
 # According to market price
 @app.route('/api/lessthen/<string:eur>', methods=['GET'])
 def control_bulb_market(eur):
-    bulb = BulbControl()
+    BulbControl().__init__()
     market_status = AwattarService()
     market_status.check_market_price(eur)
     return jsonify("Executed sucessful..")
@@ -56,8 +56,8 @@ def control_bulb_market(eur):
 
 @app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
 def update_socket_controller(switchNumber, switchStatus):
-    bulb = BulbControl()
-    bulb.socket_controller(switchNumber, switchStatus)
+    BulbControl().__init__()
+    relay_switch_controller(switchNumber, switchStatus)
     return jsonify("Executed sucessful..")
 
 

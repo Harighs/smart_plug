@@ -32,12 +32,12 @@ while True:
     for _, row in creterion_timestamp.iterrows():
         if row['start_timestamp'].time() <= current_time <= row['end_timestamp'].time():
             print('filter is okey', _)
-            bulb.bulb_on()
+            enable_relay1()
             break
 
         else:
             print('current time is not in filter')
-            bulb.bulb_off()
+            disable_relay1()
 
     # Wait for some time before checking again
     time.sleep(60)  # Sleep for 60 seconds (adjust as needed)

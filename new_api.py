@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, request
 import os
-from control import BulbControl
-import RPi.GPIO as GPIO
+
+from flask import Flask, jsonify, request
+
 from awattar_service import AwattarService
+from control import BulbControl
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -16,24 +17,28 @@ data = [
     {"id": 3, "name": "Item 3", "description": "Description of Item 3"}
 ]
 
+
 # Endpoint to get all items
 @app.route('/api/items', methods=['GET'])
 def get_items():
     return jsonify(data)
 
+
 @app.route('/api/bulbon', methods=['GET'])
 def get_bulbon():
-#    with open('smart_plug/control.py') as control:
-#        exec(control.read())
+    #    with open('smart_plug/control.py') as control:
+    #        exec(control.read())
     bulb = BulbControl()
     bulb.bulb_on()
     return jsonify("Executed sucessful..")
+
 
 @app.route('/api/bulboff', methods=['GET'])
 def get_bulboff():
     bulb = BulbControl()
     bulb.bulb_off()
     return jsonify("Executed sucessful..")
+
 
 # According to market price
 @app.route('/api/lessthen/<string:eur>', methods=['GET'])
@@ -50,7 +55,7 @@ def update_socket_controller(switchNumber, switchStatus):
     bulb.socket_controller(switchNumber, switchStatus)
     return jsonify("Executed sucessful..")
 
-    
+
 # Endpoint to get a specific item by ID
 @app.route('/api/items/<int:item_id>', methods=['GET'])
 def get_item(item_id):
@@ -60,6 +65,7 @@ def get_item(item_id):
     else:
         return jsonify({"message": "Item not found"}), 404
 
+
 # Endpoint to add a new item
 @app.route('/api/items', methods=['POST'])
 def add_item():
@@ -67,6 +73,7 @@ def add_item():
     new_item['id'] = len(data) + 1
     data.append(new_item)
     return jsonify(new_item), 201
+
 
 # Endpoint to update an existing item by ID
 @app.route('/api/items/<int:item_id>', methods=['PUT'])
@@ -78,6 +85,7 @@ def update_item(item_id):
     else:
         return jsonify({"message": "Item not found"}), 404
 
+
 # Endpoint to delete an item by ID
 @app.route('/api/items/<int:item_id>', methods=['DELETE'])
 def delete_item(item_id):
@@ -85,8 +93,9 @@ def delete_item(item_id):
     data = [item for item in data if item['id'] != item_id]
     return jsonify({"message": "Item deleted successfully"}), 200
 
+
 if __name__ == '__main__':
-#    app.run(debug=True)
+    #    app.run(debug=True)
     custom_ip = '192.168.1.166'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)

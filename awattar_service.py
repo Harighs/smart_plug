@@ -1,7 +1,9 @@
-import pandas as pd
 import datetime
+
+import pandas as pd
+
 from control import BulbControl
-import os
+
 
 class AwattarService:
     def __init__(self):
@@ -13,8 +15,8 @@ class AwattarService:
         marketdata_df['end_timestamp'] = pd.to_datetime(marketdata_df['end_timestamp'], unit='ms')
         self.marketdata_df = marketdata_df
         self.bulb = BulbControl()
-        
-    def check_market_price(self, eur:str):
+
+    def check_market_price(self, eur: str):
         # This code runs whene current day max() price is less then 25% off
         # creterion_timestamp = self.marketdata_df[self.marketdata_df['marketprice'] <= self.marketdata_df['marketprice'].max()*0.75]
         creterion_timestamp = self.marketdata_df[self.marketdata_df['marketprice'] <= int(eur)]
@@ -29,7 +31,7 @@ class AwattarService:
             end_time = row['end_timestamp'].time()
 
             # Check if the current time is within the start and end time for the current row
-            
+
             if start_time <= current_time <= end_time:
                 print('Current time is between start and end time for row', _)
                 self.bulb.bulb_on()
@@ -39,6 +41,3 @@ class AwattarService:
                 print('Price is too high')
                 self.bulb.bulb_off()
                 continue
-
-    
-    

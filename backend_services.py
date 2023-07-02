@@ -2,7 +2,7 @@ import datetime
 
 import pandas as pd
 
-from control import BulbControl
+from raspberrypi_controller import BulbControl
 
 
 class AwattarService:

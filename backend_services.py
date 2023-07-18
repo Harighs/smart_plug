@@ -2,7 +2,7 @@ import datetime
 
 import pandas as pd
 
-from raspberrypi_controller import BulbControl, enable_relay1, disable_relay1
+from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1
 
 """
     This class is responsible for handling and accessing the backend services.
@@ -21,7 +21,7 @@ class AwattarService:
         marketdata_df['start_timestamp'] = pd.to_datetime(marketdata_df['start_timestamp'], unit='ms')
         marketdata_df['end_timestamp'] = pd.to_datetime(marketdata_df['end_timestamp'], unit='ms')
         self.marketdata_df = marketdata_df
-        self.bulb = BulbControl()
+        self.bulb = RelayControl()
 
     def check_market_price(self, euro: str):
         # This code runs when current day max() price is less than 25% offer

@@ -41,7 +41,7 @@ def relay_switch_controller(relay_switch_number, relay_switch_status):
         GPIO.output(6, relay_switch_status)
 
 
-class BulbControl:
+class RelayControl:
     def __init__(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)

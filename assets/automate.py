@@ -6,7 +6,7 @@ import datetime
 import os
 
 
-from raspberrypi_controller import BulbControl
+from raspberrypi_controller import RelayControl
 import RPi.GPIO as GPIO
 
 GPIO.setwarnings(False)
@@ -23,7 +23,7 @@ marketdata_df['end_timestamp'] = pd.to_datetime(marketdata_df['end_timestamp'], 
 
 creterion_timestamp  = marketdata_df[marketdata_df['marketprice'] >= marketdata_df['marketprice'].max()]
 
-bulb = BulbControl()
+bulb = RelayControl()
 while True:
     # Get the current time
     current_time = datetime.datetime.now().time()

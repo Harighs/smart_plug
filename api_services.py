@@ -3,7 +3,7 @@ import os
 from flask import Flask, jsonify, request
 
 from backend_services import AwattarService
-from raspberrypi_controller import BulbControl, enable_relay1, disable_relay1, relay_switch_controller
+from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -19,7 +19,7 @@ data = [
 
 
 @app.route('/api/', methods=['GET'])
-def get_items():
+def rest_api():
     return jsonify("You're accessing the Enermizer API Services.")
 
 
@@ -33,14 +33,14 @@ def get_items():
 def get_bulbon():
     #    with open('smart_plug/raspberrypi_controller.py') as control:
     #        exec(control.read())
-    BulbControl().__init__()
+    RelayControl().__init__()
     enable_relay1()
-    return jsonify("Executed sucessful..")
+    return jsonify("Executed successful..")
 
 
 @app.route('/api/bulboff', methods=['GET'])
 def get_bulboff():
-    BulbControl().__init__()
+    RelayControl().__init__()
     disable_relay1()
     return jsonify("Executed sucessful..")
 
@@ -48,7 +48,7 @@ def get_bulboff():
 # According to market price
 @app.route('/api/lessthen/<string:eur>', methods=['GET'])
 def control_bulb_market(eur):
-    BulbControl().__init__()
+    RelayControl().__init__()
     market_status = AwattarService()
     market_status.check_market_price(eur)
     return jsonify("Executed sucessful..")
@@ -56,7 +56,7 @@ def control_bulb_market(eur):
 
 @app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
 def update_socket_controller(switchNumber, switchStatus):
-    BulbControl().__init__()
+    RelayControl().__init__()
     relay_switch_controller(switchNumber, switchStatus)
     return jsonify("Executed sucessful..")
 

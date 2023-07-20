@@ -35,14 +35,14 @@ def get_bulbon():
     #        exec(control.read())
     RelayControl().__init__()
     enable_relay1()
-    return jsonify("Executed successful..")
+    return jsonify({"status": "true"})
 
 
 @app.route('/api/bulboff', methods=['GET'])
 def get_bulboff():
     RelayControl().__init__()
     disable_relay1()
-    return jsonify("Executed sucessful..")
+    return jsonify({"status": "true"})
 
 
 # According to market price

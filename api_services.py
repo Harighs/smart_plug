@@ -29,6 +29,7 @@ def get_items():
     return jsonify(data)
 
 
+# TODO Exception handling
 @app.route('/api/bulbon', methods=['GET'])
 def get_bulbon():
     #    with open('smart_plug/raspberrypi_controller.py') as control:

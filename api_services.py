@@ -126,6 +126,7 @@ def averageAwattarPriceOverPeriod(fromDate, toDate):
 
 if __name__ == '__main__':
     #    app.run(debug=True)
-    custom_ip = '192.168.1.166'
+    # custom_ip = '192.168.1.166'
+    custom_ip = '192.168.0.4'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)

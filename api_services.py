@@ -52,14 +52,14 @@ def control_bulb_market(eur):
     RelayControl().__init__()
     market_status = AwattarService()
     market_status.check_market_price(eur)
-    return jsonify("Executed sucessful..")
+    return jsonify({"status": "true"})
 
 
 @app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
 def update_socket_controller(switchNumber, switchStatus):
     RelayControl().__init__()
     relay_switch_controller(switchNumber, switchStatus)
-    return jsonify("Executed sucessful..")
+    return jsonify({"status": "true"})
 
 
 # Endpoint to get a specific item by ID
@@ -98,6 +98,30 @@ def delete_item(item_id):
     global data
     data = [item for item in data if item['id'] != item_id]
     return jsonify({"message": "Item deleted successfully"}), 200
+
+
+## Report 1 - Energy consumed over selected time period
+@app.route('/api/report1', methods=['POST'])
+def energyConsumedOverPeriod(fromDate, toDate):
+    return
+
+
+## Report 2 - Costs of energy consumed = Sum of all hourly Energy consumed x Awattar price
+@app.route('/api/report2', methods=['GET'])
+def costsOfEnergyConsumed():
+    return
+
+
+## Report 3 - Average effective price = Costs of energy consumed over period divided by Energy consumed over period
+@app.route('/api/report3', methods=['GET'])
+def averageEffectivePrice():
+    return
+
+
+## Report 4 - Average Awattar price over period
+@app.route('/api/report4', methods=['POST'])
+def averageAwattarPriceOverPeriod(fromDate, toDate):
+    return
 
 
 if __name__ == '__main__':

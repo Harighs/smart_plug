@@ -40,4 +40,26 @@ class AwattarService:
                 continue
 
     
-    
+    def report_4(self, start_time, end_time):
+        """
+        start_time: str eg: '2023-07-25 15:00:00'
+        end_time: str eg: '2023-07-25 17:00:00'
+        """
+        # Define the format of the string
+        date_format = '%Y-%m-%d %H:%M:%S'
+        try:
+            start_time = datetime.datetime.strptime(start_time, date_format)
+        except:
+            print('start_time is not in the correct format')
+            raise ValueError('start_time is not in the correct format')
+
+        try:
+            end_time = datetime.datetime.strptime(start_time, date_format)
+        except:
+            print('end_time is not in the correct format')
+            raise ValueError('end_time is not in the correct format')
+        
+        # adding 1 hour to end_time to include the end_time
+        end_time = end_time + datetime.timedelta(hours=1)
+        filter_df = self.marketdata_df[(self.marketdata_df['start_timestamp'] >= start_time) & (self.marketdata_df['end_timestamp'] <= end_time)]
+        return filter_df['marketprice'].mean()

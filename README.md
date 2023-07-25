@@ -1,11 +1,24 @@
-# smart_plug
+# ENERMIZER
 
-This repository is for the experiment of smarplut using RPi Zero
+### Overview
+The goal of this project is to use smartphones and smart IoT devices to transform the home into
+a smart power ecosystem. The background process and business rules will monitor current
+electricity rates and consume power based on the rate.
 
-### Working:
+### Initial setup
+The following are the process involved for initial setup
+1. Clone this repository
+2. Navigate to the clone directory `cd smart_plug`
+3. Install all necessary python packages
+4. Execute the following command to start the API_SERVICES
+   `python3 api_services.py`
+5. You will see the API_SERVICES running of the following link
+   `http://192.168.1.166:8080/api/`
+6. Using the above services you can perform all the Raspberry Pi operations
+   For example: Accessing the GPIO pins, activating and deactivating relays and more.
 
-1. Just clone the repository
-2. Navigate to this repository by `cd smart_plug/`
-3. Enter the command `python3 control.py`
-4. Code will start running and insitates the plugs.
-5. You can control the plugs by entering <1 to 4> and again <1 for on 0 for off>
+### Contact 
+# Developers
+Harishankar Govindsamy | harishankarghs@gmail.com
+Muthukumar Neelamegam | kumar.neelamegam17@gmail.com
+

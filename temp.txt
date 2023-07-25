@@ -1,0 +1,33 @@
+Report 1 - Energy consumed over selected time period
+Create an api based on from and to date.
+Should be post method with two parameters.
+
+------------
+Report 2 - Costs of energy consumed = Sum of all hourly Energy consumed x Awattar price
+Peter:
+The Costs of Energy consumed (energy consumption costs) are for every hour the energy used during this hour times the aWattar price for this hour.
+The sum total of these numbers over the defined  period.  This number divided by the energy consumed results in the Average Effective Price.
+
+
+------------
+Report 3 - Average effective price = Costs of energy consumed over period divided by Energy consumed over period
+
+
+------------
+Report 4 - Average Awattar price over period
+
+
+------------
+Peter: In addition the app needs to calculate the average of all awattar prices of the selected period.
+Get the average Awattar price over the selected period.
+Create an api based on the selected from and to date.
+Should be post method with from date and to date.
+
+
+------------
+Report 5 - Savings = Costs of energy consumed minus Sum of all hourly Energy consumed x Average Awattar price
+
+The difference between this average price and the above average effective price will be multiplied with the energy consumed to
+result in the total costs saved.
+
+------------

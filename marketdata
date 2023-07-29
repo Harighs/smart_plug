@@ -2,12 +2,6 @@
     "object": "list",
     "data": [
         {
-            "start_timestamp": 1690610400000,
-            "end_timestamp": 1690614000000,
-            "marketprice": 85.79,
-            "unit": "Eur/MWh"
-        },
-        {
             "start_timestamp": 1690614000000,
             "end_timestamp": 1690617600000,
             "marketprice": 81.71,

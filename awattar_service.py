@@ -1,6 +1,7 @@
 import pandas as pd
 import datetime
 from control import BulbControl
+import requests
 
 class AwattarService:
     def __init__(self):
@@ -12,7 +13,15 @@ class AwattarService:
         marketdata_df['end_timestamp'] = pd.to_datetime(marketdata_df['end_timestamp'], unit='ms')
         self.marketdata_df = marketdata_df
         self.bulb = BulbControl()
-        
+
+    def update_marketdata(self):
+        self.url = "https://api.awattar.at/v1/marketdata"
+        marketdata_df = requests.get(url).json()
+        marketdata_df.to_csv('marketdata.csv', index=False)
+        one_day_df = pd.json_normalize(marketdata_df['data'])
+        one_day_df.to_csv('marketdata.csv', mode='a', header=False, index=False)
+        return True
+
     def check_market_price(self, eur:str):
         # This code runs whene current day max() price is less then 25% off
         # creterion_timestamp = self.marketdata_df[self.marketdata_df['marketprice'] <= self.marketdata_df['marketprice'].max()*0.75]
@@ -21,10 +30,7 @@ class AwattarService:
         current_time = datetime.datetime.now().time()
         print(current_time)
         print(creterion_timestamp)
-        print(int(eur))
-        # Iterate over the rows of the DataFrame
-        for _, row in creterion_timestamp.iterrows():
-            start_time = row['start_timestamp'].time()
+        print(int(eur))++stamp'].time()
             end_time = row['end_timestamp'].time()
 
             # Check if the current time is within the start and end time for the current row

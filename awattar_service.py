@@ -15,8 +15,20 @@ class AwattarService:
         self.bulb = BulbControl()
 
     def update_marketdata(self):
+        """
+        This function updates the marketdata.json file and append to marketdata.csv
+        
+        Input: None
+        
+        Output: Boolean
+        
+        Usage:
+            awattar_service = AwattarService()
+            awattar_service.update_marketdata() --> True # This will append the current day data to the marketdata.csv file
+                csv file.
+        """
         self.url = "https://api.awattar.at/v1/marketdata"
-        marketdata_df = requests.get(url).json()
+        marketdata_df = requests.get(self.url).json()
         marketdata_df.to_csv('marketdata.csv', index=False)
         one_day_df = pd.json_normalize(marketdata_df['data'])
         one_day_df.to_csv('marketdata.csv', mode='a', header=False, index=False)
@@ -30,7 +42,7 @@ class AwattarService:
         current_time = datetime.datetime.now().time()
         print(current_time)
         print(creterion_timestamp)
-        print(int(eur))++stamp'].time()
+        print(int(eur))+stamp'].time()
             end_time = row['end_timestamp'].time()
 
             # Check if the current time is within the start and end time for the current row
@@ -48,8 +60,18 @@ class AwattarService:
     
     def report_4(self, start_time, end_time):
         """
-        start_time: str eg: '2023-07-25 15:00:00'
-        end_time: str eg: '2023-07-25 17:00:00'
+        This function returns the average price for a given time period
+        
+        Inputs:
+            start_time: str eg: '2023-07-25 15:00:00'
+            end_time: str eg: '2023-07-25 17:00:00'
+        
+        Output: average_price: float
+        
+        Usage:
+            awattar_service = AwattarService()
+            awattar_service.report_4('2023-07-25 15:00:00', '2023-07-25 17:00:00') --> 0.123
+            
         """
         # Define the format of the string
         date_format = '%Y-%m-%d %H:%M:%S'

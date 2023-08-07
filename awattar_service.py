@@ -58,8 +58,9 @@ class AwattarService:
                 continue
 
     
-    def report_4(self, start_time, end_time):
+    def get_average_awattar_price_over_period(self, start_time, end_time):
         """
+        REPORT 4:
         This function returns the average price for a given time period
         
         Inputs:

@@ -15,7 +15,7 @@ Report 3 - Average effective price = Costs of energy consumed over period divide
 
 ------------
 Report 4 - Average Awattar price over period
-
+(DONE)
 
 ------------
 Peter: In addition the app needs to calculate the average of all awattar prices of the selected period.

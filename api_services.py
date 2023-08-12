@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, jsonify, request
 
+from awattar_service import get_average_awattar_price_over_period
 from backend_services import AwattarService
 from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
 
@@ -103,30 +104,31 @@ def delete_item(item_id):
 ## Report 1 - Energy consumed over selected time period
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod(fromDate, toDate):
+    # TODO
     return
-
 
 ## Report 2 - Costs of energy consumed = Sum of all hourly Energy consumed x Awattar price
 @app.route('/api/report2', methods=['GET'])
 def costsOfEnergyConsumed():
+    # TODO
     return
 
 
 ## Report 3 - Average effective price = Costs of energy consumed over period divided by Energy consumed over period
 @app.route('/api/report3', methods=['GET'])
 def averageEffectivePrice():
+    # TODO
     return
 
 
 ## Report 4 - Average Awattar price over period
-@app.route('/api/report4', methods=['POST'])
+@app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
 def averageAwattarPriceOverPeriod(fromDate, toDate):
-    return
+    return jsonify({"message", get_average_awattar_price_over_period(fromDate, toDate)}), 200
 
 
 if __name__ == '__main__':
     #    app.run(debug=True)
-    # custom_ip = '192.168.1.166'
-    custom_ip = '192.168.0.4'
+    custom_ip = '192.168.1.166'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)

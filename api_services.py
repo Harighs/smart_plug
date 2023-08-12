@@ -5,6 +5,8 @@ from flask import Flask, jsonify, request
 from awattar_service import get_average_awattar_price_over_period
 from backend_services import AwattarService
 from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
+from smartmeter_services import SmartMeter
+
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -55,6 +57,20 @@ def control_bulb_market(eur):
     market_status.check_market_price(eur)
     return jsonify({"status": "true"})
 
+# Update Market data
+@app.route('/api/update_market_data', methods=['GET'])
+def update_market_data():
+    RelayControl().__init__()
+    market_status = AwattarService().update_marketdata()
+    return True
+
+
+# Udate Smart Meter data
+@app.route('/api/update_smart_meter_data', methods=['GET'])
+def update_smart_meter_data():
+    smart_meter = SmartMeter()
+    today_data = smart_meter.smart_meter_data # Its a dataframe
+    return today_data
 
 @app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
 def update_socket_controller(switchNumber, switchStatus):

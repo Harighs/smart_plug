@@ -34,7 +34,7 @@ class SmartMeter():
             
             if self.data_response(self, data_url, headers):
                 data_response = requests.get(data_url, headers=headers).json()
-                self.smart_meter_data = pd.DataFrame(data_response[0])
+                self.SMART_METER_DATA = pd.DataFrame(data_response[0])
             else:
                 print("Data request failed with status code:", data_response.status_code)
         else:

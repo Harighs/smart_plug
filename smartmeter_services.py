@@ -34,13 +34,11 @@ class SmartMeter():
             
             if self.data_response(self, data_url, headers):
                 data_response = requests.get(data_url, headers=headers).json()
-                return pd.DataFrame(data_response[0])
+                self.smart_meter_data = pd.DataFrame(data_response[0])
             else:
                 print("Data request failed with status code:", data_response.status_code)
-                return None
         else:
             print("Authentication failed with status code:", self.auth_response.status_code)
-            return None
             
 
     @staticmethod

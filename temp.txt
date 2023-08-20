@@ -49,13 +49,13 @@ getReports(fromDate, toDate) {
 
 
    create a internal method for retrieving the values of all the reports
-    // Report 1 - Energy consumed over period of time
+    // Report 1 - Energy consumed over period of time [DONE]
 
     // Report 2 - Costs of energy consumed - (Sum of all hourly Energy consumed x Awattar price)
 
     // Report 3 - Average effective price - (Costs of energy consumed over period divided by Energy consumed over period)
 
-    // Report 4 - Average Awattar price over period
+    // Report 4 - Average Awattar price over period [DONE]
 
     // Report 5 - Savings - Costs of energy consumed minus Sum of all hourly Energy consumed x Average Awattar price
 

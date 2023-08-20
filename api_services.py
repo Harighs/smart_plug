@@ -120,28 +120,79 @@ def delete_item(item_id):
 ## Report 1 - Energy consumed over selected time period
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod(fromDate, toDate):
-    # TODO
-    return
+    smartmeter_data = SmartMeter()
+    data = smartmeter_data.SMART_METER_DATA #DF
+    data = data['meteredValues'].sum() # --> float
+    
+    # assign globe variable
+    global report1
+    report1 = data
+    
+    return jsonify({"message", data}), 200
+
+    
 
 ## Report 2 - Costs of energy consumed = Sum of all hourly Energy consumed x Awattar price
 @app.route('/api/report2', methods=['GET'])
 def costsOfEnergyConsumed():
     # TODO
-    return
+    """
+    R2 = R1 x R4
+    # find the unit of R2
+    """
+    R1, R4 = get_r1_and_r4_value(fromDate, toDate)
+    # assign globe variable
+    global report2
+    report2 = R1*R4
+    return jsonify({"message", report2}), 200
 
 
 ## Report 3 - Average effective price = Costs of energy consumed over period divided by Energy consumed over period
 @app.route('/api/report3', methods=['GET'])
 def averageEffectivePrice():
     # TODO
-    return
+    """
+    R3 = R2/R1
+    # find the unit of R3
+    
+    """
+    global report3
+    report3 = report2 / report1
+    return jsonify({"message", report3}), 200
 
 
 ## Report 4 - Average Awattar price over period
 @app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
 def averageAwattarPriceOverPeriod(fromDate, toDate):
-    return jsonify({"message", get_average_awattar_price_over_period(fromDate, toDate)}), 200
+    global report4
+    
+    report4 = get_average_awattar_price_over_period(fromDate, toDate)
+    return jsonify({"message", report4}), 200
 
+## Report 5 - Savings = Costs of energy consumed minus Sum of all hourly Energy consumed x Average Awattar price
+@app.route('/api/report5/<string:fromDate>/<string:toDate>', methods=['POST'])
+def averageAwattarPriceOverPeriod(fromDate, toDate):
+    """
+    R5 = R2 - R1 x R4
+    """
+    global report5
+    report5 = report2 - report1 * report4
+    return jsonify({"message", report5}), 200
+
+def get_r1_and_r4_value(fromDate, toDate):
+    # get R1 value
+    smartmeter_data = SmartMeter()
+    data = smartmeter_data.SMART_METER_DATA #DF
+    R1 = data['meteredValues'].sum() # --> float
+    
+    # get R4 value
+    R4 = get_average_awattar_price_over_period(fromDate, toDate)
+    
+    return R1, R4
+
+def global_api():
+    
+    return jsonify({"message", report5}), 200
 
 if __name__ == '__main__':
     #    app.run(debug=True)

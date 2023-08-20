@@ -116,10 +116,9 @@ def delete_item(item_id):
     data = [item for item in data if item['id'] != item_id]
     return jsonify({"message": "Item deleted successfully"}), 200
 
+###
 
-## Report 1 - Energy consumed over selected time period
-@app.route('/api/report1', methods=['POST'])
-def energyConsumedOverPeriod(fromDate, toDate):
+def Report1():
     smartmeter_data = SmartMeter()
     data = smartmeter_data.SMART_METER_DATA #DF
     data = data['meteredValues'].sum() # --> float
@@ -127,57 +126,54 @@ def energyConsumedOverPeriod(fromDate, toDate):
     # assign globe variable
     global report1
     report1 = data
-    
-    return jsonify({"message", data}), 200
+  
+    return None
 
-    
-
-## Report 2 - Costs of energy consumed = Sum of all hourly Energy consumed x Awattar price
-@app.route('/api/report2', methods=['GET'])
-def costsOfEnergyConsumed():
-    # TODO
-    """
-    R2 = R1 x R4
-    # find the unit of R2
-    """
+def Report2():
     R1, R4 = get_r1_and_r4_value(fromDate, toDate)
     # assign globe variable
     global report2
     report2 = R1*R4
-    return jsonify({"message", report2}), 200
+    return None
 
-
-## Report 3 - Average effective price = Costs of energy consumed over period divided by Energy consumed over period
-@app.route('/api/report3', methods=['GET'])
-def averageEffectivePrice():
-    # TODO
-    """
-    R3 = R2/R1
-    # find the unit of R3
-    
-    """
+def Report3():
     global report3
     report3 = report2 / report1
-    return jsonify({"message", report3}), 200
+    return None
 
-
-## Report 4 - Average Awattar price over period
-@app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
-def averageAwattarPriceOverPeriod(fromDate, toDate):
+def Report4():
     global report4
-    
     report4 = get_average_awattar_price_over_period(fromDate, toDate)
-    return jsonify({"message", report4}), 200
+    return None
 
-## Report 5 - Savings = Costs of energy consumed minus Sum of all hourly Energy consumed x Average Awattar price
-@app.route('/api/report5/<string:fromDate>/<string:toDate>', methods=['POST'])
-def averageAwattarPriceOverPeriod(fromDate, toDate):
-    """
-    R5 = R2 - R1 x R4
-    """
+def Report5():
     global report5
     report5 = report2 - report1 * report4
-    return jsonify({"message", report5}), 200
+    return None
+
+@app.route('/api/getallreports', methods=['POST'])
+def getAllReports(fromDate, toDate):
+    
+    """
+    call report 1 and report 4
+    then call report 2, 3, 5 
+    then return all the reports
+    I will send you the return json format - TBD
+    """
+    
+    report1 = Report1()
+    report4 = Report4()
+    report2 = Report2()
+    report3 = Report3()
+    report5 = Report5()
+    
+    returndata = ""
+    """
+    
+    {"status":"{"report1":"report1", "report2":"report2", "report3":"report3", "report4":"report4", "report5":"report5"}"}"}
+    
+    """
+    return jsonify({"message", "{returndata}"}), 200
 
 def get_r1_and_r4_value(fromDate, toDate):
     # get R1 value

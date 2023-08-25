@@ -5,34 +5,43 @@ import requests
 
 class AwattarService:
     def __init__(self):
-        marketdata_df = pd.read_json('marketdata.json')
-        marketdata_df = pd.json_normalize(marketdata_df['data'])
+        url = "https://api.awattar.at/v1/marketdata"
+        marketdata_df = requests.get(url).json()
+        self.one_day_df = pd.json_normalize(marketdata_df['data'])
+        self.one_day_df['start_timestamp'] = pd.to_datetime(self.one_day_df['start_timestamp'], unit='ms')
+        self.one_day_df['end_timestamp'] = pd.to_datetime(self.one_day_df['end_timestamp'], unit='ms')
+        return None
+    
+    # def __init__(self):
+    #     marketdata_df = pd.read_json('marketdata.json')
+    #     marketdata_df = pd.json_normalize(marketdata_df['data'])
 
-        # Convert 'start_timestamp' and 'end_timestamp' columns to datetime
-        marketdata_df['start_timestamp'] = pd.to_datetime(marketdata_df['start_timestamp'], unit='ms')
-        marketdata_df['end_timestamp'] = pd.to_datetime(marketdata_df['end_timestamp'], unit='ms')
-        self.marketdata_df = marketdata_df
-        self.bulb = BulbControl()
+    #     # Convert 'start_timestamp' and 'end_timestamp' columns to datetime
+    #     marketdata_df['start_timestamp'] = pd.to_datetime(marketdata_df['start_timestamp'], unit='ms')
+    #     marketdata_df['end_timestamp'] = pd.to_datetime(marketdata_df['end_timestamp'], unit='ms')
+    #     self.marketdata_df = marketdata_df
+    #     self.bulb = BulbControl()
 
-    def update_marketdata(self):
-        """
-        This function updates the marketdata.json file and append to marketdata.csv
+    # def update_marketdata(self):
+    #     """
+    #     This function updates the marketdata.json file and append to marketdata.csv
         
-        Input: None
+    #     Input: None
         
-        Output: Boolean
+    #     Output: Boolean
         
-        Usage:
-            awattar_service = AwattarService()
-            awattar_service.update_marketdata() --> True # This will append the current day data to the marketdata.csv file
-                csv file.
-        """
-        self.url = "https://api.awattar.at/v1/marketdata"
-        marketdata_df = requests.get(self.url).json()
-        marketdata_df.to_csv('marketdata.csv', index=False)
-        one_day_df = pd.json_normalize(marketdata_df['data'])
-        one_day_df.to_csv('marketdata.csv', mode='a', header=False, index=False)
-        return True
+    #     Usage:
+    #         awattar_service = AwattarService()
+    #         awattar_service.update_marketdata() --> True # This will append the current day data to the marketdata.csv file
+    #             csv file.
+    #     """
+
+    #     url = "https://api.awattar.at/v1/marketdata"
+    #     marketdata_df = requests.get(url).json()
+    #     # marketdata_df.to_csv('marketdata.csv', index=False)
+    #     one_day_df = pd.json_normalize(marketdata_df['data'])
+    #     one_day_df.to_csv('marketdata.csv', mode='a', header=False, index=False)
+    #     return True
 
     def check_market_price(self, eur:str):
         # This code runs whene current day max() price is less then 25% off
@@ -77,8 +86,6 @@ class AwattarService:
             
         """
         # Define the format of the string
-        start_time = '2023-08-25 15:00:00'
-        end_time = '2023-08-25 17:00:00'
         date_format = '%Y-%m-%d %H:%M:%S'
         try:
             start_time = datetime.datetime.strptime(start_time, date_format)
@@ -95,4 +102,4 @@ class AwattarService:
         # adding 1 hour to end_time to include the end_time
         end_time = end_time + datetime.timedelta(hours=1)
         filter_df = self.marketdata_df[(self.marketdata_df['start_timestamp'] >= start_time) & (self.marketdata_df['end_timestamp'] <= end_time)]
-        return filter_df['marketprice'].mean()
+        return str(filter_df['marketprice'].mean())

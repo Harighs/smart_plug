@@ -2,7 +2,6 @@ import os
 
 from flask import Flask, jsonify, request
 
-from awattar_service import get_average_awattar_price_over_period
 from backend_services import AwattarService
 from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
 from smartmeter_services import SmartMeter

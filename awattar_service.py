@@ -94,7 +94,7 @@ class AwattarService:
             raise ValueError('start_time is not in the correct format')
 
         try:
-            end_time = datetime.datetime.strptime(start_time, date_format)
+            end_time = datetime.datetime.strptime(end_time, date_format)
         except:
             print('end_time is not in the correct format')
             raise ValueError('end_time is not in the correct format')

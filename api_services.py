@@ -30,7 +30,7 @@ def rest_api():
 def energyConsumedOverPeriod():
     smartmeter_data = SmartMeter()
     if smartmeter_data.get_data():
-        data = 'Sucess'
+        data = 5555
     
     # data = data['meteredValues'].sum() # --> float
     
@@ -38,7 +38,7 @@ def energyConsumedOverPeriod():
     # global report1
     # report1 = data
     
-    return jsonify({"message", data}), 200
+    return jsonify({f"message:{data}"}), 200
 
 
 

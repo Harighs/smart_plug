@@ -16,31 +16,32 @@ class SmartMeter():
             smartmeter = SmartMeter() --> Returns a SmartMeter object as Dataframe which can be stored
         """   
         # URL for authentication
-        self.auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
-        self.auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+        # self.auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
+        # self.auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
         
-        if self.post_request(self):
-            print("Authentication successful")
-            auth_cookie = self.auth_response.cookies['__Host-go4DavidSecurityToken']
-            auth_xsrf_token = self.auth_response.cookies['XSRF-Token']
+        # if self.post_request(self):
+        #     print("Authentication successful")
+        #     auth_cookie = self.auth_response.cookies['__Host-go4DavidSecurityToken']
+        #     auth_xsrf_token = self.auth_response.cookies['XSRF-Token']
 
-            # URL for fetching data
-            data_url = f"https://smartmeter.netz-noe.at/orchestration/User/GetMeteringPointByAccountId?accountId=000019014443"
+        #     # URL for fetching data
+        #     data_url = f"https://smartmeter.netz-noe.at/orchestration/User/GetMeteringPointByAccountId?accountId=000019014443"
             
-            headers = {
-                'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
-            }
+        #     headers = {
+        #         'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
+        #     }
             
-            if self.data_response(self, data_url, headers):
-                data_response = requests.get(data_url, headers=headers).json()
-                self.SMART_METER_DATA = pd.DataFrame(data_response[0])
-                (self.SMART_METER_DATA)
-                print("HARI ---- SUCESS#######################")
-            else:
-                print("Data request failed with status code:", 'DATA FAILURE')
-        else:
-            print("Authentication failed with status code:", self.auth_response.status_code)
-            
+        #     if self.data_response(self, data_url, headers):
+        #         data_response = requests.get(data_url, headers=headers).json()
+        #         self.SMART_METER_DATA = pd.DataFrame(data_response[0])
+        #         (self.SMART_METER_DATA)
+        #         print("HARI ---- SUCESS#######################")
+        #     else:
+        #         print("Data request failed with status code:", 'DATA FAILURE')
+        # else:
+        #     print("Authentication failed with status code:", self.auth_response.status_code)
+        return True
+    
     def get_data(self):
         auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
         auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}

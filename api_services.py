@@ -117,6 +117,12 @@ def delete_item(item_id):
     return jsonify({"message": "Item deleted successfully"}), 200
 
 
+## Test Report - test report
+@app.route('/api/test', methods=['POST'])
+def api_test():    
+    return jsonify({"message", 'sucess'}), 200
+
+
 ## Report 1 - Energy consumed over selected time period
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod(fromDate, toDate):

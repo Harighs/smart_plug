@@ -37,10 +37,7 @@ def energyConsumedOverPeriod():
 @app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
 def averageAwattarPriceOverPeriod(fromDate, toDate):
     get_avg_data = AwattarService()
-    if get_avg_data.update_marketdata():
-        data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
-    else:
-        print("################ Failure #################")
+    data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
     return jsonify({"message": str(data)}), 200
     
 

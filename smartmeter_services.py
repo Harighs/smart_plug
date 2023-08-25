@@ -31,12 +31,12 @@ class SmartMeter():
                 'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
             }
             
-            
+            data_response = None
             if self.data_response(self, data_url, headers):
                 data_response = requests.get(data_url, headers=headers).json()
                 self.SMART_METER_DATA = pd.DataFrame(data_response[0])
             else:
-                print("Data request failed with status code:", data_response.status_code)
+                print("Data request failed with status code:", 'DATA FAILURE')
         else:
             print("Authentication failed with status code:", self.auth_response.status_code)
             

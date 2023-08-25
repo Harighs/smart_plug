@@ -37,7 +37,7 @@ def energyConsumedOverPeriod():
     # # assign globe variable
     # global report1
     # report1 = data
-    return jsonify({"status": "true"})
+    return jsonify({"message": str(data)}), 200
 
     # return jsonify({f"message": str{data}}), 200
 

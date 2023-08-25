@@ -40,7 +40,7 @@ def averageAwattarPriceOverPeriod():
     print(new_item)
     #get_avg_data = AwattarService()
     #data = get_avg_data.get_average_awattar_price_over_period("fromDate", "toDate")
-    return jsonify({"message": str(data)}), 200
+    return jsonify({"message": str(111)}), 200
     
 
 

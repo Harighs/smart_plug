@@ -29,12 +29,13 @@ def rest_api():
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod():
     smartmeter_data = SmartMeter()
-    data = smartmeter_data.get_data()
-    data = data['meteredValues'].sum() # --> float
+    if smartmeter_data.get_data()
+        data = 'Sucess'
+    # data = data['meteredValues'].sum() # --> float
     
-    # assign globe variable
-    global report1
-    report1 = data
+    # # assign globe variable
+    # global report1
+    # report1 = data
     
     return jsonify({"message", data}), 200
 

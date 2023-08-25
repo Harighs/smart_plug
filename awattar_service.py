@@ -101,5 +101,5 @@ class AwattarService:
         
         # adding 1 hour to end_time to include the end_time
         end_time = end_time + datetime.timedelta(hours=1)
-        filter_df = self.marketdata_df[(self.marketdata_df['start_timestamp'] >= start_time) & (self.marketdata_df['end_timestamp'] <= end_time)]
+        filter_df = self.one_day_df[(self.one_day_df['start_timestamp'] >= start_time) & (self.one_day_df['end_timestamp'] <= end_time)]
         return filter_df['marketprice'].mean()

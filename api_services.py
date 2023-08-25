@@ -29,7 +29,7 @@ def rest_api():
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod():
     smartmeter_data = SmartMeter()
-    data = smartmeter_data.SMART_METER_DATA #DF
+    data = smartmeter_data.get_data()
     data = data['meteredValues'].sum() # --> float
     
     # assign globe variable

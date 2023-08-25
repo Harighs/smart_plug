@@ -174,15 +174,15 @@ def averageAwattarPriceOverPeriod(fromDate, toDate):
     report4 = get_average_awattar_price_over_period(fromDate, toDate)
     return jsonify({"message", report4}), 200
 
-## Report 5 - Savings = Costs of energy consumed minus Sum of all hourly Energy consumed x Average Awattar price
-@app.route('/api/report5/<string:fromDate>/<string:toDate>', methods=['POST'])
-def averageAwattarPriceOverPeriod(fromDate, toDate):
-    """
-    R5 = R2 - R1 x R4
-    """
-    global report5
-    report5 = report2 - report1 * report4
-    return jsonify({"message", report5}), 200
+# ## Report 5 - Savings = Costs of energy consumed minus Sum of all hourly Energy consumed x Average Awattar price
+# @app.route('/api/report5/<string:fromDate>/<string:toDate>', methods=['POST'])
+# def averageAwattarPriceOverPeriod(fromDate, toDate):
+#     """
+#     R5 = R2 - R1 x R4
+#     """
+#     global report5
+#     report5 = report2 - report1 * report4
+#     return jsonify({"message", report5}), 200
 
 def get_r1_and_r4_value(fromDate, toDate):
     # get R1 value

@@ -117,7 +117,7 @@ def delete_item(item_id):
 
 
 ## Test Report - test report
-@app.route('/api/test', methods=['POST'])
+@app.route('/api/test', methods=['GET'])
 def api_test():    
     return jsonify({"message", 'sucess'}), 200
 

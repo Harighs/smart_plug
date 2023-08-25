@@ -29,8 +29,7 @@ def rest_api():
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod():
     smartmeter_data = SmartMeter()
-    if smartmeter_data.get_data():
-        data = 5555
+    data = smartmeter_data.get_data() ## STR value
     
     # data = data['meteredValues'].sum() # --> float
     
@@ -39,7 +38,6 @@ def energyConsumedOverPeriod():
     # report1 = data
     return jsonify({"message": str(data)}), 200
 
-    # return jsonify({f"message": str{data}}), 200
 
 
 

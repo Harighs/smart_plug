@@ -42,7 +42,23 @@ class SmartMeter():
             print("Authentication failed with status code:", self.auth_response.status_code)
             
     def get_data(self):
-        return True
+        auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
+        auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+
+        auth_response = requests.post(auth_url, json=auth_payload)
+        auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
+        auth_xsrf_token = auth_response.cookies['XSRF-Token']
+        ### TODO: update date from mobile 
+        data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day=2023-8-24&__Host-go4DavidSecurityToken={auth_cookie}"
+
+        headers = {
+            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
+        }
+
+        data_response = requests.get(data_url, headers=headers).json()
+        data = pd.DataFrame(data_response)
+        data['meteredValues'].sum()
+        return data
     
     @staticmethod
     def post_request(self):

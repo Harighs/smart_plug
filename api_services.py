@@ -34,10 +34,12 @@ def energyConsumedOverPeriod():
 
 ########### REPORT - 4 ############
 ## Report 4 - Average Awattar price over period
-@app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
-def averageAwattarPriceOverPeriod(fromDate, toDate):
-    get_avg_data = AwattarService()
-    data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
+@app.route('/api/report4', methods=['POST'])
+def averageAwattarPriceOverPeriod():
+    new_item = request.json
+    print(new_item)
+    #get_avg_data = AwattarService()
+    #data = get_avg_data.get_average_awattar_price_over_period("fromDate", "toDate")
     return jsonify({"message": str(data)}), 200
     
 

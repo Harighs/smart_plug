@@ -19,10 +19,26 @@ data = [
     {"id": 3, "name": "Item 3", "description": "Description of Item 3"}
 ]
 
-
+########### TESTING ############
 @app.route('/api/', methods=['GET'])
 def rest_api():
     return jsonify("You're accessing the Enermizer API Services.")
+
+########### REPORT - 1 ############
+## Report 1 - Energy consumed over selected time period
+@app.route('/api/report1', methods=['POST'])
+def energyConsumedOverPeriod():
+    smartmeter_data = SmartMeter()
+    data = smartmeter_data.SMART_METER_DATA #DF
+    data = data['meteredValues'].sum() # --> float
+    
+    # assign globe variable
+    global report1
+    report1 = data
+    
+    return jsonify({"message", data}), 200
+
+
 
 
 # Endpoint to get all items
@@ -122,18 +138,6 @@ def api_test():
     return jsonify({"message", 'sucess'}), 200
 
 
-## Report 1 - Energy consumed over selected time period
-@app.route('/api/report1', methods=['POST'])
-def energyConsumedOverPeriod(fromDate, toDate):
-    smartmeter_data = SmartMeter()
-    data = smartmeter_data.SMART_METER_DATA #DF
-    data = data['meteredValues'].sum() # --> float
-    
-    # assign globe variable
-    global report1
-    report1 = data
-    
-    return jsonify({"message", data}), 200
 
     
 

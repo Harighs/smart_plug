@@ -29,16 +29,17 @@ def rest_api():
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod():
     smartmeter_data = SmartMeter()
-    data = smartmeter_data.get_data() ## STR value
-    
-    # data = data['meteredValues'].sum() # --> float
-    
-    # # assign globe variable
-    # global report1
-    # report1 = data
+    data = smartmeter_data.get_data() ## str: value
     return jsonify({"message": str(data)}), 200
 
-
+########### REPORT - 4 ############
+## Report 4 - Average Awattar price over period
+@app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
+def averageAwattarPriceOverPeriod(fromDate, toDate):
+    get_avg_data = AwattarService()
+    data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
+    return jsonify({"message": str(data)}), 200
+    
 
 
 
@@ -170,14 +171,6 @@ def averageEffectivePrice():
     report3 = report2 / report1
     return jsonify({"message", report3}), 200
 
-
-## Report 4 - Average Awattar price over period
-@app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
-def averageAwattarPriceOverPeriod(fromDate, toDate):
-    global report4
-    
-    report4 = get_average_awattar_price_over_period(fromDate, toDate)
-    return jsonify({"message", report4}), 200
 
 # ## Report 5 - Savings = Costs of energy consumed minus Sum of all hourly Energy consumed x Average Awattar price
 # @app.route('/api/report5/<string:fromDate>/<string:toDate>', methods=['POST'])

@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+from urllib.parse import quote
 
 
 class SmartMeter():
@@ -58,7 +59,7 @@ class SmartMeter():
 
         data_response = requests.get(data_url, headers=headers).json()
         data = pd.DataFrame(data_response)
-        data['meteredValues'].sum()
+        data = data['meteredValues'].sum()
         return data
     
     @staticmethod

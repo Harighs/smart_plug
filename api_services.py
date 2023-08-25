@@ -38,6 +38,8 @@ def energyConsumedOverPeriod():
 def averageAwattarPriceOverPeriod():
     new_item = request.json
     print(new_item)
+    print(new_item['fromDate'])
+    print(new_item['toDate'])
     #get_avg_data = AwattarService()
     #data = get_avg_data.get_average_awattar_price_over_period("fromDate", "toDate")
     return jsonify({"message": str(111)}), 200

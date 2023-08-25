@@ -40,7 +40,7 @@ class SmartMeter():
         #         print("Data request failed with status code:", 'DATA FAILURE')
         # else:
         #     print("Authentication failed with status code:", self.auth_response.status_code)
-        return True
+        return None
     
     def get_data(self):
         auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'

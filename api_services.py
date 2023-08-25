@@ -2,7 +2,7 @@ import os
 
 from flask import Flask, jsonify, request
 
-from backend_services import AwattarService
+from awattar_service import AwattarService
 from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
 from smartmeter_services import SmartMeter
 
@@ -37,7 +37,10 @@ def energyConsumedOverPeriod():
 @app.route('/api/report4/<string:fromDate>/<string:toDate>', methods=['POST'])
 def averageAwattarPriceOverPeriod(fromDate, toDate):
     get_avg_data = AwattarService()
-    data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
+    if get_avg_data.update_marketdata():
+        data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
+    else:
+        print("################ Failure #################")
     return jsonify({"message": str(data)}), 200
     
 

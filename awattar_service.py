@@ -77,8 +77,8 @@ class AwattarService:
             
         """
         # Define the format of the string
-        start_time = '2023-07-24 15:00:00'
-        end_time = '2023-07-24 17:00:00'
+        start_time = '2023-08-25 15:00:00'
+        end_time = '2023-08-25 17:00:00'
         date_format = '%Y-%m-%d %H:%M:%S'
         try:
             start_time = datetime.datetime.strptime(start_time, date_format)

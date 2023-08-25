@@ -12,6 +12,7 @@ class AwattarService:
         self.one_day_df['end_timestamp'] = pd.to_datetime(self.one_day_df['end_timestamp'], unit='ms')
         return None
     
+    
     # def __init__(self):
     #     marketdata_df = pd.read_json('marketdata.json')
     #     marketdata_df = pd.json_normalize(marketdata_df['data'])

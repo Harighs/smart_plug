@@ -68,12 +68,9 @@ class AwattarService:
             raise ValueError('end_time is not in the correct format')
         
         # adding 1 hour to end_time to include the end_time
-        if not os.path.isfile('dataset/awattar_data.csv'):
-            print('No data available')
-            raise Exception('No data available')
         
         end_time = end_time + datetime.timedelta(hours=1)
-        df = pd.read_csv('dataset/awattar_data.csv')
+        df = pd.read_csv(self.dataset_path)
         df['start_timestamp'] = pd.to_datetime(df['start_timestamp'])
         df['end_timestamp'] = pd.to_datetime(df['end_timestamp'])
         filter_df = df[(df['start_timestamp'] >= start_time) & (df['end_timestamp'] <= end_time)]
@@ -89,11 +86,11 @@ class AwattarService:
         new_df['end_timestamp'] = pd.to_datetime(new_df['end_timestamp'], unit='ms')
         
         # Check if the file exists
-        if not os.path.isfile('dataset/awattar_data.csv'):
-            new_df.to_csv('awattar_data.csv', index=True)
+        if not os.path.isfile(self.dataset_path):
+            new_df.to_csv(self.dataset_path, index=True)
             return None
         
-        old_df = pd.read_csv('dataset/awattar_data.csv')
+        old_df = pd.read_csv(self.dataset_path)
         old_df['start_timestamp'] = pd.to_datetime(old_df['start_timestamp'])
         old_df['end_timestamp'] = pd.to_datetime(old_df['end_timestamp'])
         
@@ -108,4 +105,4 @@ class AwattarService:
             # Saving the new data
             print('New data available... saving the new data')
             resulting_df = pd.concat([old_df, new_df], ignore_index=True)
-            resulting_df.to_csv('dataset/awattar_data.csv', index=True)
+            resulting_df.to_csv(self.dataset_path, index=True)

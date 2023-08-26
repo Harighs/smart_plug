@@ -20,7 +20,7 @@ class SmartMeter():
         self.auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
         return None
     
-    def get_data(self, intrested_date: str = None):
+    def get_consolidated_smart_meter_data(self, intrested_date: str = None):
         """
         Usage:
             intrested_date: str --> '2023-8-24'
@@ -46,6 +46,28 @@ class SmartMeter():
             data_response = pd.DataFrame(data_response)
             return data_response['meteredValues'].sum()
 
+    def get_smart_meter_full_data(self, start_date: str = None, end_date: str = None):
+        
+        if start_date is None and end_date is None:
+            start_date = '2023-8-21'
+            end_date = '2023-8-28'
+        
+        auth_cookie, auth_xsrf_token = self.post_request(self)
+        
+        if auth_cookie and auth_xsrf_token is None:
+            print("Authentication failed with status code:", self.auth_response.status_code)
+        headers = {
+            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
+        }
+
+        ### TODO: update date from mobile
+        self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId=AT0020000000000000000000020826367&startDate={start_date}&endDate={end_date}"
+        data_response = self.data_response(self, self.data_url, headers)
+        
+        if data_response is not None:
+            data_response = pd.DataFrame(data_response)[['meteredValues', 'peakDemandTimes']]
+            return data_response['meteredValues'].sum()
+
     
     @staticmethod
     def post_request(self):
@@ -56,7 +78,7 @@ class SmartMeter():
             auth_xsrf_token = auth_response.cookies['XSRF-Token']
             return auth_cookie, auth_xsrf_token
         else:
-            raise Exception("Authentication failed with status code: Smartmeter_service line 74", self.auth_response.status_code)
+            raise Exception("Authentication failed with status code: Smartmeter_service line 82", self.auth_response.status_code)
             
         
     @staticmethod
@@ -66,5 +88,5 @@ class SmartMeter():
             return data_response
         else:
             print("Data request failed with status code:", 'DATA FAILURE')
-            raise Exception("Data request failed with status code: Smartmeter_service line 84", data_response.status_code)
+            raise Exception("Data request failed with status code: Smartmeter_service line 92", data_response.status_code)
                 

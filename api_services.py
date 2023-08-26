@@ -105,7 +105,7 @@ def combined_reports():
     # Calculate R2 and R3
     R2 = R1 * R4
     R3 = R2 / R1
-    R5 = R2 - R1 * R4
+    R5 = R2 - (R1 * R4)
     
 
     return jsonify({

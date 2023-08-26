@@ -34,6 +34,7 @@ class SmartMeter():
         if auth_cookie and auth_xsrf_token is None:
             print("Authentication failed with status code:", self.auth_response.status_code)
         headers = {
+            'Cache-Control': 'no-cache',
             'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
         }
         if intrested_date is None:
@@ -58,6 +59,7 @@ class SmartMeter():
         if auth_cookie and auth_xsrf_token is None:
             print("Authentication failed with status code:", self.auth_response.status_code)
         headers = {
+            'Cache-Control': 'no-cache',
             'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
         }
 
@@ -66,10 +68,10 @@ class SmartMeter():
         data_response = self.data_response(self, self.data_url, headers)
         
         if data_response is not None:
-            print(data_response.json())
-            # data_response = pd.DataFrame(data_response)[['meteredValues', 'peakDemandTimes']]
-            # return data_response['meteredValues'].sum()
-            return data_response.json()
+            # print(data_response.json())
+            data_response = pd.DataFrame(data_response)[['meteredValues', 'peakDemandTimes']]
+            return data_response['meteredValues'].sum()
+            # return data_response.json()
 
     
     @staticmethod

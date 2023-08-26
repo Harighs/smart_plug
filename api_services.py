@@ -20,7 +20,7 @@ data = [
 
 
 ########### TESTING ############
-@app.route('/api/', methods=['GET'])
+@app.route('/api/status', methods=['GET'])
 def rest_api():
     return jsonify("You're accessing the Enermizer API Services.")
 
@@ -267,3 +267,5 @@ if __name__ == '__main__':
     custom_ip = '192.168.1.166'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)
+    download_awattar_data = AwattarService().download_awattar_data()
+    

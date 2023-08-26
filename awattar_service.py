@@ -5,44 +5,8 @@ import requests
 
 class AwattarService:
     def __init__(self):
-        url = "https://api.awattar.at/v1/marketdata"
-        marketdata_df = requests.get(url).json()
-        self.one_day_df = pd.json_normalize(marketdata_df['data'])
-        self.one_day_df['start_timestamp'] = pd.to_datetime(self.one_day_df['start_timestamp'], unit='ms')
-        self.one_day_df['end_timestamp'] = pd.to_datetime(self.one_day_df['end_timestamp'], unit='ms')
+        self.download_new_awattar_data()
         return None
-    
-    
-    # def __init__(self):
-    #     marketdata_df = pd.read_json('marketdata.json')
-    #     marketdata_df = pd.json_normalize(marketdata_df['data'])
-
-    #     # Convert 'start_timestamp' and 'end_timestamp' columns to datetime
-    #     marketdata_df['start_timestamp'] = pd.to_datetime(marketdata_df['start_timestamp'], unit='ms')
-    #     marketdata_df['end_timestamp'] = pd.to_datetime(marketdata_df['end_timestamp'], unit='ms')
-    #     self.marketdata_df = marketdata_df
-    #     self.bulb = BulbControl()
-
-    # def update_marketdata(self):
-    #     """
-    #     This function updates the marketdata.json file and append to marketdata.csv
-        
-    #     Input: None
-        
-    #     Output: Boolean
-        
-    #     Usage:
-    #         awattar_service = AwattarService()
-    #         awattar_service.update_marketdata() --> True # This will append the current day data to the marketdata.csv file
-    #             csv file.
-    #     """
-
-    #     url = "https://api.awattar.at/v1/marketdata"
-    #     marketdata_df = requests.get(url).json()
-    #     # marketdata_df.to_csv('marketdata.csv', index=False)
-    #     one_day_df = pd.json_normalize(marketdata_df['data'])
-    #     one_day_df.to_csv('marketdata.csv', mode='a', header=False, index=False)
-    #     return True
 
     def check_market_price(self, eur:str):
         # This code runs whene current day max() price is less then 25% off
@@ -102,5 +66,37 @@ class AwattarService:
         
         # adding 1 hour to end_time to include the end_time
         end_time = end_time + datetime.timedelta(hours=1)
-        filter_df = self.one_day_df[(self.one_day_df['start_timestamp'] >= start_time) & (self.one_day_df['end_timestamp'] <= end_time)]
+        df = pd.read_csv('awattar_data.csv')
+        filter_df = df[(df['start_timestamp'] >= start_time) & (df['end_timestamp'] <= end_time)]
         return filter_df['marketprice'].mean()
+    
+    @staticmethod
+    def download_new_awattar_data():
+        # New data
+        url = "https://api.awattar.at/v1/marketdata"
+        new_df = requests.get(url).json()
+        new_df = pd.json_normalize(new_df['data'])
+        new_df['start_timestamp'] = pd.to_datetime(new_df['start_timestamp'], unit='ms')
+        new_df['end_timestamp'] = pd.to_datetime(new_df['end_timestamp'], unit='ms')
+        
+        # Check if the file exists
+        if not os.path.isfile('dataset/awattar_data.csv'):
+            new_df.to_csv('awattar_data.csv', index=True)
+            return None
+        
+        old_df = pd.read_csv('dataset/awattar_data.csv')
+        old_df['start_timestamp'] = pd.to_datetime(old_df['start_timestamp'])
+        old_df['end_timestamp'] = pd.to_datetime(old_df['end_timestamp'])
+        
+        old_end_date = old_df['end_timestamp'].max()
+        new_start_date = new_df['start_timestamp'].min()
+        
+        if old_end_date == new_start_date:
+            print('No new data available')
+            return None
+        
+        elif old_end_date < new_start_date:
+            # Saving the new data
+            print('New data available... saving the new data')
+            resulting_df = pd.concat([old_df, new_df], ignore_index=True)
+            resulting_df.to_csv('dataset/awattar_data.csv', index=True)

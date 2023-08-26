@@ -81,7 +81,7 @@ class SmartMeter():
             'Cookie': f'__Host-go4DavidSecurityToken={self.auth_cookie};',
         }
 
-        self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId={meterId}&startDate={start_date}&endDate={end_date}"
+        self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId={meter_id}&startDate={start_date}&endDate={end_date}"
         data_response = self.data_response(self, self.data_url, headers)
 
         if data_response is not None:

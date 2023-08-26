@@ -6,7 +6,6 @@ from awattar_service import AwattarService
 from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
 from smartmeter_services import SmartMeter
 
-
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
 
@@ -19,10 +18,12 @@ data = [
     {"id": 3, "name": "Item 3", "description": "Description of Item 3"}
 ]
 
+
 ########### TESTING ############
 @app.route('/api/', methods=['GET'])
 def rest_api():
     return jsonify("You're accessing the Enermizer API Services.")
+
 
 ########### REPORT - 1 ############
 ## Report 1 - Energy consumed over selected time period
@@ -31,10 +32,33 @@ def energyConsumedOverPeriod():
     new_item = request.json
     fromDate = new_item['fromDate']
     toDate = new_item['toDate']
-    
+
     smartmeter_data = SmartMeter()
-    data = smartmeter_data.get_smart_meter_full_data(fromDate, toDate) ## str: value
+    data = smartmeter_data.getConsolidatedData(fromDate, toDate)  ## str: value
     return jsonify({"message": str(data)}), 200
+
+
+@app.route('/api/report1_extended', methods=['POST'])
+def energyConsumedOverPeriod_Extended():
+    new_item = request.json
+    fromDate = new_item['fromDate']
+    toDate = new_item['toDate']
+
+    smartmeter_data = SmartMeter()
+    data = smartmeter_data.getConsolidatedFullData(fromDate, toDate)  ## str: value
+    return jsonify({"message": data}), 200
+
+
+@app.route('/api/report1_bymeterid', methods=['POST'])
+def energyConsumedOverPeriod_ByMeterId():
+    new_item = request.json
+    fromDate = new_item['fromDate']
+    toDate = new_item['toDate']
+    meterId = new_item['meterId']
+
+    smartmeter_data = SmartMeter()
+    data = smartmeter_data.getConsolidatedFullData(fromDate, toDate)  ## str: value
+    return jsonify({"message": data}), 200
 
 
 ########### REPORT - 4 ############
@@ -47,8 +71,6 @@ def averageAwattarPriceOverPeriod():
     get_avg_data = AwattarService()
     data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
     return jsonify({"message": str(data)}), 200
-    
-
 
 
 # Endpoint to get all items
@@ -82,6 +104,7 @@ def control_bulb_market(eur):
     market_status.check_market_price(eur)
     return jsonify({"status": "true"})
 
+
 # Update Market data
 @app.route('/api/update_market_data', methods=['GET'])
 def update_market_data():
@@ -94,8 +117,9 @@ def update_market_data():
 @app.route('/api/update_smart_meter_data', methods=['GET'])
 def update_smart_meter_data():
     smart_meter = SmartMeter()
-    today_data = smart_meter.smart_meter_data # Its a dataframe
+    today_data = smart_meter.smart_meter_data  # Its a dataframe
     return today_data
+
 
 @app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
 def update_socket_controller(switchNumber, switchStatus):
@@ -144,12 +168,9 @@ def delete_item(item_id):
 
 ## Test Report - test report
 @app.route('/api/test', methods=['GET'])
-def api_test():    
+def api_test():
     return jsonify({"message", 'sucess'}), 200
 
-
-
-    
 
 ## Report 2 - Costs of energy consumed = Sum of all hourly Energy consumed x Awattar price
 @app.route('/api/report2', methods=['GET'])
@@ -162,7 +183,7 @@ def costsOfEnergyConsumed():
     R1, R4 = get_r1_and_r4_value(fromDate, toDate)
     # assign globe variable
     global report2
-    report2 = R1*R4
+    report2 = R1 * R4
     return jsonify({"message", report2}), 200
 
 
@@ -193,17 +214,18 @@ def averageEffectivePrice():
 def get_r1_and_r4_value(fromDate, toDate):
     # get R1 value
     smartmeter_data = SmartMeter()
-    data = smartmeter_data.SMART_METER_DATA #DF
-    R1 = data['meteredValues'].sum() # --> float
-    
+    data = smartmeter_data.SMART_METER_DATA  # DF
+    R1 = data['meteredValues'].sum()  # --> float
+
     # get R4 value
     R4 = get_average_awattar_price_over_period(fromDate, toDate)
-    
+
     return R1, R4
 
+
 def global_api():
-    
     return jsonify({"message", report5}), 200
+
 
 if __name__ == '__main__':
     #    app.run(debug=True)

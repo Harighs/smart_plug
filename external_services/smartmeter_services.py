@@ -3,7 +3,7 @@ import pandas as pd
 from urllib.parse import quote
 
 
-class SmartMeter():
+class SmartMeterServices:
     def __init__(self):
         """
         This class is used to fetch data from the smartmeter.netz-noe.at website.
@@ -22,7 +22,7 @@ class SmartMeter():
         return None
 
     # This method return the sum of consumed electricity data in Kwh
-    def getConsolidatedData(self, start_date:str, end_date:str):
+    def getConsolidatedData(self, start_date: str, end_date: str):
         """
         Usage:
             intrested_date: str --> '2023-8-24'
@@ -41,7 +41,6 @@ class SmartMeter():
             'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
         }
 
-        ### TODO: update date from mobile
         self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId=AT0020000000000000000000020826367&startDate={start_date}&endDate={end_date}"
         data_response = self.data_response(self, self.data_url, headers)
         if data_response is not None:
@@ -49,7 +48,7 @@ class SmartMeter():
             return data_response['meteredValues'].sum()
 
     # This method return the full data set of consumed electricity
-    def getConsolidatedFullData(self, start_date:str, end_date:str):
+    def getConsolidatedFullData(self, start_date: str, end_date: str):
 
         # Check the date format
         if (start_date is None) or (end_date is None):
@@ -69,7 +68,7 @@ class SmartMeter():
             return data_response.to_json()
 
     # This method returns the full data set consumed electricity of specific MeterId
-    def getConsolidatedFullDataByMeterId(self, meter_id:str, start_date:str, end_date:str):
+    def getConsolidatedFullDataByMeterId(self, meter_id: str, start_date: str, end_date: str):
 
         # Check the date format
         if (start_date is None) or (end_date is None) or (meter_id is None):

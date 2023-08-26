@@ -7,6 +7,9 @@ import os
 class AwattarService:
     def __init__(self):
         self.download_new_awattar_data()
+        self.dataset_path = 'home/pi/smart_plug/dataset/awattar_data.csv'
+        if not os.path.isfile(self.dataset_path):
+            raise Exception('Dataset not found')
         return None
 
     def check_market_price(self, eur:str):

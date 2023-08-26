@@ -92,16 +92,28 @@ def combined_reports():
     print(R1)
     print(R4)
     
+    """
+    Formula:
+    R1 = Get the data from the Smart-Meter Json api
+    R2 = R1 x R4
+    R3 = R2 / R1
+    R4 = Get the data from Awattar services and Consolidate it
+    R5 = R2 - R1 x R4
+
+    """
+    
     # Calculate R2 and R3
     R2 = R1 * R4
     R3 = R2 / R1
+    R5 = R2 - R1 * R4
     
 
     return jsonify({
         "report1": str(R1),
         "report2": str(R2),
         "report3": str(R3),
-        "report4": str(R4)
+        "report4": str(R4),
+        "report5": str(R5)
     }), 200
     
 # Endpoint to get all items

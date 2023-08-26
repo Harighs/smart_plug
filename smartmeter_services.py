@@ -18,6 +18,7 @@ class SmartMeter():
         """   
         self.auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
         self.auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+        self.auth_cookie, self.auth_xsrf_token, self.nsc_wt = self.post_request(self)
         return None
     
     def get_consolidated_smart_meter_data(self, intrested_date: str = None):
@@ -53,13 +54,12 @@ class SmartMeter():
             end_date = '2023-8-28'
             print('No start and end date provided, using default dates: ', start_date, end_date)
         
-        auth_cookie, auth_xsrf_token, nsc_wt = self.post_request(self)
         
-        if auth_cookie and auth_xsrf_token is None:
+        if self.auth_cookie and self.auth_xsrf_token is None:
             print("Authentication failed with status code:", self.auth_response.status_code)
         headers = {
             # 'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
-            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie};',
+            'Cookie': f'__Host-go4DavidSecurityToken={self.auth_cookie};',
         }
 
         ### TODO: update date from mobile

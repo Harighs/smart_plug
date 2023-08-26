@@ -1,4 +1,6 @@
 import os
+import schedule
+import time
 
 from flask import Flask, jsonify, request
 
@@ -261,6 +263,13 @@ def get_r1_and_r4_value(fromDate, toDate):
 def global_api():
     return jsonify({"message", report5}), 200
 
+# Define the function to download awattar data
+def download_awattar_data():
+    awattar_service = AwattarService()
+    return None
+
+# Schedule the download_awattar_data function to run at 12-hour intervals
+schedule.every(12).hours.do(download_awattar_data)
 
 if __name__ == '__main__':
     #    app.run(debug=True)
@@ -268,4 +277,9 @@ if __name__ == '__main__':
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)
     download_awattar_data = AwattarService().download_awattar_data()
+    
+    # Run the scheduler loop in a separate thread
+    while True:
+    schedule.run_pending()
+    time.sleep(1)
     

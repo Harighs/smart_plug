@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 import os
-from control import BulbControl
+from relay_controller import BulbControl
 import RPi.GPIO as GPIO
 from awattar_service import AwattarService
 
@@ -23,7 +23,7 @@ def get_items():
 
 @app.route('/api/bulbon', methods=['GET'])
 def get_bulbon():
-#    with open('smart_plug/control.py') as control:
+#    with open('smart_plug/relay_controller.py') as control:
 #        exec(control.read())
     bulb = BulbControl()
     bulb.bulb_on()

@@ -121,7 +121,7 @@ def combined_reports():
     
 #############  Checking GPIO status #############
 
-@app.route('/api/socketstatus/<string:socketNumber>', methods=['GET'])
+@app.route('/api/socketstatus/<int:socketNumber>', methods=['GET'])
 def gpio_status(socketNumber):
     relay_control = BulbControl()
     relay1_status = relay_control.check_socket_status(socketNumber)

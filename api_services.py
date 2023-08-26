@@ -134,7 +134,7 @@ def getAllReports():
 @app.route('/api/relaystatus/<int:relayNumber>', methods=['GET'])
 def relayStatus(relayNumber):
     relay_control = RelayControl()
-    relay_status = relay_control.check_socket_status(relayNumber)
+    relay_status = relay_control.checkRelayStatus(relayNumber)
     if relay_status:  # check whether the relay is turned on/off
         status = "true"  # ON
     else:

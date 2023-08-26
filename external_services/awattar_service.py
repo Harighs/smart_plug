@@ -1,6 +1,5 @@
 import pandas as pd
 import datetime
-from relay_controller import BulbControl
 import requests
 import os
 

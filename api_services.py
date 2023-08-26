@@ -4,9 +4,9 @@ import time
 
 from flask import Flask, jsonify, request
 
-from awattar_service import AwattarService
-from relay_controller import BulbControl
-from smartmeter_services import SmartMeter
+from external_services.awattar_service import AwattarService
+from pi_controller.relay_controller import RelayControl
+from external_services.smartmeter_services import SmartMeter
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -133,7 +133,7 @@ def combined_reports():
 
 @app.route('/api/socketstatus/<int:socketNumber>', methods=['GET'])
 def gpio_status(socketNumber):
-    relay_control = BulbControl()
+    relay_control = RelayControl()
     relay1_status = relay_control.check_socket_status(socketNumber)
     return jsonify({"message": str(relay1_status)}), 200
 

@@ -1,5 +1,15 @@
 import RPi.GPIO as GPIO
 
+
+# Enabling relay socket on GPIO 5
+def enable_relay1():
+    GPIO.output(5, GPIO.LOW)
+
+
+# Disabling relay socket on GPIO 5
+def disable_relay1():
+    GPIO.output(5, GPIO.HIGH)
+
 """
  This class is responsible to handle all the operations done in Raspberry Pi Zero.
  - Accessing the specific GPIO 
@@ -21,7 +31,7 @@ Examples:
     relay_switch_controller(1,0) --> switch the Relay 1
     relay_switch_controller(1,1) --> switch off the Relay 1
 """
-class BulbControl:
+class RelayControl:
         def __init__(self):
                 GPIO.setwarnings(False)
                 GPIO.setmode(GPIO.BCM)
@@ -38,14 +48,7 @@ class BulbControl:
                 GPIO.output(16, GPIO.HIGH)
                 GPIO.output(19, GPIO.HIGH)
                 GPIO.output(20, GPIO.HIGH)
-                
-        # Turning on bulb 1
-        def bulb_on(self):
-                GPIO.output(5, GPIO.LOW) #Wire is inverted
 
-        def bulb_off(self):
-                GPIO.output(5, GPIO.HIGH) # Wire is inverted
-        
         def socket_controller(self, switchNumber, switchStatus):
                 if switchNumber == 1:
                         GPIO.output(5, switchStatus)

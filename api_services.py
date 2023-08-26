@@ -280,6 +280,6 @@ if __name__ == '__main__':
     
     # Run the scheduler loop in a separate thread
     while True:
-    schedule.run_pending()
-    time.sleep(1)
-    
+        schedule.run_pending()
+        time.sleep(1)
+        

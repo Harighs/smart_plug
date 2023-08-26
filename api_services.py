@@ -28,8 +28,12 @@ def rest_api():
 ## Report 1 - Energy consumed over selected time period
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod():
+    new_item = request.json
+    fromDate = new_item['fromDate']
+    toDate = new_item['toDate']
+    
     smartmeter_data = SmartMeter()
-    data = smartmeter_data.get_data() ## str: value
+    data = smartmeter_data.get_smart_meter_full_data(fromDate, toDate) ## str: value
     return jsonify({"message": str(data)}), 200
 
 ########### REPORT - 4 ############

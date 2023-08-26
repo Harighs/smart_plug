@@ -2,7 +2,7 @@ import datetime
 
 import pandas as pd
 
-from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1
+from pi_controller.relay_controller import RelayControl
 
 """
     This class is responsible for handling and accessing the backend services.

@@ -30,6 +30,16 @@ class BulbControl:
                         GPIO.output(5, switchStatus)
                 elif switchNumber == 2:
                         GPIO.output(6, switchStatus)
+                elif switchNumber == 3:
+                        return GPIO.input(13)
+                elif switchNumber == 4:
+                        return GPIO.input(16)
+                elif switchNumber == 5:
+                        return GPIO.input(19)
+                elif switchNumber == 6:
+                        return GPIO.input(20)
+                else:
+                        return False
         
         def check_socket_status(self, switchNumber):
                 if switchNumber == 1:

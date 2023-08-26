@@ -5,6 +5,7 @@ import time
 from flask import Flask, jsonify, request
 
 from awattar_service import AwattarService
+from control import BulbControl
 from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
 from smartmeter_services import SmartMeter
 
@@ -122,7 +123,7 @@ def combined_reports():
 
 @app.route('/api/socketstatus/<string:socketNumber>', methods=['GET'])
 def gpio_status(socketNumber):
-    relay_control = RelayControl()
+    relay_control = BulbControl()
     relay1_status = relay_control.check_socket_status(socketNumber)
     return jsonify({"message": str(relay1_status)}), 200
 

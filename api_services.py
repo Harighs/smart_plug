@@ -36,6 +36,7 @@ def energyConsumedOverPeriod():
     data = smartmeter_data.get_smart_meter_full_data(fromDate, toDate) ## str: value
     return jsonify({"message": str(data)}), 200
 
+
 ########### REPORT - 4 ############
 ## Report 4 - Average Awattar price over period
 @app.route('/api/report4', methods=['POST'])

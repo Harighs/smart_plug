@@ -52,20 +52,23 @@ class AwattarService:
             
         """
         # Define the format of the string
-        date_format = '%Y-%m-%d %H:%M:%S'
         try:
-            start_time = datetime.datetime.strptime(start_time, date_format)
+            start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
         except:
             print('start_time is not in the correct format')
             raise ValueError('start_time is not in the correct format')
 
         try:
-            end_time = datetime.datetime.strptime(end_time, date_format)
+            end_time = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
         except:
             print('end_time is not in the correct format')
             raise ValueError('end_time is not in the correct format')
         
         # adding 1 hour to end_time to include the end_time
+        if not os.isfile('dataset/awattar_data.csv'):
+            print('No data available')
+            raise Exception('No data available')
+        
         end_time = end_time + datetime.timedelta(hours=1)
         df = pd.read_csv('dateaset/awattar_data.csv')
         df['start_timestamp'] = pd.to_datetime(df['start_timestamp'])

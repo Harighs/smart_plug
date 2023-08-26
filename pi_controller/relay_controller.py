@@ -54,17 +54,17 @@ class RelayControl:
 
     def relayController(self, relayNumber, relayStatus):
         if relayNumber == 1:
-            GPIO.output(5, relayStatus)
+            return GPIO.output(5, relayStatus)
         elif relayNumber == 2:
-            GPIO.output(6, relayStatus)
+            return GPIO.output(6, relayStatus)
         elif relayNumber == 3:
-            GPIO.output(13, relayStatus)
+            return GPIO.output(13, relayStatus)
         elif relayNumber == 4:
-            GPIO.output(16, relayStatus)
+            return GPIO.output(16, relayStatus)
         elif relayNumber == 5:
-            GPIO.output(19, relayStatus)
+            return GPIO.output(19, relayStatus)
         elif relayNumber == 6:
-            GPIO.output(20, relayStatus)
+            return GPIO.output(20, relayStatus)
         else:
             return False
 

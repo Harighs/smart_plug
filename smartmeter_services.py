@@ -29,13 +29,13 @@ class SmartMeter():
             DataResonse['meteredValues'].sum() --> [float] kWh
         """
         
-        auth_cookie, auth_xsrf_token = self.post_request(self)
+        auth_cookie, auth_xsrf_token, nsc_wt = self.post_request(self)
         
         if auth_cookie and auth_xsrf_token is None:
             print("Authentication failed with status code:", self.auth_response.status_code)
         headers = {
             'Cache-Control': 'no-cache',
-            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
+            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
         }
         if intrested_date is None:
             intrested_date = '2023-8-24'
@@ -54,13 +54,13 @@ class SmartMeter():
             end_date = '2023-8-28'
             print('No start and end date provided, using default dates: ', start_date, end_date)
         
-        auth_cookie, auth_xsrf_token = self.post_request(self)
+        auth_cookie, auth_xsrf_token, nsc_wt = self.post_request(self)
         
         if auth_cookie and auth_xsrf_token is None:
             print("Authentication failed with status code:", self.auth_response.status_code)
         headers = {
             'Cache-Control': 'no-cache',
-            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}',
+            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
         }
 
         ### TODO: update date from mobile
@@ -76,13 +76,14 @@ class SmartMeter():
     
     @staticmethod
     def post_request(self):
-        auth_cookie, auth_xsrf_token = None, None
+        auth_cookie, auth_xsrf_token, nsc_wt = None, None, None
         auth_response = requests.post(self.auth_url, json=self.auth_payload)
         if auth_response.status_code == 200:
             print("Authentication successful...")
             auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
-            auth_xsrf_token = auth_response.cookies['XSRF-Token']
-            return auth_cookie, auth_xsrf_token
+            auth_xsrf_token =  auth_response.cookies['XSRF-Token']
+            nsc_wt =  auth_response.cookies['NSC_WT_TWYUXFCQ-TTM']
+            return auth_cookie, auth_xsrf_token, nsc_wt
         else:
             raise Exception("Authentication failed with status code: Smartmeter_service line 82", self.auth_response.status_code)
             

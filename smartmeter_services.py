@@ -51,7 +51,7 @@ class SmartMeter():
         if start_date is None and end_date is None:
             start_date = '2023-8-21'
             end_date = '2023-8-28'
-            print('No start and end date provided, using default dates: ', start_date, end_date')
+            print('No start and end date provided, using default dates: ', start_date, end_date)
         
         auth_cookie, auth_xsrf_token = self.post_request(self)
         
@@ -72,6 +72,7 @@ class SmartMeter():
     
     @staticmethod
     def post_request(self):
+        auth_cookie, auth_xsrf_token = None, None
         auth_response = requests.post(self.auth_url, json=self.auth_payload)
         if auth_response.status_code == 200:
             print("Authentication successful...")
@@ -84,9 +85,9 @@ class SmartMeter():
         
     @staticmethod
     def data_response(self, data_url, headers):
-        data_response = requests.get(data_url, headers=headers).json()
+        data_response = requests.get(data_url, headers=headers)
         if data_response.status_code == 200:
-            return data_response
+            return data_response.json()
         else:
             print("Data request failed with status code:", 'DATA FAILURE')
             raise Exception("Data request failed with status code: Smartmeter_service line 92", data_response.status_code)

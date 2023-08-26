@@ -22,7 +22,7 @@ class SmartMeter():
         return None
 
     # This method return the sum of consumed electricity data in Kwh
-    def getConsolidatedData(self, start_date: str = None, end_date: str = None):
+    def getConsolidatedData(self, start_date:str, end_date:str):
         """
         Usage:
             intrested_date: str --> '2023-8-24'
@@ -30,7 +30,7 @@ class SmartMeter():
         Output:
             DataResonse['meteredValues'].sum() --> [float] kWh
         """
-        if start_date or end_date is None:
+        if (start_date is None) or (end_date is None):
             raise Exception("Please provide a date in the format: Eg:'2023-8-24'")
 
         auth_cookie, auth_xsrf_token, nsc_wt = self.post_request(self)

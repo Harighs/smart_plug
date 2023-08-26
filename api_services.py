@@ -28,7 +28,7 @@ def rest_api():
 ########### REPORT - 1 ############
 ## Report 1 - Energy consumed over selected time period
 @app.route('/api/report1', methods=['POST'])
-def energyConsumedOverPeriod(fromDate, toDate):
+def energyConsumedOverPeriod():
     new_item = request.json
     fromDate = new_item['fromDate']
     toDate = new_item['toDate']
@@ -64,7 +64,7 @@ def energyConsumedOverPeriod_ByMeterId():
 ########### REPORT - 4 ############
 ## Report 4 - Average Awattar price over period
 @app.route('/api/report4', methods=['POST'])
-def averageAwattarPriceOverPeriod(fromDate, toDate):
+def averageAwattarPriceOverPeriod():
     new_item = request.json
     fromDate = new_item['fromDate']
     toDate = new_item['toDate']
@@ -83,8 +83,11 @@ def combined_reports():
     toDate_aws = new_item['toDate_aws']
 
     # Get R1 and R4 values
-    R1 = energyConsumedOverPeriod(fromDate_sm, toDate_sm)
-    R4 = averageAwattarPriceOverPeriod(fromDate_aws, toDate_aws)
+    smartmeter_data = SmartMeter()
+    R1 = smartmeter_data.getConsolidatedData(fromDate_sm, toDate_sm)  ## str: value
+    
+    get_avg_data = AwattarService()
+    R4 = get_avg_data.get_average_awattar_price_over_period(fromDate_aws, toDate_aws)
     
     print(R1)
     print(R4)

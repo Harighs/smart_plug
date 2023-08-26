@@ -131,7 +131,7 @@ def getAllReports():
 """
 
 
-@app.route('/api/relaystatus/<int:relayNumber>', methods=['GET'])
+@app.route('/api/relaystatus/<int:relayNumber>', methods=['POST'])
 def relayStatus(relayNumber):
     relay_control = RelayControl()
     relay_status = relay_control.checkRelayStatus(relayNumber)
@@ -149,7 +149,7 @@ Control the relay by passing switch number and switch status as parameter
 """
 
 
-@app.route('/api/relaycontroller/<int:relayNumber>/<int:relayStatus>', methods=['GET'])
+@app.route('/api/relaycontroller/<int:relayNumber>/<int:relayStatus>', methods=['POST'])
 def relayController(relayNumber, relayStatus):
     relay_control = RelayControl()
     relay_trigger_status = relay_control.relayController(relayNumber, relayStatus)

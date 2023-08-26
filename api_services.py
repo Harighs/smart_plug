@@ -38,7 +38,7 @@ def energyConsumedOverPeriod():
     return jsonify({"message": str(data)}), 200
 
 
-@app.route('/api/report1_extended', methods=['POST'])
+@app.route('/api/report1/extended', methods=['POST'])
 def energyConsumedOverPeriod_Extended():
     new_item = request.json
     fromDate = new_item['fromDate']
@@ -49,7 +49,7 @@ def energyConsumedOverPeriod_Extended():
     return jsonify({"message": data}), 200
 
 
-@app.route('/api/report1_bymeterid', methods=['POST'])
+@app.route('/api/report1/bymeterid', methods=['POST'])
 def energyConsumedOverPeriod_ByMeterId():
     new_item = request.json
     fromDate = new_item['fromDate']
@@ -57,7 +57,7 @@ def energyConsumedOverPeriod_ByMeterId():
     meterId = new_item['meterId']
 
     smartmeter_data = SmartMeter()
-    data = smartmeter_data.getConsolidatedFullData(fromDate, toDate)  ## str: value
+    data = smartmeter_data.getConsolidatedFullDataByMeterId(meterId, fromDate, toDate)  ## str: value
     return jsonify({"message": data}), 200
 
 

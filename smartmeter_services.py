@@ -69,7 +69,7 @@ class SmartMeter():
             return data_response.to_json()
 
     # This method returns the full data set consumed electricity of specific MeterId
-    def getConsolidatedFullDataByMeterId(self, meterId: str = None, start_date: str = None, end_date: str = None):
+    def getConsolidatedFullDataByMeterId(self, meter_id: str = None, start_date: str = None, end_date: str = None):
 
         # Check the date format
         if (start_date is None) or (end_date is None):

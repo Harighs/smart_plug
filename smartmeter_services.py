@@ -49,7 +49,7 @@ class SmartMeter():
             return data_response['meteredValues'].sum()
 
     # This method return the full data set of consumed electricity
-    def getConsolidatedFullData(self, start_date: str = None, end_date: str = None):
+    def getConsolidatedFullData(self, start_date:str, end_date:str):
 
         # Check the date format
         if (start_date is None) or (end_date is None):
@@ -69,10 +69,10 @@ class SmartMeter():
             return data_response.to_json()
 
     # This method returns the full data set consumed electricity of specific MeterId
-    def getConsolidatedFullDataByMeterId(self, meter_id: str = None, start_date: str = None, end_date: str = None):
+    def getConsolidatedFullDataByMeterId(self, meter_id:str, start_date:str, end_date:str):
 
         # Check the date format
-        if (start_date is None) or (end_date is None):
+        if (start_date is None) or (end_date is None) or (meter_id is None):
             raise Exception("Please provide a 'start_date' and 'end_date' in the format: Eg:'2023-8-24'")
 
         if self.auth_cookie and self.auth_xsrf_token is None:

@@ -30,6 +30,8 @@ class SmartMeter():
         Output:
             DataResonse['meteredValues'].sum() --> [float] kWh
         """
+        if start_date or end_date is None:
+            raise Exception("Please provide a date in the format: Eg:'2023-8-24'")
 
         auth_cookie, auth_xsrf_token, nsc_wt = self.post_request(self)
 
@@ -38,8 +40,6 @@ class SmartMeter():
         headers = {
             'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
         }
-        if start_date or end_date is None:
-            raise Exception("Please provide a date in the format: Eg:'2023-8-24'")
 
         ### TODO: update date from mobile
         self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId=AT0020000000000000000000020826367&startDate={start_date}&endDate={end_date}"

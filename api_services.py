@@ -72,7 +72,35 @@ def averageAwattarPriceOverPeriod():
     data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
     return jsonify({"message": str(data)}), 200
 
+########### Combined report ############
+# Combined report endpoint
+@app.route('/api/combined_reports', methods=['POST'])
+def combined_reports():
+    new_item = request.json
+    fromDate_sm = new_item['fromDate']
+    toDate_sm = new_item['toDate']
+    fromDate_aws = new_item['fromDate']
+    toDate_aws = new_item['toDate']
 
+    # Get R1 and R4 values
+    R1 = energyConsumedOverPeriod(fromDate_sm, toDate_sm)
+    R4 = averageAwattarPriceOverPeriod(fromDate_aws, toDate_aws)
+    
+    print(R1)
+    print(R4)
+    
+    # Calculate R2 and R3
+    R2 = R1 * R4
+    R3 = R2 / R1
+    
+
+    return jsonify({
+        "report1": str(R1),
+        "report2": str(R2),
+        "report3": str(R3),
+        "report4": str(R4)
+    }), 200
+    
 # Endpoint to get all items
 @app.route('/api/items', methods=['GET'])
 def get_items():

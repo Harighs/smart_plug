@@ -135,13 +135,7 @@ def getAllReports():
 def relayStatus(relayNumber):
     relay_control = RelayControl()
     relay_status = relay_control.checkRelayStatus(relayNumber)
-    print(relay_status)
-
-    if relay_status:  # check whether the relay is turned on/off
-        status = "true"  # ON
-    else:
-        status = "false"  # OFF
-    return jsonify({"status": str(status)}), 200
+    return jsonify({"status": str(bool(relay_status))}), 200
 
 
 """
@@ -153,13 +147,7 @@ Control the relay by passing switch number and switch status as parameter
 def relayController(relayNumber, relayStatus):
     relay_control = RelayControl()
     relay_trigger_status = relay_control.relayController(relayNumber, relayStatus)
-    print(relay_trigger_status)
-    
-    if relay_trigger_status:  # check whether the relay is turned on/off
-        status = "true"  # ON
-    else:
-        status = "false"  # OFF
-    return jsonify({"status": str(status)}), 200
+    return jsonify({"status": str(bool(relay_trigger_status))}), 200
 
 
 """

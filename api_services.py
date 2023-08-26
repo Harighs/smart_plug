@@ -5,8 +5,7 @@ import time
 from flask import Flask, jsonify, request
 
 from awattar_service import AwattarService
-from control import BulbControl
-from raspberrypi_controller import RelayControl, enable_relay1, disable_relay1, relay_switch_controller
+from relay_controller import BulbControl
 from smartmeter_services import SmartMeter
 
 current_dir = os.getcwd()
@@ -22,14 +21,19 @@ data = [
 ]
 
 
-########### TESTING ############
+# API SERVICE STATUS
 @app.route('/api/status', methods=['GET'])
 def rest_api():
     return jsonify({"status": "true"}), 200
 
 
-########### REPORT - 1 ############
-## Report 1 - Energy consumed over selected time period
+"""
+ Following methods are responsible for direct calls
+ Specifically for Reports (1-5)
+"""
+
+
+# Report 1 - Energy consumed over selected time period
 @app.route('/api/report1', methods=['POST'])
 def energyConsumedOverPeriod():
     new_item = request.json
@@ -64,8 +68,7 @@ def energyConsumedOverPeriod_ByMeterId():
     return jsonify({"message": data}), 200
 
 
-########### REPORT - 4 ############
-## Report 4 - Average Awattar price over period
+# Report 4 - Average Awattar price over period
 @app.route('/api/report4', methods=['POST'])
 def averageAwattarPriceOverPeriod():
     new_item = request.json
@@ -75,8 +78,15 @@ def averageAwattarPriceOverPeriod():
     data = get_avg_data.get_average_awattar_price_over_period(fromDate, toDate)
     return jsonify({"message": str(data)}), 200
 
-########### Combined report ############
-# Combined report endpoint
+
+"""
+    Get all 5 reports based on the start-date and end-date
+    Smart-meter services:  requires only start and end date
+    Awattar services: requires both date and time
+"""
+
+
+# All 5 reports
 @app.route('/api/combined_reports', methods=['POST'])
 def combined_reports():
     new_item = request.json
@@ -88,13 +98,13 @@ def combined_reports():
     # Get R1 and R4 values
     smartmeter_data = SmartMeter()
     R1 = smartmeter_data.getConsolidatedData(fromDate_sm, toDate_sm)  ## str: value
-    
+
     get_avg_data = AwattarService()
     R4 = get_avg_data.get_average_awattar_price_over_period(fromDate_aws, toDate_aws)
-    
+
     print(R1)
     print(R4)
-    
+
     """
     Formula:
     R1 = Get the data from the Smart-Meter Json api
@@ -104,28 +114,29 @@ def combined_reports():
     R5 = R2 - R1 x R4
 
     """
-    
+
     # Calculate R2 and R3
     R2 = R1 * R4
     R3 = R2 / R1
     R5 = R2 - (R1 * R4)
-    
 
-    return jsonify({
-        "report1": str(R1),
-        "report2": str(R2),
-        "report3": str(R3),
-        "report4": str(R4),
-        "report5": str(R5)
-    }), 200
-    
-#############  Checking GPIO status #############
+    all_reports = {"report1": str(R1),
+                   "report2": str(R2),
+                   "report3": str(R3),
+                   "report4": str(R4),
+                   "report5": str(R5)}
+
+    return jsonify({"message": jsonify(all_reports)}), 200
+
+
+# Checking the gpio status
 
 @app.route('/api/socketstatus/<int:socketNumber>', methods=['GET'])
 def gpio_status(socketNumber):
     relay_control = BulbControl()
     relay1_status = relay_control.check_socket_status(socketNumber)
     return jsonify({"message": str(relay1_status)}), 200
+
 
 # Endpoint to get all items
 @app.route('/api/items', methods=['GET'])
@@ -219,6 +230,7 @@ def delete_item(item_id):
     data = [item for item in data if item['id'] != item_id]
     return jsonify({"message": "Item deleted successfully"}), 200
 
+
 ###
 
 ## Test Report - test report
@@ -240,6 +252,7 @@ def costsOfEnergyConsumed():
     global report2
     report2 = R1 * R4
     return jsonify({"message", report2}), 200
+
 
 def Report3():
     global report3
@@ -272,10 +285,12 @@ def get_r1_and_r4_value(fromDate, toDate):
 def global_api():
     return jsonify({"message", report5}), 200
 
+
 # Define the function to download awattar data
 def download_awattar_data():
     awattar_service = AwattarService()
     return None
+
 
 # Schedule the download_awattar_data function to run at 12-hour intervals
 schedule.every(12).hours.do(download_awattar_data)
@@ -286,9 +301,8 @@ if __name__ == '__main__':
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)
     download_awattar_data = AwattarService().download_awattar_data()
-    
+
     # Run the scheduler loop in a separate thread
     while True:
         schedule.run_pending()
         time.sleep(1)
-        

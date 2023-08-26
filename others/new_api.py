@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 import os
 from pi_controller.relay_controller import RelayControl
-from external_services.awattar_service import AwattarService
+from external_services.awattar_services import AwattarServices
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -38,7 +38,7 @@ def get_bulboff():
 @app.route('/api/lessthen/<string:eur>', methods=['GET'])
 def control_bulb_market(eur):
     bulb = RelayControl()
-    market_status = AwattarService()
+    market_status = AwattarServices()
     market_status.check_market_price(eur)
     return jsonify("Executed sucessful..")
 
@@ -46,7 +46,7 @@ def control_bulb_market(eur):
 @app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
 def update_socket_controller(switchNumber, switchStatus):
     bulb = RelayControl()
-    bulb.socket_controller(switchNumber, switchStatus)
+    bulb.relayController(switchNumber, switchStatus)
     return jsonify("Executed sucessful..")
 
     

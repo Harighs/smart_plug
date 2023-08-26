@@ -41,13 +41,13 @@ class RelayControl:
                 GPIO.setup(16, GPIO.OUT)
                 GPIO.setup(19, GPIO.OUT)
                 GPIO.setup(20, GPIO.OUT)
-                # Bulb wireing is inverted
-                GPIO.output(5, GPIO.HIGH)
-                GPIO.output(6, GPIO.HIGH)
-                GPIO.output(13, GPIO.HIGH)
-                GPIO.output(16, GPIO.HIGH)
-                GPIO.output(19, GPIO.HIGH)
-                GPIO.output(20, GPIO.HIGH)
+                # # Bulb wireing is inverted
+                # GPIO.output(5, GPIO.HIGH)
+                # GPIO.output(6, GPIO.HIGH)
+                # GPIO.output(13, GPIO.HIGH)
+                # GPIO.output(16, GPIO.HIGH)
+                # GPIO.output(19, GPIO.HIGH)
+                # GPIO.output(20, GPIO.HIGH)
 
         def socket_controller(self, switchNumber, switchStatus):
                 if switchNumber == 1:

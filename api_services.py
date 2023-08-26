@@ -28,7 +28,7 @@ def rest_api():
 ########### REPORT - 1 ############
 ## Report 1 - Energy consumed over selected time period
 @app.route('/api/report1', methods=['POST'])
-def energyConsumedOverPeriod():
+def energyConsumedOverPeriod(fromDate, toDate):
     new_item = request.json
     fromDate = new_item['fromDate']
     toDate = new_item['toDate']
@@ -64,7 +64,7 @@ def energyConsumedOverPeriod_ByMeterId():
 ########### REPORT - 4 ############
 ## Report 4 - Average Awattar price over period
 @app.route('/api/report4', methods=['POST'])
-def averageAwattarPriceOverPeriod():
+def averageAwattarPriceOverPeriod(fromDate, toDate):
     new_item = request.json
     fromDate = new_item['fromDate']
     toDate = new_item['toDate']

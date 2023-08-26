@@ -135,6 +135,7 @@ def combined_reports():
 def gpio_status(socketNumber):
     relay_control = RelayControl()
     relay1_status = relay_control.check_socket_status(socketNumber)
+    print(relay1_status)
     return jsonify({"message": str(relay1_status)}), 200
 
 

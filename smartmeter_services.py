@@ -51,6 +51,7 @@ class SmartMeter():
         if start_date is None and end_date is None:
             start_date = '2023-8-21'
             end_date = '2023-8-28'
+            print('No start and end date provided, using default dates: ', start_date, end_date')
         
         auth_cookie, auth_xsrf_token = self.post_request(self)
         

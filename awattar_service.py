@@ -65,12 +65,12 @@ class AwattarService:
             raise ValueError('end_time is not in the correct format')
         
         # adding 1 hour to end_time to include the end_time
-        if not os.isfile('dataset/awattar_data.csv'):
+        if not os.path.isfile('dataset/awattar_data.csv'):
             print('No data available')
             raise Exception('No data available')
         
         end_time = end_time + datetime.timedelta(hours=1)
-        df = pd.read_csv('dateaset/awattar_data.csv')
+        df = pd.read_csv('dataset/awattar_data.csv')
         df['start_timestamp'] = pd.to_datetime(df['start_timestamp'])
         df['end_timestamp'] = pd.to_datetime(df['end_timestamp'])
         filter_df = df[(df['start_timestamp'] >= start_time) & (df['end_timestamp'] <= end_time)]

@@ -77,10 +77,10 @@ def averageAwattarPriceOverPeriod():
 @app.route('/api/combined_reports', methods=['POST'])
 def combined_reports():
     new_item = request.json
-    fromDate_sm = new_item['fromDate']
-    toDate_sm = new_item['toDate']
-    fromDate_aws = new_item['fromDate']
-    toDate_aws = new_item['toDate']
+    fromDate_sm = new_item['fromDate_sm']
+    toDate_sm = new_item['toDate_sm']
+    fromDate_aws = new_item['fromDate_aws']
+    toDate_aws = new_item['toDate_aws']
 
     # Get R1 and R4 values
     R1 = energyConsumedOverPeriod(fromDate_sm, toDate_sm)

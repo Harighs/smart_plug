@@ -146,8 +146,8 @@ Control the relay by passing switch number and switch status as parameter
 
 @app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
 def update_socket_controller(switchNumber, switchStatus):
-    RelayControl().__init__()
-    socket_controller(switchNumber, switchStatus)
+    relay_control = RelayControl()
+    relay_control.socket_controller(switchNumber, switchStatus)
     return jsonify({"status": "true"})
 
 

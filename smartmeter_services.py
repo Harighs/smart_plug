@@ -34,7 +34,6 @@ class SmartMeter():
         if auth_cookie and auth_xsrf_token is None:
             print("Authentication failed with status code:", self.auth_response.status_code)
         headers = {
-            'Cache-Control': 'no-cache',
             'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
         }
         if intrested_date is None:
@@ -59,8 +58,8 @@ class SmartMeter():
         if auth_cookie and auth_xsrf_token is None:
             print("Authentication failed with status code:", self.auth_response.status_code)
         headers = {
-            'Cache-Control': 'no-cache',
-            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
+            # 'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
+            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie};',
         }
 
         ### TODO: update date from mobile

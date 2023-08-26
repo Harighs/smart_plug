@@ -129,7 +129,9 @@ def combined_reports():
     return jsonify({"message": jsonify(all_reports)}), 200
 
 
-# Checking the gpio status
+"""
+Checking the gpio status
+"""
 
 @app.route('/api/socketstatus/<int:socketNumber>', methods=['GET'])
 def gpio_status(socketNumber):
@@ -138,30 +140,20 @@ def gpio_status(socketNumber):
     print(relay1_status)
     return jsonify({"message": str(relay1_status)}), 200
 
+"""
+Control the relay by passing switch number and switch status as parameter
+"""
 
-# Endpoint to get all items
-@app.route('/api/items', methods=['GET'])
-def get_items():
-    return jsonify(data)
-
-
-# TODO Exception handling
-@app.route('/api/bulbon', methods=['GET'])
-def get_bulbon():
-    #    with open('smart_plug/raspberrypi_controller.py') as control:
-    #        exec(control.read())
+@app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
+def update_socket_controller(switchNumber, switchStatus):
     RelayControl().__init__()
-    enable_relay1()
+    socket_controller(switchNumber, switchStatus)
     return jsonify({"status": "true"})
 
 
-@app.route('/api/bulboff', methods=['GET'])
-def get_bulboff():
-    RelayControl().__init__()
-    disable_relay1()
-    return jsonify({"status": "true"})
-
-
+"""
+ Extra methods and apis
+"""
 # According to market price
 @app.route('/api/lessthen/<string:eur>', methods=['GET'])
 def control_bulb_market(eur):
@@ -185,13 +177,6 @@ def update_smart_meter_data():
     smart_meter = SmartMeter()
     today_data = smart_meter.smart_meter_data  # Its a dataframe
     return today_data
-
-
-@app.route('/api/socketcontroller/<int:switchNumber>/<int:switchStatus>', methods=['GET'])
-def update_socket_controller(switchNumber, switchStatus):
-    RelayControl().__init__()
-    relay_switch_controller(switchNumber, switchStatus)
-    return jsonify({"status": "true"})
 
 
 # Endpoint to get a specific item by ID

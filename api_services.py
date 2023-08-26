@@ -24,7 +24,7 @@ data = [
 ########### TESTING ############
 @app.route('/api/status', methods=['GET'])
 def rest_api():
-    return jsonify({"message": str("success")}), 200
+    return jsonify({"status": "true"}), 200
 
 
 ########### REPORT - 1 ############

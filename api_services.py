@@ -120,24 +120,11 @@ def combined_reports():
     
 #############  Checking GPIO status #############
 
-@app.route('/api/gpio_status', methods=['GET'])
-def gpio_status():
+@app.route('/api/socketstatus/<string:socketNumber>', methods=['GET'])
+def gpio_status(socketNumber):
     relay_control = RelayControl()
-    relay1_status = relay_control.check_socket_status(1)
-    relay2_status = relay_control.check_socket_status(2)
-    relay3_status = relay_control.check_socket_status(3)
-    relay4_status = relay_control.check_socket_status(4)
-    relay5_status = relay_control.check_socket_status(5)
-    relay6_status = relay_control.check_socket_status(6)
-    
-    return jsonify({
-        "relay1": str(relay1_status),
-        "relay2": str(relay2_status),
-        "relay3": str(relay3_status),
-        "relay4": str(relay4_status),
-        "relay5": str(relay5_status),
-        "relay6": str(relay6_status)
-    }), 200
+    relay1_status = relay_control.check_socket_status(socketNumber)
+    return jsonify({"message": str(relay1_status)}), 200
 
 # Endpoint to get all items
 @app.route('/api/items', methods=['GET'])

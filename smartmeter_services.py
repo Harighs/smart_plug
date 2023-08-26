@@ -66,8 +66,10 @@ class SmartMeter():
         data_response = self.data_response(self, self.data_url, headers)
         
         if data_response is not None:
-            data_response = pd.DataFrame(data_response)[['meteredValues', 'peakDemandTimes']]
-            return data_response['meteredValues'].sum()
+            print(data_response.json())
+            # data_response = pd.DataFrame(data_response)[['meteredValues', 'peakDemandTimes']]
+            # return data_response['meteredValues'].sum()
+            return data_response.json()
 
     
     @staticmethod

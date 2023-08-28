@@ -6,7 +6,7 @@ import os
 
 class AwattarServices:
     def __init__(self):
-        self.download_new_awattar_data()
+        self.download_new_awattar_data(self)
         self.dataset_path = 'home/pi/smart_plug/dataset/awattar_data.csv'
         if not os.path.isfile(self.dataset_path):
             raise Exception('Dataset not found')
@@ -76,6 +76,7 @@ class AwattarServices:
         filter_df = df[(df['start_timestamp'] >= start_time) & (df['end_timestamp'] <= end_time)]
         return filter_df['marketprice'].mean()
 
+    @staticmethod
     def download_new_awattar_data(self):
         # New data
         url = "https://api.awattar.at/v1/marketdata"

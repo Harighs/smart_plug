@@ -117,11 +117,11 @@ def getAllReports():
     R3 = R2 / R1
     R5 = R2 - (R1 * R4)
 
-    all_reports = {"report1": str(R1),
-                   "report2": str(R2),
-                   "report3": str(R3),
-                   "report4": str(R4),
-                   "report5": str(R5)}
+    all_reports = {"report1": R1,
+                   "report2": R2,
+                   "report3": R3,
+                   "report4": R4,
+                   "report5": R5}
 
     return jsonify({"message": jsonify(all_reports)}), 200
 

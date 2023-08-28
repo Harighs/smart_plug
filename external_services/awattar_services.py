@@ -86,7 +86,7 @@ class AwattarServices:
         new_df['end_timestamp'] = pd.to_datetime(new_df['end_timestamp'], unit='ms')
 
         # Check if the file exists
-        if os.path.isfile(dataset_path):
+        if not os.path.isfile(dataset_path):
             new_df.to_csv(dataset_path, index=True)
             return None
 

@@ -122,7 +122,6 @@ def getAllReports():
                    "report3": str(R3),
                    "report4": str(R4),
                    "report5": str(R5)}
-
     return jsonify({"message": str(all_reports)}), 200
 
 

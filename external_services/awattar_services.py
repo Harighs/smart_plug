@@ -7,7 +7,7 @@ import os
 class AwattarServices:
     def __init__(self):
         self.dataset_path = '/home/pi/smart_plug/dataset/awattar_data.csv'
-        self.download_awattar_data(self.dataset_path)
+        self.download_awattar_data()
         if not os.path.isfile(self.dataset_path):
             raise Exception('Dataset not found')
         return None
@@ -76,7 +76,7 @@ class AwattarServices:
         filter_df = df[(df['start_timestamp'] >= start_time) & (df['end_timestamp'] <= end_time)]
         return filter_df['marketprice'].mean()
 
-    def download_awattar_data(dataset_path):
+    def download_awattar_data(self):
         # New data
         url = "https://api.awattar.at/v1/marketdata"
         new_df = requests.get(url).json()
@@ -85,11 +85,11 @@ class AwattarServices:
         new_df['end_timestamp'] = pd.to_datetime(new_df['end_timestamp'], unit='ms')
 
         # Check if the file exists
-        if not os.path.isfile(dataset_path):
-            new_df.to_csv(dataset_path, index=True)
+        if not os.path.isfile(self.dataset_path):
+            new_df.to_csv(self.dataset_path, index=True)
             return None
 
-        old_df = pd.read_csv(dataset_path)
+        old_df = pd.read_csv(self.dataset_path)
         old_df['start_timestamp'] = pd.to_datetime(old_df['start_timestamp'])
         old_df['end_timestamp'] = pd.to_datetime(old_df['end_timestamp'])
 
@@ -104,4 +104,4 @@ class AwattarServices:
             # Saving the new data
             print('New data available... saving the new data')
             resulting_df = pd.concat([old_df, new_df], ignore_index=True)
-            resulting_df.to_csv(dataset_path, index=True)
+            resulting_df.to_csv(self.dataset_path, index=True)

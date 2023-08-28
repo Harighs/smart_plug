@@ -7,7 +7,7 @@ import os
 class AwattarServices:
     def __init__(self):
         self.dataset_path = '/home/pi/smart_plug/dataset/awattar_data.csv'
-        self.download_new_awattar_data(self.dataset_path)
+        self.download_awattar_data(self.dataset_path)
         if not os.path.isfile(self.dataset_path):
             raise Exception('Dataset not found')
         return None

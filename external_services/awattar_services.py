@@ -76,8 +76,8 @@ class AwattarServices:
         filter_df = df[(df['start_timestamp'] >= start_time) & (df['end_timestamp'] <= end_time)]
         return filter_df['marketprice'].mean()
 
-    @staticmethod
-    def download_new_awattar_data():
+
+    def download_new_awattar_data(self):
         # New data
         url = "https://api.awattar.at/v1/marketdata"
         new_df = requests.get(url).json()

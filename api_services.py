@@ -123,6 +123,8 @@ def getAllReports():
                    "report4": R4,
                    "report5": R5}
 
+    print("all reports:", all_reports)
+    print("all reports (jsonify):", jsonify(all_reports))
     return jsonify({"message": jsonify(all_reports)}), 200
 
 

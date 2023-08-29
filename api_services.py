@@ -109,8 +109,10 @@ def getAllReports():
     get_avg_data = AwattarServices()
     R4 = get_avg_data.get_average_awattar_price_over_period(fromDate_aws, toDate_aws)
 
-    print(R1)
-    print(R4)
+    print(R1)  # smart meter info are in kWh
+
+    # awattar prices are in Mwh, so we need to convert this values
+    print(R4 * 1000)  # mwh to kwh = multiply the energy value by 1000
 
     # Calculate R2 and R3
     R2 = R1 * R4

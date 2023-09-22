@@ -105,3 +105,8 @@ class AwattarServices:
             print('New data available... saving the new data')
             resulting_df = pd.concat([old_df, new_df], ignore_index=True)
             resulting_df.to_csv(self.dataset_path, index=True)
+
+
+    def download_awattar_data_update(self, start_time, end_time):
+
+        url = https://api.awattar.at/v1/marketdata?start=1561932000000&end=1564610400000

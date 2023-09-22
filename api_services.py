@@ -104,6 +104,8 @@ def getAllReports():
 
     # Get R1 and R4 values
     smartmeter_data = SmartMeterServices()
+    # TODO: Change the below method according to 1 Feedback of Peter adding Date time in smart meter service
+    # new method --> smartmeter_data.get_smart_meter_data()
     R1 = smartmeter_data.getConsolidatedData(fromDate_sm, toDate_sm)  ## str: value
 
     get_avg_data = AwattarServices()

@@ -109,4 +109,4 @@ class AwattarServices:
 
     def download_awattar_data_update(self, start_time, end_time):
 
-        url = https://api.awattar.at/v1/marketdata?start=1561932000000&end=1564610400000
+        url = "https://api.awattar.at/v1/marketdata?start=1561932000000&end=1564610400000"

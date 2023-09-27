@@ -168,7 +168,10 @@ class SmartMeterServices:
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
         smart_meter_data = pd.read_csv(path_to_file)  # Read in the DataFrame
+        for col in smart_meter_data.columns:
+            if col == u'peakDemandTimes':
+                smart_meter_data[u'peakDemandTimes'] = pd.to_datetime(smart_meter_data[u'peakDemandTimes'])
         # Filter the DataFrame for rows within the desired datetime range
-        filtered_df = smart_meter_data[(smart_meter_data['peakDemandTimes'] >= start_date) & (smart_meter_data['peakDemandTimes'] <= end_date)]
+        filtered_df = smart_meter_data[(smart_meter_data[u'peakDemandTimes'] >= start_date) & (smart_meter_data[u'peakDemandTimes'] <= end_date)]
         # Calculate the mean of 'meteredValues' for the filtered rows
         return filtered_df['meteredValues'].mean()

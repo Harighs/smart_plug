@@ -167,7 +167,7 @@ class SmartMeterServices:
         # Define the start_date and end_date
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
-
+        smart_meter_data = pd.read_csv('smart_meter_data.csv')  # Read in the DataFrame
         # Filter the DataFrame for rows within the desired datetime range
         filtered_df = smart_meter_data[(smart_meter_data['peakDemandTimes'] >= start_date) & (smart_meter_data['peakDemandTimes'] <= end_date)]
 

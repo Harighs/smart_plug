@@ -161,8 +161,6 @@ class SmartMeterServices:
         :param end_date_time: '2023-09-30 00:00:00'
         :return:
         """
-        start_date = '2023-09-18 00:15:00'
-        end_date = '2023-09-30 00:00:00'
         path_to_file = '/home/pi/smart_plug/dataset/smart_meter_data.csv'
         # Define the start_date and end_date
         start_date = pd.to_datetime(start_date)

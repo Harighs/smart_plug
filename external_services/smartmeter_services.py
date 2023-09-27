@@ -143,13 +143,13 @@ class SmartMeterServices:
             if col == u'peakDemandTimes':
                 new_data[u'peakDemandTimes'] = pd.to_datetime(new_data[u'peakDemandTimes'])
 
-        smart_meter_data = pd.read_csv('smart_meter_data.csv')
+        smart_meter_data = pd.read_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv')
         smart_meter_data[u'peakDemandTimes'] = pd.to_datetime(smart_meter_data[u'peakDemandTimes'])
         if smart_meter_data[u'peakDemandTimes'].max().date() < datetime.date.today():
             concatinated_data = pd.concat([smart_meter_data, new_data], ignore_index=True)
 
         #saving new data:
-        concatinated_data.to_csv('smart_meter_data.csv', index=False)
+        concatinated_data.to_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv', index=False)
         print("saving new data smartmeter data file to csv file")
         return True
 
@@ -163,13 +163,12 @@ class SmartMeterServices:
         """
         start_date = '2023-09-18 00:15:00'
         end_date = '2023-09-30 00:00:00'
-
+        path_to_file = '/home/pi/smart_plug/dataset/smart_meter_data.csv'
         # Define the start_date and end_date
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
-        smart_meter_data = pd.read_csv('smart_meter_data.csv')  # Read in the DataFrame
+        smart_meter_data = pd.read_csv(path_to_file)  # Read in the DataFrame
         # Filter the DataFrame for rows within the desired datetime range
         filtered_df = smart_meter_data[(smart_meter_data['peakDemandTimes'] >= start_date) & (smart_meter_data['peakDemandTimes'] <= end_date)]
-
         # Calculate the mean of 'meteredValues' for the filtered rows
         return filtered_df['meteredValues'].mean()

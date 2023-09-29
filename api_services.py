@@ -84,10 +84,10 @@ def averageAwattarPriceOverPeriod():
     Awattar services: requires both date and time
     
     Formula:
-    R1 = Get the data from the Smart-Meter Json api
-    R2 = R1 x R4
+    R1 = Get the data from the Smart-Meter Json api and include hourly consumption info
+    R2 = R1 x R4 (Hourly awattar price)
     R3 = R2 / R1
-    R4 = Get the data from Awattar services and Consolidate it
+    R4 = Get the data from Awattar services and individual hourly prices
     R5 = R2 - R1 x R4
 
 """
@@ -102,17 +102,21 @@ def getAllReports():
     fromDate_aws = new_item['fromDate_aws']
     toDate_aws = new_item['toDate_aws']
 
+#####################
+    """
+    TODO 5 - Move this two service calls to auto_services.py (See TODO 1)
+    line 109 to 118 should run in separate service and automatically stores the data 
+    to database that I have already created
+    """
     # Get R1 and R4 values
     smartmeter_data = SmartMeterServices()
-    # TODO: Change the below method according to 1 Feedback of Peter adding Date time in smart meter service
-    # new method --> smartmeter_data.get_smart_meter_data()
-    # R1 = smartmeter_data.getConsolidatedData(fromDate_sm, toDate_sm)  ## str: value
+    # R1 = smartmeter_data.getConsolidatedData(fromDate_sm, toDate_sm)  ## str: value old method
     R1 = smartmeter_data.get_smart_meter_data(fromDate_sm, toDate_sm)  ## str: value
 
 
     get_avg_data = AwattarServices()
     R4 = get_avg_data.get_average_awattar_price_over_period(fromDate_aws, toDate_aws)
-
+#####################
     print(R1)  # smart meter info are in kWh
 
     # awattar prices are in Mwh, so we need to convert this values
@@ -173,10 +177,22 @@ schedule.every(12).hours.do(download_awattar_data)
  Main Python API service starts here
 """
 if __name__ == '__main__':
-    #    app.run(debug=True)
+
+    """
+    TODO 
+    Once this service is started and then the following should automatically called
+    1. Get daily awattar dataset and store it on our local sqlite database
+    2. Get daily consumption and store it on our local sqlite database
+    3. then we have all data at one place --> sqlite database and now its easier to calculate the 
+        reports.    
+    Better call another service from here to avoid the crashes.
+    """
+
     custom_ip = '192.168.1.166'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)
+
+
     download_awattar_data = AwattarServices().download_awattar_data()
 
     # Run the scheduler loop in a separate thread

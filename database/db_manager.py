@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import json
 
 conn = None
 cursor = None
@@ -41,6 +42,17 @@ def create_table():
             status BOOLEAN
         )
     ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS automode (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   last_24hrs_usage TEXT NOT NULL,
+                   times_to_turnon TEXT NOT NULL,
+                   status BOOLEAN,
+                   datetime TEXT NOT NULL
+        )
+    ''')
+
     cursor.close()
 
 def insert_table(start_datetime, end_datetime, awattar_price, smart_meter_consumption, R2, R3, R5):

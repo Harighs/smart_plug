@@ -28,8 +28,8 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
         
-        start_date = ""
-        end_date = ""
+        start_date = '1693526400000'
+        end_date = '1696118399000'
         self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD(start_date, end_date)
         self.smartmeter_df = smartmeter_services.sm_each_date()
         

@@ -12,6 +12,16 @@ Created a Sqlite3 local database to store our datasets
     - 
 """
 
+class DatabaseManager:
+ def __init__(self):
+    print("init called")
+    create_connection()
+    create_table()
+    # insert_table("2023-09-18 01:00:00", "2023-09-18 02:00:00", "5.50", "100", "0", "0", "0") # TODO pass it from services
+    # read_table()
+    delete_datacache_table()
+
+
 def create_connection():
     try:
         conn = sqlite3.connect(db_name)
@@ -25,11 +35,13 @@ def create_connection():
 def create_table():
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
+
+    # datacache - table to store the master records from (Awattar service and Smartmeter)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS datacache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            start_datetime TEXT NOT NULL,
-            end_datetime TEXT NOT NULL,
+            start_timestamp TEXT NOT NULL,
+            end_timestamp TEXT NOT NULL,
             awattar_price TEXT NOT NULL,
             smart_meter_consumption TEXT NOT NULL,
             awattar_unit TEXT NOT NULL,
@@ -39,10 +51,12 @@ def create_table():
             R3 TEXT NOT NULL,
             R4 TEXT NOT NULL,
             R5 TEXT NOT NULL,
-            status BOOLEAN
+            status BOOLEAN,
+            mode TEXT NOT NULL
         )
     ''')
 
+    # automode - table to record information for Auto Mode
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS automode (
                    id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,15 +69,15 @@ def create_table():
 
     cursor.close()
 
-def insert_table(start_datetime, end_datetime, awattar_price, smart_meter_consumption, R2, R3, R5):
+def insert_datacache_table(start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO datacache (start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-                   (start_datetime, end_datetime, awattar_price, smart_meter_consumption, '€', 'Eur/MWh', awattar_price, R2, R3, smart_meter_consumption, R5, 'true'))
+    cursor.execute("INSERT INTO datacache (start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+                   (start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode))
     conn.commit()
     cursor.close()
 
-def read_table():
+def read_datacache_table():
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM datacache")
@@ -72,7 +86,7 @@ def read_table():
         print(row)
     cursor.close()
 
-def delete_table():
+def delete_datacache_table():
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM datacache")
@@ -80,8 +94,4 @@ def delete_table():
     cursor.close()
 
 if __name__ == '__main__':
-    create_connection()
-    create_table()
-    insert_table("2023-09-18 01:00:00", "2023-09-18 02:00:00", "5.50", "100", "0", "0", "0") # TODO pass it from services
-    read_table()
-    #delete_table()
+    DatabaseManager()

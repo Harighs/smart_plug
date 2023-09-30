@@ -7,16 +7,20 @@ TODO 2: call the awattar and smart meter services
 TODO 3: store the information to the database table (datacache) and use db_manager().insert(?, ?, ?, ?)
 """
 
+import sys
+sys.path.append('../')
 import os
 import schedule
 import pandas as pd
 import time
+import sqlite3
 
 from flask import Flask, jsonify, request
 
 from external_services.awattar_services import AwattarServices
 from pi_controller.relay_controller import RelayControl
 from external_services.smartmeter_services import SmartMeterServices
+from database.db_manager import DatabaseManager
 
 
 class AutoServices:
@@ -24,6 +28,8 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
         
+        start_date = ""
+        end_date = ""
         self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD(start_date, end_date)
         self.smartmeter_df = smartmeter_services.sm_each_date()
         
@@ -31,7 +37,6 @@ class AutoServices:
         self.smart_meter_data_path = '../DATASET/smart_meter_data.csv'
         
         # Updating Awattar one day data in Dataset folder
-        
 
 
 def create_master_df(self):
@@ -56,8 +61,10 @@ def create_master_df(self):
         
     Master_Data['start_timestamp'] = awattar_data['start_timestamp']
     Master_Data['end_timestamp'] = awattar_data['end_timestamp']
-    Master_Data['awattar_price'] = awattar_data['marketprice']
+    Master_Data['awattar_price'] = awattar_data['marketprice']/1000 # Converting mWh to kWh
     Master_Data['smart_meter_consumption'] = smart_meter_data['meteredValues']
+    Master_Data['awattar_unit'] = awattar_data['unit']
+    Master_Data['smart_meter_unit'] = "kWh"
     # R1
     Master_Data['R1'] = smart_meter_data['meteredValues']
     # R4
@@ -80,6 +87,10 @@ def create_master_df(self):
     Master_Data.to_csv(Master_Data_Path, index=False)
 
     #TODO: Feed Master Data CSV to the database
+    db = DatabaseManager()
+    conn = sqlite3.connect("pythonsqlite.db")
+    Master_Data.to_sql('datacache', conn, index=False, if_exists='replace')
     return True
     
-    
+if __name__ == '__main__':
+        AutoServices()

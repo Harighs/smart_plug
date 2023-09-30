@@ -163,8 +163,8 @@ class SmartMeterServices:
         """
         path_to_file = '/home/pi/smart_plug/dataset/smart_meter_data.csv'
         # Define the start_date and end_date
-        start_date = pd.to_datetime(start_date)
-        end_date = pd.to_datetime(end_date)
+        start_date = pd.to_datetime(start_date_time)
+        end_date = pd.to_datetime(end_date_time)
         smart_meter_data = pd.read_csv(path_to_file)  # Read in the DataFrame
         for col in smart_meter_data.columns:
             if col == u'peakDemandTimes':

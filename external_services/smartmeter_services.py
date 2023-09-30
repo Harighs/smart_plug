@@ -115,11 +115,73 @@ class SmartMeterServices:
                             data_response.status_code)
 
     # New func written on 22-09-2023
+    def sm_each_date(self, current_date):
+        auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
+        auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+        auth_response = requests.post(auth_url, json=auth_payload)
+        auth_cookie = auth_response.j['__Host-go4DavidSecurityToken']
+        auth_xsrf_token = auth_response.cookies['XSRF-Token']
+        # current_date = str(datetime.date.today())
+        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
+        headers = {
+            'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
+        }
+
+        data_response = requests.get(data_url, headers=headers)
+
+        if data_response.status_code == 200:
+            print("The status code is 200 (OK).")
+        else:
+            raise ValueError(f"HTTP request is failing see this code with status code {data_response.status_code}.")
+
+
+        new_data = pd.DataFrame(json.loads(data_response.content))[['meteredValues', 'peakDemandTimes']]
+        return new_data
+
+    # New func written on 22-09-2023
+    def saving_SmartMeter_Data_Each_day(self, current_date = str(datetime.date.today())):
+        auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
+        auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+        auth_response = requests.post(auth_url, json=auth_payload)
+        auth_cookie = auth_response.j['__Host-go4DavidSecurityToken']
+        auth_xsrf_token = auth_response.cookies['XSRF-Token']
+        # current_date = str(datetime.date.today())
+        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
+        headers = {
+            'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
+        }
+
+        data_response = requests.get(data_url, headers=headers)
+
+        if data_response.status_code == 200:
+            print("The status code is 200 (OK).")
+        else:
+            raise ValueError(f"HTTP request is failing see this code with status code {data_response.status_code}.")
+
+
+        new_data = pd.DataFrame(json.loads(data_response.content))[['meteredValues', 'peakDemandTimes']]
+
+        # Convert all Unicode values in the DataFrame to regular strings
+        for col in new_data.columns:
+            new_data[col] = new_data[col].apply(lambda x: x.encode('utf-8') if isinstance(x, unicode) else x)
+            if col == u'peakDemandTimes':
+                new_data[u'peakDemandTimes'] = pd.to_datetime(new_data[u'peakDemandTimes'])
+
+        smart_meter_data = pd.read_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv')
+        smart_meter_data[u'peakDemandTimes'] = pd.to_datetime(smart_meter_data[u'peakDemandTimes'])
+        if smart_meter_data[u'peakDemandTimes'].max().date() < datetime.date.today():
+            concatinated_data = pd.concat([smart_meter_data, new_data], ignore_index=True)
+
+        #saving new data:
+        concatinated_data.to_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv', index=False)
+        print("saving new data smartmeter data file to csv file")
+        return True
+    
     def saving_SmartMeter_Data_Each_day(self):
         auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
         auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
         auth_response = requests.post(auth_url, json=auth_payload)
-        auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
+        auth_cookie = auth_response.j['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
         current_date = str(datetime.date.today())
         data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
@@ -151,7 +213,7 @@ class SmartMeterServices:
         #saving new data:
         concatinated_data.to_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv', index=False)
         print("saving new data smartmeter data file to csv file")
-        return True
+        return concatinated_data
 
     # New func written on 22-09-2023
     def get_smart_meter_data(self, start_date_time, end_date_time):

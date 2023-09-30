@@ -188,7 +188,7 @@ if __name__ == '__main__':
     Better call another service from here to avoid the crashes.
     """
 
-    custom_ip = '192.168.1.166'
+    custom_ip = '192.168.1.238'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)
 

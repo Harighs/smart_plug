@@ -6,7 +6,7 @@ import os
 
 class AwattarServices:
     def __init__(self):
-        self.dataset_path = '/home/pi/smart_plug/dataset/awattar_data.csv'
+        self.dataset_path = '/home/pi/smart_plug/DATASET/awattar_data.csv'
         self.download_awattar_data()
         if not os.path.isfile(self.dataset_path):
             raise Exception('Dataset not found')
@@ -107,5 +107,23 @@ class AwattarServices:
             resulting_df.to_csv(self.dataset_path, index=True)
 
 
-    def download_awattar_data_update(self, start_time, end_time):
-        url = "https://api.awattar.at/v1/marketdata?start=1561932000000&end=1564610400000"
+    def AWATTAR_ONE_DAY_PERIOD(self, start_date, end_date): 
+        """
+        INPUT:
+            start_date: str --> 'YYYY:MM:dd hh:mm:ss'
+            end_date: str --> 'YYYY:MM:dd hh:mm:ss'
+        PARAMS: 
+            self.awattar_json_url
+        OUTPUT: awattar_json_response: pd.DataFrame
+        """
+        # Get Awattar Data
+        json_url = self.awattar_json_url.format(start_date, end_date)
+        awattar_json_response = requests.get(json_url).json()
+        awattar_json_response = pd.json_normalize(awattar_json_response['data'])
+        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms')
+        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms')
+        
+        if os.path.exists(self.dataset_path):
+            os.remove(self.dataset_path)
+        awattar_json_response.to_csv(self.dataset_path, index=False)
+        return awattar_json_response

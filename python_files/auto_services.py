@@ -19,21 +19,22 @@ from pi_controller.relay_controller import RelayControl
 from external_services.smartmeter_services import SmartMeterServices
 
 
+class AutoServices:
+    def __init__(self):
+        awattar_services = AwattarServices()
+        smartmeter_services = SmartMeterServices()
+        
+        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD(start_date, end_date)
+        self.smartmeter_df = smartmeter_services.sm_each_date()
+        
+        self.awattar_data_path = '../DATASET/awattar_data.csv'
+        self.smart_meter_data_path = '../DATASET/smart_meter_data.csv'
+        
+        # Updating Awattar one day data in Dataset folder
+        
 
-# Get R1 and R4 values
-smartmeter_data = SmartMeterServices()
-# R1 = smartmeter_data.getConsolidatedData(fromDate_sm, toDate_sm)  ## str: value old method
-fromDate_sm = '2023-09-30 00:15:00'
-toDate_sm = '2023-09-01 00:00:00'
-# R1 = smartmeter_data.get_smart_meter_data(fromDate_sm, toDate_sm)  ## str: value
 
-
-get_avg_data = AwattarServices()
-R4 = get_avg_data.get_average_awattar_price_over_period(fromDate_sm, toDate_sm)
-
-print(R4)
-
-def create_master_df(awattar_data_path, smart_meter_data_path):
+def create_master_df(self):
     Master_Data_Path = '../DATASET/master_data.csv'
     
     if not os.path.exists(Master_Data_Path):
@@ -43,10 +44,10 @@ def create_master_df(awattar_data_path, smart_meter_data_path):
     Master_Data = pd.read_csv(Master_Data_Path)
     
     # Load and process awattar data
-    awattar_data = pd.read_csv(awattar_data_path)
+    awattar_data = pd.read_csv(self.awattar_data_path)
     
     # Load and process smart meter data
-    smart_meter_data = pd.read_csv(smart_meter_data_path)
+    smart_meter_data = pd.read_csv(self.smart_meter_data_path)
     
     smart_meter_data['peakDemandTimes'] = pd.to_datetime(smart_meter_data['peakDemandTimes'])
     smart_meter_data['hourly_time'] = smart_meter_data['peakDemandTimes'].dt.floor('H')
@@ -74,8 +75,11 @@ def create_master_df(awattar_data_path, smart_meter_data_path):
     # fill NaN on chosen columns with 0
     Master_Data[['R1', 'R2', 'R3', 'R4', 'R5']] = Master_Data[['R1', 'R2', 'R3', 'R4', 'R5']].fillna(0)
     
+    if os.path.exists(Master_Data_Path):
+        os.remove(Master_Data_Path)    
     Master_Data.to_csv(Master_Data_Path, index=False)
 
+    #TODO: Feed Master Data CSV to the database
     return True
     
     

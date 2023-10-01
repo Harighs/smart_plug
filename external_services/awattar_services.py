@@ -110,11 +110,28 @@ class AwattarServices:
 
 
     def AWATTAR_ONE_DAY_PERIOD(self): 
-      
-
         # This return the datetime timestamp before 24hours
         # Replace this with your Unix timestamp
         current_datetime = datetime.now() - timedelta(hours=24)
+        unix_timestamp = current_datetime.timestamp()
+        start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(unix_timestamp)
+
+        # Get Awattar Data
+        json_url = self.awattar_json_url.format(int(start_of_day.timestamp()*1000), int(end_of_day.timestamp()*1000))
+        awattar_json_response = requests.get(json_url).json()
+        awattar_json_response = pd.json_normalize(awattar_json_response['data'])
+        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms')
+        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms')
+        
+        if os.path.exists(self.dataset_path):
+            os.remove(self.dataset_path)
+        awattar_json_response.to_csv(self.dataset_path, index=False)
+        return awattar_json_response
+    
+    def AWATTAR_FUTURE_PRICE(self): 
+        # This return the datetime timestamp before 24hours
+        # Replace this with your Unix timestamp
+        current_datetime = datetime.now() 
         unix_timestamp = current_datetime.timestamp()
         start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(unix_timestamp)
 

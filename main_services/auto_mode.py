@@ -1,36 +1,37 @@
-#usr/bin/python3
-from awattar_services import AwattarServices
+# usr/bin/python3
 import datetime
-
 import sys
+
+from awattar_services import AwattarServices
 
 # Add the directory to sys.path
 sys.path.append('..')
 from pi_controller.relay_controller import RelayControl
 
+
 class Auto_Mode:
     def __init__(self):
         self.future_df = None
         pass
-        
-    def auto_mode(self, no_of_times:int):
+
+    def auto_mode(self, no_of_times: int):
         self.future_df = AwattarServices().AWATTAR_FUTURE_PRICE()
         self.date_time = datetime.datetime.now()
-        #delete past values from future_df
+        # delete past values from future_df
         self.future_df = self.future_df[self.future_df['start_timestamp'] > self.date_time.now()]
-        
-        #find min 4 values of future_df
+
+        # find min 4 values of future_df
         self.future_df.sort_values(by=['marketprice'], inplace=True)
         self.future_df = self.future_df.iloc[:no_of_times]
         self.future_df.sort_values(by=['start_timestamp'], inplace=True)
         # add column
         self.future_df['triggerstatus'] = True
         print(self.future_df)
-        #TODO: Put inside db
-        
+        # TODO: Put inside db
+
         return self.future_df
-    
-    def turn_on_turn_off(self):    
+
+    def turn_on_turn_off(self):
         # TODO: get DB data and change to dataframe
         current_time = datetime.datetime.now()
         # Check if current time is within any interval
@@ -46,7 +47,6 @@ class Auto_Mode:
                     # print('False')
 
 
-        
 if __name__ == "__main__":
     auto_mode = Auto_Mode()
     auto_mode.auto_mode(4)

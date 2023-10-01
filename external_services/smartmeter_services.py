@@ -1,9 +1,8 @@
-import requests
-import pandas as pd
-import json
-from urllib.parse import quote
-import os
 import datetime
+import json
+import os
+import pandas as pd
+import requests
 
 
 class SmartMeterServices:
@@ -122,10 +121,12 @@ class SmartMeterServices:
         auth_response = requests.post(auth_url, json=auth_payload)
         auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
-        current_date = str(datetime.date.today()-datetime.timedelta(days=2)) # two days because the data is not available last 24hrs
+        current_date = str(
+            datetime.date.today() - datetime.timedelta(days=2))  # two days because the data is not available last 24hrs
         # TODO remove the hardcoded meter id or id
-        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
-       # data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=40565569&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
+        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(
+            current_date, auth_cookie)
+        # data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=40565569&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
         headers = {
             'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
         }
@@ -137,15 +138,13 @@ class SmartMeterServices:
         else:
             raise ValueError(f"HTTP request is failing see this code with status code {data_response.status_code}.")
 
-
         new_data = pd.DataFrame(json.loads(data_response.content))[['meteredValues', 'peakDemandTimes']]
-        
+
         if os.path.exists(self.dataset_path):
             os.remove(self.dataset_path)
         new_data.to_csv(self.dataset_path, index=False)
         return new_data
 
-    
     def saving_SmartMeter_Data_Each_day(self):
         auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
         auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
@@ -153,7 +152,8 @@ class SmartMeterServices:
         auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
         current_date = str(datetime.date.today())
-        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
+        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(
+            current_date, auth_cookie)
         headers = {
             'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
         }
@@ -164,7 +164,6 @@ class SmartMeterServices:
             print("The status code is 200 (OK).")
         else:
             raise ValueError(f"HTTP request is failing see this code with status code {data_response.status_code}.")
-
 
         new_data = pd.DataFrame(json.loads(data_response.content.decode('utf-8')))[['meteredValues', 'peakDemandTimes']]
 
@@ -178,7 +177,7 @@ class SmartMeterServices:
         if smart_meter_data[u'peakDemandTimes'].max().date() < datetime.date.today():
             concatinated_data = pd.concat([smart_meter_data, new_data], ignore_index=True)
 
-        #saving new data:
+        # saving new data:
         concatinated_data.to_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv', index=False)
         print("saving new data smartmeter data file to csv file")
         return concatinated_data
@@ -200,6 +199,7 @@ class SmartMeterServices:
             if col == u'peakDemandTimes':
                 smart_meter_data[u'peakDemandTimes'] = pd.to_datetime(smart_meter_data[u'peakDemandTimes'])
         # Filter the DataFrame for rows within the desired datetime range
-        filtered_df = smart_meter_data[(smart_meter_data[u'peakDemandTimes'] >= start_date) & (smart_meter_data[u'peakDemandTimes'] <= end_date)]
+        filtered_df = smart_meter_data[
+            (smart_meter_data[u'peakDemandTimes'] >= start_date) & (smart_meter_data[u'peakDemandTimes'] <= end_date)]
         # Calculate the mean of 'meteredValues' for the filtered rows
         return filtered_df['meteredValues'].mean()

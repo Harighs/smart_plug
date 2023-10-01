@@ -38,12 +38,12 @@ class RelayControl:
     def __init__(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(5, GPIO.OUT)
-        GPIO.setup(6, GPIO.OUT)
-        GPIO.setup(13, GPIO.OUT)
+        GPIO.setup(24, GPIO.OUT)
+        GPIO.setup(25, GPIO.OUT)
+        GPIO.setup(8, GPIO.OUT)
+        GPIO.setup(7, GPIO.OUT)
+        GPIO.setup(12, GPIO.OUT)
         GPIO.setup(16, GPIO.OUT)
-        GPIO.setup(19, GPIO.OUT)
-        GPIO.setup(20, GPIO.OUT)
         # # Bulb wireing is inverted
         # GPIO.output(5, GPIO.HIGH)
         # GPIO.output(6, GPIO.HIGH)
@@ -54,32 +54,32 @@ class RelayControl:
 
     def relayController(self, relayNumber, relayStatus):
         if relayNumber == 1:
-            return GPIO.output(5, relayStatus)
+            return GPIO.output(24, relayStatus)            
         elif relayNumber == 2:
-            return GPIO.output(6, relayStatus)
+            return GPIO.output(25, relayStatus)
         elif relayNumber == 3:
-            return GPIO.output(13, relayStatus)
+            return GPIO.output(8, relayStatus)
         elif relayNumber == 4:
-            return GPIO.output(16, relayStatus)
+            return GPIO.output(7, relayStatus)
         elif relayNumber == 5:
-            return GPIO.output(19, relayStatus)
+            return GPIO.output(12, relayStatus)
         elif relayNumber == 6:
-            return GPIO.output(20, relayStatus)
+            return GPIO.output(16, relayStatus)
         else:
             return False
 
     def checkRelayStatus(self, relayNumber):
-        if relayNumber == 1:
-            return GPIO.input(5)
-        elif relayNumber == 2:
-            return GPIO.input(6)
-        elif relayNumber == 3:
-            return GPIO.input(13)
-        elif relayNumber == 4:
+       if relayNumber == 1:
+            return GPIO.input(24)
+       elif relayNumber == 2:
+            return GPIO.input(25)
+       elif relayNumber == 3:
+            return GPIO.input(8)
+       elif relayNumber == 4:
+            return GPIO.input(7)
+       elif relayNumber == 5:
+            return GPIO.input(12)
+       elif relayNumber == 6:
             return GPIO.input(16)
-        elif relayNumber == 5:
-            return GPIO.input(19)
-        elif relayNumber == 6:
-            return GPIO.input(20)
-        else:
+       else:
             return False

@@ -43,8 +43,6 @@ def postRelaySettings():
     return jsonify({"status": "true"}), 200
 
 
-
-
 # New method to get all the reports from the database
 @app.route('/api/getAllReports', methods=['POST'])
 def getAllReports():
@@ -87,7 +85,6 @@ def getAllReports():
  The following methods are used to control the RELAYs and its status
 """
 
-
 @app.route('/api/relaystatus/<int:relayNumber>', methods=['POST'])
 def relayStatus(relayNumber):
     relay_control = RelayControl()
@@ -99,7 +96,6 @@ def relayStatus(relayNumber):
 Control the relay by passing switch number and switch status as parameter
 """
 
-
 @app.route('/api/relaycontroller/<int:relayNumber>/<int:relayStatus>', methods=['POST'])
 def relayController(relayNumber, relayStatus):
     relay_control = RelayControl()
@@ -108,42 +104,10 @@ def relayController(relayNumber, relayStatus):
 
 
 """
- Extra methods and apis
-"""
-
-
-# Define the function to download awattar data
-def download_awattar_data():
-    awattar_service = AwattarServices()
-    return None
-
-
-# Schedule the download_awattar_data function to run at 12-hour intervals
-schedule.every(12).hours.do(download_awattar_data)
-
-"""
  Main Python API service starts here
 """
 if __name__ == '__main__':
 
-    """
-    TODO 
-    Once this service is started and then the following should automatically called
-    1. Get daily awattar dataset and store it on our local sqlite database
-    2. Get daily consumption and store it on our local sqlite database
-    3. then we have all data at one place --> sqlite database and now its easier to calculate the 
-        reports.    
-    Better call another service from here to avoid the crashes.
-    """
-
     custom_ip = '192.168.1.238'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)
-
-
-    download_awattar_data = AwattarServices().download_awattar_data()
-
-    # Run the scheduler loop in a separate thread
-    while True:
-        schedule.run_pending()
-        time.sleep(1)

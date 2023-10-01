@@ -42,6 +42,29 @@ def averageAwattarPriceOverPeriod():
 
 
 """
+ Extra methods 
+"""
+
+# Define the function to download awattar data
+# def download_awattar_data():
+#  awattar_service = AwattarServices()
+# return None
+
+
+# Schedule the download_awattar_data function to run at 12-hour intervals
+# schedule.every(12).hours.do(download_awattar_data)
+
+
+
+# download_awattar_data = AwattarServices().download_awattar_data()
+
+# Run the scheduler loop in a separate thread
+# while True:
+#    schedule.run_pending()
+#   time.sleep(1)
+
+
+"""
     Get all 5 reports based on the start-date and end-date
     Smart-meter services:  requires only start and end date
     Awattar services: requires both date and time

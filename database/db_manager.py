@@ -54,10 +54,35 @@ class DatabaseManager:
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS automode (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                datetime TEXT NOT NULL,
                 last_24hrs_usage TEXT NOT NULL,
                 times_to_turnon TEXT NOT NULL,
-                status BOOLEAN,
-                datetime TEXT NOT NULL
+                status BOOLEAN
+            )
+        ''')
+
+         # automaterelay - table to record information for turn on and turn off
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS automaterelay (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                start_timestamp TEXT NOT NULL,
+                end_timestamp TEXT NOT NULL,
+                marketprice TEXT NOT NULL,
+                unit TEXT NOT NULL,
+                triggerstatus BOOLEAN 
+            )
+        ''')
+
+          # relaysettings - table to record information for turn on and turn off
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS relaysettings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                datetime TEXT NOT NULL,
+                relay1power TEXT NOT NULL,
+                relay2power TEXT NOT NULL,
+                relay1unit TEXT NOT NULL,
+                relay2unit TEXT NOT NULL,
+                status BOOLEAN
             )
         ''')
 
@@ -83,7 +108,7 @@ class DatabaseManager:
     def read_datacache_withdate_table(self, fromDate, toDate):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        cursor.execute(f"SELECT * FROM datacache WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}'")
+        cursor.execute(f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}'")
         rows = cursor.fetchall()
 
         result_list = []

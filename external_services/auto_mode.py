@@ -27,9 +27,11 @@ class Auto_Mode:
         self.future_df['triggerstatus'] = True
         print(self.future_df)
         #TODO: Put inside db
+        
         return self.future_df
     
-    def turn_on_turn_off(self):        
+    def turn_on_turn_off(self):    
+        # TODO: get DB data and change to dataframe
         current_time = datetime.datetime.now()
         # Check if current time is within any interval
         while True:

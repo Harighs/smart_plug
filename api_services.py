@@ -1,6 +1,7 @@
 import os
 import schedule
 import time
+from datetime import datetime
 
 from flask import Flask, jsonify, request
 
@@ -139,17 +140,34 @@ def getAllReports_old():
 
 @app.route('/api/getAllReports', methods=['POST'])
 def getAllReports():
-    new_item = request.json
-    fromDate = new_item['fromDate']
-    toDate = new_item['toDate']
-
-    print(fromDate)
-    print(toDate)
+    json_data = request.json
+   
+    from_date = datetime.strptime(json_data["fromDate"], "%Y-%m-%d")
+    to_date = datetime.strptime(json_data["toDate"], "%Y-%m-%d")
 
     db = DatabaseManager()
-    result = db.read_datacache_withdate_table(fromDate, toDate)
+    result = db.read_datacache_withdate_table(from_date, to_date)[0]
+        
+    if (result[0] is not None or result[3] is not None):
+        # Create a dictionary with keys and values
+        json_data = {
+            "report1": str("{:.2f}".format(result[0])),
+            "report2": str("{:.2f}".format(result[1])),
+            "report3": str("{:.2f}".format(result[2])),
+            "report4": str("{:.2f}".format(result[3])),
+            "report5": str("{:.2f}".format(result[4]))
+        }
+    else:
+        json_data = {
+            "report1": "0",
+            "report2": "0",
+            "report3": "0",
+            "report4": "0",
+            "report5": "0",
+        }
+
     
-    return jsonify({"message": result}), 200
+    return jsonify({"message": json_data}), 200
 
 
 """

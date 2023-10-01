@@ -141,33 +141,38 @@ def getAllReports_old():
 @app.route('/api/getAllReports', methods=['POST'])
 def getAllReports():
     json_data = request.json
+    print("Received data:", json_data)
    
-    from_date = datetime.strptime(json_data["fromDate"], "%Y-%m-%d")
-    to_date = datetime.strptime(json_data["toDate"], "%Y-%m-%d")
+    try:
+        from_date = datetime.strptime(json_data["fromDate"], "%Y-%m-%d")
+        to_date = datetime.strptime(json_data["toDate"], "%Y-%m-%d")
 
-    db = DatabaseManager()
-    result = db.read_datacache_withdate_table(from_date, to_date)[0]
-        
-    if (result[0] is not None or result[3] is not None):
-        # Create a dictionary with keys and values
-        json_data = {
-            "report1": str("{:.2f}".format(result[0])),
-            "report2": str("{:.2f}".format(result[1])),
-            "report3": str("{:.2f}".format(result[2])),
-            "report4": str("{:.2f}".format(result[3])),
-            "report5": str("{:.2f}".format(result[4]))
-        }
-    else:
-        json_data = {
-            "report1": "0",
-            "report2": "0",
-            "report3": "0",
-            "report4": "0",
-            "report5": "0",
-        }
+        db = DatabaseManager()
+        result = db.read_datacache_withdate_table(from_date, to_date)[0]
 
-    
-    return jsonify({"message": json_data}), 200
+        if (result[0] is not None or result[3] is not None):
+            # Create a dictionary with keys and values
+            json_data = {
+                "report1": str("{:.2f}".format(result[0])),
+                "report2": str("{:.2f}".format(result[1])),
+                "report3": str("{:.2f}".format(result[2])),
+                "report4": str("{:.2f}".format(result[3])),
+                "report5": str("{:.2f}".format(result[4]))
+            }
+        else:
+            json_data = {
+                "report1": "0",
+                "report2": "0",
+                "report3": "0",
+                "report4": "0",
+                "report5": "0",
+            }
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return "", 400 # Server cannot process the request
+        # You might want to set a default value for json_data or handle the error in another way
+
+    return jsonify({"message": str(json_data)}), 200
 
 
 """

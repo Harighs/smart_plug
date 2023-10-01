@@ -30,11 +30,11 @@ class AutoServices:
         self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
         self.smartmeter_df = smartmeter_services.sm_each_date()
         
-        self.awattar_data_path = '../DATASET/awattar_data.csv'
-        self.smart_meter_data_path = '../DATASET/smart_meter_data.csv'
+        self.awattar_data_path = '../dataset/awattar_data.csv'
+        self.smart_meter_data_path = '../dataset/smart_meter_data.csv'
         
     def create_master_df(self):
-        Master_Data_Path = '../DATASET/master_data.csv'
+        Master_Data_Path = '../dataset/master_data.csv'
         
         if not os.path.exists(Master_Data_Path):
             columns  = ['start_timestamp', 'end_timestamp', 'awattar_price', 'smart_meter_consumption', 'R1', 'R2', 'R3', 'R4', 'R5', 'status','mode']

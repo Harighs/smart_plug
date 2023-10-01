@@ -4,6 +4,7 @@ import sqlite3
 from sqlite3 import Error
 import os
 import json
+from datetime import datetime
 
 global conn
 global cursor
@@ -87,6 +88,15 @@ class DatabaseManager:
         ''')
 
         cursor.close()
+
+    def insert_relaysettings_table(self, relay1Power, relay2Power):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM relaysettings")
+        cursor.execute("INSERT INTO relaysettings(datetime, relay1power, relay2power, relay1unit, relay2unit,status) VALUES (?, ?, ?, ?, ?, ?)",(datetime.now(), relay1Power, relay2Power, "kWh", "kWh", True))
+        conn.commit()
+        cursor.close()
+
 
     def insert_datacache_table(self, start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode):
         conn = sqlite3.connect(db_name)

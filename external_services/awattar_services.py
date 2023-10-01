@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 class AwattarServices:
     def __init__(self):
-        self.dataset_path = '/home/pi/smart_plug/DATASET/awattar_data.csv'
+        self.dataset_path = '/home/pi/smart_plug/dataset/awattar_data.csv'
         self.awattar_json_url = "https://api.awattar.at/v1/marketdata?start={}&end={}"
        # self.download_awattar_data()
        # if not os.path.isfile(self.dataset_path):

@@ -1,14 +1,15 @@
 import sys
+
 sys.path.append('../')
 import sqlite3
 from sqlite3 import Error
 import os
-import json
 from datetime import datetime
 
 global conn
 global cursor
-db_name = os.path.join(os.path.dirname(__file__), 'pythonsqlite.db') 
+db_name = os.path.join(os.path.dirname(__file__), 'pythonsqlite.db')
+
 
 class DatabaseManager:
     def __init__(self):
@@ -25,7 +26,6 @@ class DatabaseManager:
             print(sqlite3.version)
         except Error as e:
             print("create_connection", e)
-        
 
     def create_table(self):
         conn = sqlite3.connect(db_name)
@@ -62,7 +62,7 @@ class DatabaseManager:
             )
         ''')
 
-         # automaterelay - table to record information for turn on and turn off
+        # automaterelay - table to record information for turn on and turn off
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS automaterelay (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,7 +74,7 @@ class DatabaseManager:
             )
         ''')
 
-          # relaysettings - table to record information for turn on and turn off
+        # relaysettings - table to record information for turn on and turn off
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS relaysettings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,16 +93,20 @@ class DatabaseManager:
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM relaysettings")
-        cursor.execute("INSERT INTO relaysettings(datetime, relay1power, relay2power, relay1unit, relay2unit,status) VALUES (?, ?, ?, ?, ?, ?)",(datetime.now(), relay1Power, relay2Power, "kWh", "kWh", True))
+        cursor.execute(
+            "INSERT INTO relaysettings(datetime, relay1power, relay2power, relay1unit, relay2unit,status) VALUES (?, ?, ?, ?, ?, ?)",
+            (datetime.now(), relay1Power, relay2Power, "kWh", "kWh", True))
         conn.commit()
         cursor.close()
 
-
-    def insert_datacache_table(self, start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode):
+    def insert_datacache_table(self, start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit,
+                               smart_meter_unit, R1, R2, R3, R4, R5, status, mode):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO datacache (start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
-                    (start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode))
+        cursor.execute(
+            "INSERT INTO datacache (start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1, R2, R3, R4, R5, status, mode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit, smart_meter_unit, R1,
+             R2, R3, R4, R5, status, mode))
         conn.commit()
         cursor.close()
 
@@ -118,15 +122,16 @@ class DatabaseManager:
     def read_datacache_withdate_table(self, fromDate, toDate):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        cursor.execute(f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}'")
+        cursor.execute(
+            f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}'")
         rows = cursor.fetchall()
 
         result_list = []
         for row in rows:
-            #print(row)
-            result_list.append(row)   
-            
-        # Convert the list to JSON
+            # print(row)
+            result_list.append(row)
+
+            # Convert the list to JSON
         # json_data = json.dumps(result_list, indent=2)
 
         cursor.close()
@@ -139,6 +144,7 @@ class DatabaseManager:
         cursor.execute("DELETE FROM datacache")
         conn.commit()
         cursor.close()
+
 
 if __name__ == '__main__':
     db = DatabaseManager()

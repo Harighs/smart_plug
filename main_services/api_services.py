@@ -2,13 +2,11 @@ import os
 import schedule
 import time
 from datetime import datetime
-
 from flask import Flask, jsonify, request
 
+from database.db_manager import DatabaseManager
 from external_services.awattar_services import AwattarServices
 from pi_controller.relay_controller import RelayControl
-from external_services.smartmeter_services import SmartMeterServices
-from database.db_manager import DatabaseManager
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -37,12 +35,9 @@ def postRelaySettings():
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        return "", 400 # Server cannot process the request
-
+        return "", 400  # Server cannot process the request
 
     return jsonify({"status": "true"}), 200
-
-
 
 
 # New method to get all the reports from the database
@@ -50,7 +45,7 @@ def postRelaySettings():
 def getAllReports():
     json_data = request.json
     print("Received data:", json_data)
-   
+
     try:
         from_date = datetime.strptime(json_data["fromDate"], "%Y-%m-%d")
         to_date = datetime.strptime(json_data["toDate"], "%Y-%m-%d")
@@ -77,7 +72,7 @@ def getAllReports():
             }
     except Exception as e:
         print(f"An error occurred: {e}")
-        return "", 400 # Server cannot process the request
+        return "", 400  # Server cannot process the request
         # You might want to set a default value for json_data or handle the error in another way
 
     return jsonify({"message": str(json_data)}), 200
@@ -139,7 +134,6 @@ if __name__ == '__main__':
     custom_ip = '192.168.1.238'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)
-
 
     download_awattar_data = AwattarServices().download_awattar_data()
 

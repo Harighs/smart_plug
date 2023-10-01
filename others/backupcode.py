@@ -1,28 +1,17 @@
-import os
-import schedule
-import time
-from datetime import datetime
-
 from flask import Flask, jsonify, request
 
 from external_services.awattar_services import AwattarServices
-from pi_controller.relay_controller import RelayControl
 from external_services.smartmeter_services import SmartMeterServices
-from database.db_manager import DatabaseManager
-
 
 app = Flask(__name__)
 
-
 # api_services.py #######################################################
-
 
 
 """
     # SMART METER SERVICES
     The following methods are used to retrieve the data from SMART METER SERVICES
 """
-
 
 """
     # AWATTAR LIVE AND PREDICTED PRICE
@@ -91,7 +80,6 @@ def energyConsumedOverPeriod_ByMeterId():
     return jsonify({"message": data}), 200
 
 
-
 # All 5 reports
 @app.route('/api/getAllReports_old', methods=['POST'])
 def getAllReports_old():
@@ -101,9 +89,9 @@ def getAllReports_old():
     fromDate_aws = new_item['fromDate_aws']
     toDate_aws = new_item['toDate_aws']
 
-#####################
+    #####################
     """
-    TODO 5 - Move this two service calls to auto_services.py (See TODO 1)
+    TODO 5 - Move this two service calls to masterdata_services.py (See TODO 1)
     line 109 to 118 should run in separate service and automatically stores the data 
     to database that I have already created
     """
@@ -112,10 +100,9 @@ def getAllReports_old():
     # R1 = smartmeter_data.getConsolidatedData(fromDate_sm, toDate_sm)  ## str: value old method
     R1 = smartmeter_data.get_smart_meter_data(fromDate_sm, toDate_sm)  ## str: value
 
-
     get_avg_data = AwattarServices()
     R4 = get_avg_data.get_average_awattar_price_over_period(fromDate_aws, toDate_aws)
-#####################
+    #####################
     print(R1)  # smart meter info are in kWh
 
     # awattar prices are in Mwh, so we need to convert this values
@@ -132,4 +119,3 @@ def getAllReports_old():
                    "report4": str(R4),
                    "report5": str(R5)}
     return jsonify({"message": str(all_reports)}), 200
-

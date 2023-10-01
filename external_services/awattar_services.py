@@ -2,15 +2,16 @@ import pandas as pd
 import datetime
 import requests
 import os
+from datetime import datetime, timedelta
 
 
 class AwattarServices:
     def __init__(self):
         self.dataset_path = '/home/pi/smart_plug/DATASET/awattar_data.csv'
         self.awattar_json_url = "https://api.awattar.at/v1/marketdata?start={}&end={}"
-        self.download_awattar_data()
-        if not os.path.isfile(self.dataset_path):
-            raise Exception('Dataset not found')
+       # self.download_awattar_data()
+       # if not os.path.isfile(self.dataset_path):
+       #    raise Exception('Dataset not found')
         return None
 
     def check_market_price(self, eur: str):
@@ -108,17 +109,17 @@ class AwattarServices:
             resulting_df.to_csv(self.dataset_path, index=True)
 
 
-    def AWATTAR_ONE_DAY_PERIOD(self, start_date, end_date): 
-        """
-        INPUT:
-            start_date: str --> 'YYYY:MM:dd hh:mm:ss'
-            end_date: str --> 'YYYY:MM:dd hh:mm:ss'
-        PARAMS: 
-            self.awattar_json_url
-        OUTPUT: awattar_json_response: pd.DataFrame
-        """
+    def AWATTAR_ONE_DAY_PERIOD(self): 
+      
+
+        # This return the datetime timestamp before 24hours
+        # Replace this with your Unix timestamp
+        current_datetime = datetime.now() - timedelta(hours=24)
+        unix_timestamp = current_datetime.timestamp()
+        start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(unix_timestamp)
+
         # Get Awattar Data
-        json_url = self.awattar_json_url.format(start_date, end_date)
+        json_url = self.awattar_json_url.format(int(start_of_day.timestamp()*1000), int(end_of_day.timestamp()*1000))
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
         awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms')
@@ -128,3 +129,17 @@ class AwattarServices:
             os.remove(self.dataset_path)
         awattar_json_response.to_csv(self.dataset_path, index=False)
         return awattar_json_response
+    
+
+    def get_start_and_end_of_day(unix_timestamp):
+        # Convert Unix timestamp to datetime
+        dt = datetime.utcfromtimestamp(unix_timestamp)
+
+        # Start of the day
+        start_of_day = datetime(dt.year, dt.month, dt.day, 0, 0, 0, 0)
+
+        # End of the day
+        end_of_day = start_of_day + timedelta(days=1) - timedelta(microseconds=1)
+
+        return start_of_day, end_of_day
+

@@ -122,8 +122,10 @@ class SmartMeterServices:
         auth_response = requests.post(auth_url, json=auth_payload)
         auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
-        current_date = str(datetime.date.today()-datetime.timedelta(days=1))
+        current_date = str(datetime.date.today()-datetime.timedelta(days=2)) # two days because the data is not available last 24hrs
+        # TODO remove the hardcoded meter id or id
         data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
+       # data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=40565569&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
         headers = {
             'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
         }

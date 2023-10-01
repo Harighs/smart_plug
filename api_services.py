@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request
 from external_services.awattar_services import AwattarServices
 from pi_controller.relay_controller import RelayControl
 from external_services.smartmeter_services import SmartMeterServices
+from database.db_manager import DatabaseManager
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -94,8 +95,8 @@ def averageAwattarPriceOverPeriod():
 
 
 # All 5 reports
-@app.route('/api/getAllReports', methods=['POST'])
-def getAllReports():
+@app.route('/api/getAllReports_old', methods=['POST'])
+def getAllReports_old():
     new_item = request.json
     fromDate_sm = new_item['fromDate_sm']
     toDate_sm = new_item['toDate_sm']
@@ -133,6 +134,22 @@ def getAllReports():
                    "report4": str(R4),
                    "report5": str(R5)}
     return jsonify({"message": str(all_reports)}), 200
+
+
+
+@app.route('/api/getAllReports', methods=['POST'])
+def getAllReports():
+    new_item = request.json
+    fromDate = new_item['fromDate']
+    toDate = new_item['toDate']
+
+    print(fromDate)
+    print(toDate)
+
+    db = DatabaseManager()
+    result = db.read_datacache_withdate_table(fromDate, toDate)
+    
+    return jsonify({"message": result}), 200
 
 
 """

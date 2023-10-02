@@ -1,10 +1,8 @@
-import sys
-
-sys.path.append('../')
 import sqlite3
 from sqlite3 import Error
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 global conn
 global cursor
@@ -51,7 +49,26 @@ class DatabaseManager:
             )
         ''')
 
-        # automode - table to record information for Auto Mode
+        # automode - table to record information when relay is on Auto mode
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS automode_report (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                datetime TEXT NOT NULL,
+                relaynumber INTEGER NOT NULL,
+                status BOOLEAN
+            )
+        ''')
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS automode_temp (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            datetime TEXT NOT NULL,
+            relaynumber INTEGER NOT NULL,
+            status BOOLEAN
+        )
+    ''')
+
+        # automode - table to record 
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS automode (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,6 +104,48 @@ class DatabaseManager:
             )
         ''')
 
+        cursor.close()
+
+    def insert_automode(self, relayNumber):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        print("insert called")
+
+        # this below entry is to track when the relay is turned on or off or auto mode
+        # mainly for future record purpose
+        cursor.execute("INSERT INTO automode_report(datetime, relaynumber, status) VALUES(?, ?, ?)",
+                       (datetime.now(), relayNumber, True))
+        
+        # this below entry is to temporary purpose to handle the status of the relays
+        cursor.execute("INSERT INTO automode_temp(datetime, relaynumber, status) VALUES(?, ?, ?)",
+                       (datetime.now(), relayNumber, True))
+        
+        conn.commit()
+        cursor.close()
+
+    def read_automode_temp(self, relayNumber):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        
+        query = "SELECT * FROM automode_temp WHERE relaynumber=? AND status=1 AND datetime BETWEEN datetime('now', '-30 minutes') AND datetime('now', '+1 hour');"
+        cursor.execute(query, (relayNumber,))
+        
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            # print(row)
+            result_list.append(row)
+        
+        cursor.close()
+        return result_list
+    
+    def delete_automode_temp(self, relayNumber):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        print("delete called")
+        query = "DELETE FROM automode_temp WHERE relaynumber=?"
+        cursor.execute(query, (relayNumber,))
+        conn.commit()
         cursor.close()
 
     def insert_relaysettings_table(self, relay1Power, relay2Power):

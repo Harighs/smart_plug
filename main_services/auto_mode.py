@@ -6,7 +6,7 @@ from awattar_services import AwattarServices
 
 # Add the directory to sys.path
 sys.path.append('..')
-from pi_controller.relay_controller import RelayControl
+from main_services.relay_controller import RelayControl
 
 
 class Auto_Mode:

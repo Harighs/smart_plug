@@ -1,16 +1,10 @@
-import os
-import schedule
-import time
 from datetime import datetime
 
 from flask import Flask, jsonify, request
-import sys 
 import sys
 sys.path.append('../')
 import os
-from external_services.awattar_services import AwattarServices
-from pi_controller.relay_controller import RelayControl
-from external_services.smartmeter_services import SmartMeterServices
+from main_services.relay_controller import RelayControl
 from database.db_manager import DatabaseManager
 
 current_dir = os.getcwd()

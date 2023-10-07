@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 
-from external_services.awattar_services import AwattarServices
-from external_services.smartmeter_services import SmartMeterServices
+from main_services.awattar_services import AwattarServices
+from main_services.smartmeter_services import SmartMeterServices
 
 app = Flask(__name__)
 

@@ -14,8 +14,8 @@ import os
 import pandas as pd
 import sqlite3
 
-from external_services.awattar_services import AwattarServices
-from external_services.smartmeter_services import SmartMeterServices
+from main_services.awattar_services import AwattarServices
+from main_services.smartmeter_services import SmartMeterServices
 
 
 class AutoServices:

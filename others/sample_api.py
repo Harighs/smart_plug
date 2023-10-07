@@ -1,8 +1,8 @@
 import os
 from flask import Flask, jsonify, request
 
-from external_services.awattar_services import AwattarServices
-from pi_controller.relay_controller import RelayControl
+from main_services.awattar_services import AwattarServices
+from main_services.relay_controller import RelayControl
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)

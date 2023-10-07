@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import time
 
-from pi_controller.relay_controller import enable_relay1, disable_relay1
+from main_services.relay_controller import enable_relay1, disable_relay1
 
 GPIO.setwarnings(False)
 import os

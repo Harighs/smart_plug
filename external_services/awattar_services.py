@@ -1,8 +1,9 @@
+import sys 
+sys.path.append('/home/pi/smart_plug')
 import os
 import pandas as pd
 import requests
 from datetime import datetime, timedelta
-
 
 class AwattarServices:
     def __init__(self):

@@ -1,13 +1,12 @@
+import sys 
+sys.path.append('/home/pi/smart_plug')
 import os
 import schedule
 import time
 from datetime import datetime
 
 from flask import Flask, jsonify, request
-import sys 
-import sys
-sys.path.append('../')
-import os
+
 from external_services.awattar_services import AwattarServices
 from pi_controller.relay_controller import RelayControl
 from external_services.smartmeter_services import SmartMeterServices
@@ -94,7 +93,7 @@ def relayStatus(relayNumber):
     relay_status = relay_control.checkRelayStatus(relayNumber)
      # check if the relay is in auto mode
     db = DatabaseManager()
-    results = db.read_automode_temp(relayNumber)
+    results = db.read_relaymode_temp(relayNumber)
     if len(results) > 0:
         return jsonify({"status": str(bool(relay_status)), "relaystatus": "Auto"}), 200
     else:
@@ -110,12 +109,16 @@ def relayController(relayNumber, relayStatus):
     relay_control = RelayControl()
     relay_trigger_status = relay_control.relayController(relayNumber, relayStatus)
     # check if the relay is in auto mode
-    if(relayStatus == 2):
-        db = DatabaseManager()
-        db.insert_automode(relayNumber)
-    else:
-        db = DatabaseManager()
-        db.delete_automode_temp(relayNumber)
+    db = DatabaseManager()
+    if(relayStatus == 0):
+        db.insert_relaymode_report(relayNumber, "Off")
+        db.delete_relaymode_temp(relayNumber)
+    elif(relayStatus == 1):
+        db.insert_relaymode_report(relayNumber, "On")
+        db.delete_relaymode_temp(relayNumber)
+    elif(relayStatus == 2):
+        db.insert_relaymode_report(relayNumber, "Auto")
+        db.insert_relaymode_temp(relayNumber, "Auto")
 
     return jsonify({"status": str(bool(relay_trigger_status))}), 200
 
@@ -124,7 +127,6 @@ def relayController(relayNumber, relayStatus):
  Main Python API service starts here
 """
 if __name__ == '__main__':
-
     custom_ip = '192.168.1.238'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)

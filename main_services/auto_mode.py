@@ -52,3 +52,10 @@ if __name__ == "__main__":
     auto_mode.auto_mode(4)
     auto_mode.turn_on_turn_off()
     print(auto_mode.future_df)
+
+""""
+    TODO
+    Calculate the E value for "automode" every 24th hour and get the "master record"
+    Calcualte the Escalation value with 1.33 static value
+    Update this service
+"""

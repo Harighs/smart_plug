@@ -1,3 +1,5 @@
+import sys 
+sys.path.append('/home/pi/smart_plug')
 import datetime
 import json
 import os
@@ -21,7 +23,7 @@ class SmartMeterServices:
         self.auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
         self.auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
         self.auth_cookie, self.auth_xsrf_token, self.nsc_wt = self.post_request(self)
-        self.dataset_path = '/home/pi/smart_plug/DATASET/smart_meter_data.csv'
+        self.dataset_path = '/home/pi/smart_plug/dataset/smart_meter_data.csv'
         return None
 
     # This method return the sum of consumed electricity data in Kwh

@@ -45,30 +45,33 @@ class DatabaseManager:
                 R4 TEXT NOT NULL,
                 R5 TEXT NOT NULL,
                 status BOOLEAN,
-                mode TEXT NOT NULL
+                mode TEXT NULL
             )
         ''')
 
-        # automode - table to record information when relay is on Auto mode
+        # relaymode_report - table to record information when relay is ON / OFF / AUTO
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS automode_report (
+            CREATE TABLE IF NOT EXISTS relaymode_report (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 datetime TEXT NOT NULL,
                 relaynumber INTEGER NOT NULL,
+                relayMode TEXT NOT NULL,
                 status BOOLEAN
             )
         ''')
 
+        # relaymode_temp - table to record the relay mode temporarly
         cursor.execute('''
-        CREATE TABLE IF NOT EXISTS automode_temp (
+        CREATE TABLE IF NOT EXISTS relaymode_temp (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             datetime TEXT NOT NULL,
             relaynumber INTEGER NOT NULL,
+            relayMode TEXT NOT NULL,
             status BOOLEAN
         )
     ''')
 
-        # automode - table to record 
+        # automode - table to record 24hr auto (E) value 
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS automode (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,7 +94,7 @@ class DatabaseManager:
             )
         ''')
 
-        # relaysettings - table to record information for turn on and turn off
+        # relaysettings - table to record app settings
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS relaysettings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -106,28 +109,36 @@ class DatabaseManager:
 
         cursor.close()
 
-    def insert_automode(self, relayNumber):
+    def insert_relaymode_report(self, relayNumber, relayMode):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         print("insert called")
 
         # this below entry is to track when the relay is turned on or off or auto mode
         # mainly for future record purpose
-        cursor.execute("INSERT INTO automode_report(datetime, relaynumber, status) VALUES(?, ?, ?)",
-                       (datetime.now(), relayNumber, True))
-        
-        # this below entry is to temporary purpose to handle the status of the relays
-        cursor.execute("INSERT INTO automode_temp(datetime, relaynumber, status) VALUES(?, ?, ?)",
-                       (datetime.now(), relayNumber, True))
+        cursor.execute("INSERT INTO relaymode_report(datetime, relaynumber, relayMode, status) VALUES(?, ?, ?, ?)",
+                       (datetime.now(), relayNumber, relayMode, True))
         
         conn.commit()
         cursor.close()
 
-    def read_automode_temp(self, relayNumber):
+    def insert_relaymode_temp(self, relayNumber, relayMode):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        print("insert called")
+
+        # this below entry is to temporary purpose to handle the status of the relays
+        cursor.execute("INSERT INTO relaymode_temp(datetime, relaynumber, relayMode, status) VALUES(?, ?, ?, ?)",
+                        (datetime.now(), relayNumber, relayMode, True))
+
+        conn.commit()
+        cursor.close()
+
+    def read_relaymode_temp(self, relayNumber):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         
-        query = "SELECT * FROM automode_temp WHERE relaynumber=? AND status=1 AND datetime BETWEEN datetime('now', '-30 minutes') AND datetime('now', '+1 hour');"
+        query = "SELECT * FROM relaymode_temp WHERE relaynumber=? AND status=1 AND datetime BETWEEN datetime('now', '-30 minutes') AND datetime('now', '+1 hour');"
         cursor.execute(query, (relayNumber,))
         
         rows = cursor.fetchall()
@@ -139,11 +150,11 @@ class DatabaseManager:
         cursor.close()
         return result_list
     
-    def delete_automode_temp(self, relayNumber):
+    def delete_relaymode_temp(self, relayNumber):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         print("delete called")
-        query = "DELETE FROM automode_temp WHERE relaynumber=?"
+        query = "DELETE FROM relaymode_temp WHERE relaynumber=?"
         cursor.execute(query, (relayNumber,))
         conn.commit()
         cursor.close()

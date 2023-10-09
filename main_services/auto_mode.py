@@ -1,8 +1,10 @@
 # usr/bin/python3
-import datetime
-import sys
+import sys 
+sys.path.append('/home/pi/smart_plug')
 
-from awattar_services import AwattarServices
+import datetime
+
+from external_services.awattar_services import AwattarServices
 
 # Add the directory to sys.path
 sys.path.append('..')

@@ -7,9 +7,8 @@ TODO 2: call the awattar and smart meter services
 TODO 3: store the information to the database table (datacache) and use db_manager().insert(?, ?, ?, ?)
 """
 
-import sys
-
-sys.path.append('../')
+import sys 
+sys.path.append('/home/pi/smart_plug')
 import os
 import pandas as pd
 import sqlite3

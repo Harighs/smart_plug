@@ -6,6 +6,7 @@ import os
 import pandas as pd
 import requests
 
+from main_services.common_utils import common_utils 
 
 class SmartMeterServices:
     def __init__(self):
@@ -20,10 +21,10 @@ class SmartMeterServices:
         Usage:
             smartmeter = SmartMeter() --> Returns a SmartMeter object as Dataframe which can be stored
         """
-        self.auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
-        self.auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+        self.auth_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Login'
+        self.auth_payload = {"user": common_utils.static_smart_meter_username, "pwd": common_utils.static_smart_meter_password}
         self.auth_cookie, self.auth_xsrf_token, self.nsc_wt = self.post_request(self)
-        self.dataset_path = '/home/pi/smart_plug/dataset/smart_meter_data.csv'
+        self.dataset_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
         return None
 
     # This method return the sum of consumed electricity data in Kwh
@@ -46,7 +47,7 @@ class SmartMeterServices:
             'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie}; XSRF-Token={auth_xsrf_token}; NSC_WT_TWYUXFCQ-TTM={nsc_wt}',
         }
 
-        self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId=AT0020000000000000000000020826367&startDate={start_date}&endDate={end_date}"
+        self.data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Week?meterId={common_utils.static_smart_meter_meter_id}&startDate={start_date}&endDate={end_date}"
         data_response = self.data_response(self, self.data_url, headers)
         if data_response is not None:
             data_response = pd.DataFrame(data_response)
@@ -65,7 +66,7 @@ class SmartMeterServices:
             'Cookie': f'__Host-go4DavidSecurityToken={self.auth_cookie};',
         }
 
-        self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId=AT0020000000000000000000020826367&startDate={start_date}&endDate={end_date}"
+        self.data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Week?meterId={common_utils.static_smart_meter_meter_id}&startDate={start_date}&endDate={end_date}"
         data_response = self.data_response(self, self.data_url, headers)
 
         if data_response is not None:
@@ -85,7 +86,7 @@ class SmartMeterServices:
             'Cookie': f'__Host-go4DavidSecurityToken={self.auth_cookie};',
         }
 
-        self.data_url = f"https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Week?meterId={meter_id}&startDate={start_date}&endDate={end_date}"
+        self.data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Week?meterId={meter_id}&startDate={start_date}&endDate={end_date}"
         data_response = self.data_response(self, self.data_url, headers)
 
         if data_response is not None:
@@ -97,7 +98,7 @@ class SmartMeterServices:
         auth_cookie, auth_xsrf_token, nsc_wt = None, None, None
         auth_response = requests.post(self.auth_url, json=self.auth_payload)
         if auth_response.status_code == 200:
-            print("Authentication successful...")
+            print("Smart meter - Authentication successful...")
             auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
             auth_xsrf_token = auth_response.cookies['XSRF-Token']
             nsc_wt = auth_response.cookies['NSC_WT_TWYUXFCQ-TTM']
@@ -118,16 +119,15 @@ class SmartMeterServices:
 
     # New func written on 22-09-2023
     def sm_each_date(self):
-        auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
-        auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+        auth_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Login'
+        auth_payload = {"user": common_utils.static_smart_meter_username, "pwd": common_utils.static_smart_meter_password}
         auth_response = requests.post(auth_url, json=auth_payload)
         auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
         current_date = str(
-            datetime.date.today() - datetime.timedelta(days=2))  # two days because the data is not available last 24hrs
+            datetime.date.today() - datetime.timedelta(days=1))  # two days because the data is not available last 24hrs
         # TODO remove the hardcoded meter id or id
-        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(
-            current_date, auth_cookie)
+        data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={current_date}&__Host-go4DavidSecurityToken={auth_cookie}"
         # data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=40565569&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
         headers = {
             'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
@@ -148,14 +148,13 @@ class SmartMeterServices:
         return new_data
 
     def saving_SmartMeter_Data_Each_day(self):
-        auth_url = 'https://smartmeter.netz-noe.at/orchestration/Authentication/Login'
-        auth_payload = {"user": "SommererPrivatstiftung", "pwd": "SpS*1996"}
+        auth_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Login'
+        auth_payload = {"user": common_utils.static_smart_meter_username, "pwd": common_utils.static_smart_meter_password}
         auth_response = requests.post(auth_url, json=auth_payload)
         auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
         current_date = str(datetime.date.today())
-        data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/Day?meterId=AT0020000000000000000000020826368&day={}&__Host-go4DavidSecurityToken={}".format(
-            current_date, auth_cookie)
+        data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={current_date}&__Host-go4DavidSecurityToken={auth_cookie}"
         headers = {
             'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
         }
@@ -174,13 +173,13 @@ class SmartMeterServices:
             if col == u'peakDemandTimes':
                 new_data[u'peakDemandTimes'] = pd.to_datetime(new_data[u'peakDemandTimes'])
 
-        smart_meter_data = pd.read_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv')
+        smart_meter_data = pd.read_csv('/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename)
         smart_meter_data[u'peakDemandTimes'] = pd.to_datetime(smart_meter_data[u'peakDemandTimes'])
         if smart_meter_data[u'peakDemandTimes'].max().date() < datetime.date.today():
             concatinated_data = pd.concat([smart_meter_data, new_data], ignore_index=True)
 
         # saving new data:
-        concatinated_data.to_csv('/home/pi/smart_plug/dataset/smart_meter_data.csv', index=False)
+        concatinated_data.to_csv('/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename, index=False)
         print("saving new data smartmeter data file to csv file")
         return concatinated_data
 
@@ -192,7 +191,7 @@ class SmartMeterServices:
         :param end_date_time: '2023-09-30 00:00:00'
         :return:
         """
-        path_to_file = '/home/pi/smart_plug/dataset/smart_meter_data.csv'
+        path_to_file = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
         # Define the start_date and end_date
         start_date = pd.to_datetime(start_date_time)
         end_date = pd.to_datetime(end_date_time)

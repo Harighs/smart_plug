@@ -3,7 +3,6 @@ from sqlite3 import Error
 import os
 from datetime import datetime, timedelta
 
-
 global conn
 global cursor
 db_name = os.path.join(os.path.dirname(__file__), 'pythonsqlite.db')
@@ -91,7 +90,8 @@ class DatabaseManager:
                 end_timestamp TEXT NOT NULL,
                 marketprice TEXT NOT NULL,
                 unit TEXT NOT NULL,
-                triggerstatus BOOLEAN 
+                relaynumber INTEGER NOT NULL,
+                triggerstatus BOOLEAN
             )
         ''')
 
@@ -114,24 +114,26 @@ class DatabaseManager:
     def insert_automode(self, last_24hrs_usage, relayNumber, times_to_turnon):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
+
+        current_datetime = datetime.now() - timedelta(hours=24)
+
         # this data will be inserted every day at 04:00 AM (E-value)
         cursor.execute("INSERT INTO automode(datetime, last_24hrs_usage, relaynumber, times_to_turnon, status) VALUES(?, ?, ?, ?, ?)",
-                       (datetime.now(), last_24hrs_usage, relayNumber, times_to_turnon, True))
+                       (current_datetime, last_24hrs_usage, relayNumber, times_to_turnon, True))
         
         conn.commit()
         cursor.close()
 
 
-    def read_automode(self, relayNumber):
+    def read_automode_24hrs_before(self, relayNumber):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         
         current_datetime = datetime.now() - timedelta(hours=24)
-        print(current_datetime.date())
         start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
 
-        query = "SELECT * FROM automode WHERE datetime BETWEEN '{start_of_day}' AND '{end_of_day}';"
+        query = f"SELECT times_to_turnon FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}';"
         cursor.execute(query, (relayNumber,))
         
         rows = cursor.fetchall()
@@ -142,6 +144,25 @@ class DatabaseManager:
         cursor.close()
         return result_list
     
+    def read_automode_48hrs_before(self, relayNumber):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        
+        current_datetime = datetime.now() - timedelta(hours=48)
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+
+        query = f"SELECT times_to_turnon FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}';"
+        cursor.execute(query, (relayNumber,))
+        
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            result_list.append(row)
+        
+        cursor.close()
+        return result_list
+
 
         ##### relaymode_report, relaymode_temp TABLE
 
@@ -255,6 +276,25 @@ class DatabaseManager:
             result_list.append(row)
         cursor.close()
         return result_list
+    
+
+    def read_datacache_last_48hrs_consumption(self):
+        current_datetime = datetime.now() - timedelta(hours=48)
+        print(current_datetime.date())
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        cursor.execute(
+            f"SELECT sum(smart_meter_consumption) as consumption, smart_meter_unit as unit FROM datacache WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}'")
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            result_list.append(row)
+        cursor.close()
+        return result_list
+
 
     def read_datacache_withdate_table(self, fromDate, toDate):
         conn = sqlite3.connect(db_name)

@@ -1,5 +1,5 @@
 import sys 
-sys.path.append('/home/pi/smart_plug')
+sys.path.append('/home/pi/smart_plug/')
 import os
 import schedule
 import time
@@ -16,6 +16,11 @@ current_dir = os.getcwd()
 print("Current working directory:", current_dir)
 
 app = Flask(__name__)
+
+@app.route('/api/', methods=['GET'])
+def api_home():
+    return jsonify({"message": "Welcome to Enermizer API Services"}), 200
+
 
 
 # New method to get the status if the services
@@ -127,6 +132,6 @@ def relayController(relayNumber, relayStatus):
  Main Python API service starts here
 """
 if __name__ == '__main__':
-    custom_ip = '192.168.1.238'
+    custom_ip = '192.168.1.240'
     custom_port = 8080
     app.run(host=custom_ip, port=custom_port, debug=True)

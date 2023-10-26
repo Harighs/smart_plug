@@ -78,6 +78,7 @@ class DatabaseManager:
                 datetime TEXT NOT NULL,
                 last_24hrs_usage TEXT NOT NULL,
                 times_to_turnon TEXT NOT NULL,
+                relaynumber INTEGER NOT NULL,   
                 status BOOLEAN
             )
         ''')
@@ -109,11 +110,44 @@ class DatabaseManager:
 
         cursor.close()
 
+        ##### automode TABLE
+    def insert_automode(self, last_24hrs_usage, relayNumber, times_to_turnon):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        # this data will be inserted every day at 04:00 AM (E-value)
+        cursor.execute("INSERT INTO automode(datetime, last_24hrs_usage, relaynumber, times_to_turnon, status) VALUES(?, ?, ?, ?, ?)",
+                       (datetime.now(), last_24hrs_usage, relayNumber, times_to_turnon, True))
+        
+        conn.commit()
+        cursor.close()
+
+
+    def read_automode(self, relayNumber):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        
+        current_datetime = datetime.now() - timedelta(hours=24)
+        print(current_datetime.date())
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+
+        query = "SELECT * FROM automode WHERE datetime BETWEEN '{start_of_day}' AND '{end_of_day}';"
+        cursor.execute(query, (relayNumber,))
+        
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            result_list.append(row)
+        
+        cursor.close()
+        return result_list
+    
+
+        ##### relaymode_report, relaymode_temp TABLE
+
     def insert_relaymode_report(self, relayNumber, relayMode):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        print("insert called")
-
         # this below entry is to track when the relay is turned on or off or auto mode
         # mainly for future record purpose
         cursor.execute("INSERT INTO relaymode_report(datetime, relaynumber, relayMode, status) VALUES(?, ?, ?, ?)",
@@ -125,8 +159,6 @@ class DatabaseManager:
     def insert_relaymode_temp(self, relayNumber, relayMode):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        print("insert called")
-
         # this below entry is to temporary purpose to handle the status of the relays
         cursor.execute("INSERT INTO relaymode_temp(datetime, relaynumber, relayMode, status) VALUES(?, ?, ?, ?)",
                         (datetime.now(), relayNumber, relayMode, True))
@@ -159,6 +191,8 @@ class DatabaseManager:
         conn.commit()
         cursor.close()
 
+        ##### relaysettings TABLE
+
     def insert_relaysettings_table(self, relay1Power, relay2Power):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
@@ -168,6 +202,21 @@ class DatabaseManager:
             (datetime.now(), relay1Power, relay2Power, "kWh", "kWh", True))
         conn.commit()
         cursor.close()
+
+
+    def read_relaysettings_table(self):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        cursor.execute("select * from relaysettings")
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            result_list.append(row)
+        cursor.close()
+        return result_list
+
+
+        ##### DATACACHE TABLE
 
     def insert_datacache_table(self, start_datetime, end_datetime, awattar_price, smart_meter_consumption, awattar_unit,
                                smart_meter_unit, R1, R2, R3, R4, R5, status, mode):
@@ -188,6 +237,24 @@ class DatabaseManager:
         for row in rows:
             print(row)
         cursor.close()
+
+
+    def read_datacache_last_24hrs_consumption(self):
+        current_datetime = datetime.now() - timedelta(hours=24)
+        print(current_datetime.date())
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        cursor.execute(
+            f"SELECT sum(smart_meter_consumption) as consumption, smart_meter_unit as unit FROM datacache WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}'")
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            result_list.append(row)
+        cursor.close()
+        return result_list
 
     def read_datacache_withdate_table(self, fromDate, toDate):
         conn = sqlite3.connect(db_name)

@@ -1,5 +1,6 @@
+######################
+  # This service is used to download the data from awattar and smartmeter
   GNU nano 5.4  
-  # sudo nano /etc/systemd/system/smart_plug_data_download.service                                                         /etc/systemd/system/smart_plug_data_download.service                                                                    
 # /etc/systemd/system/smart_plug.service
 
 [Unit]
@@ -15,5 +16,38 @@ WantedBy=multi-user.target
 
 
 ######################
+# This service is used to communicate with the api and pi 
+  GNU nano 5.4    
+# /etc/systemd/system/smart_plug.service
+
+[Unit]
+Description=Smart Plug Service is Running
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/smart_plug/main_services/api_services.py
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
 
 
+######################
+
+Commands
+# sudo nano /etc/systemd/system/smart_plug_data_download.service                                                                
+# sudo nano /etc/systemd/system/smart_plug.service                                                                                                                                       
+
+sudo systemctl start smart_plug_data_download.service
+sudo systemctl start smart_plug.service
+
+sudo systemctl stop smart_plug_data_download.service
+sudo systemctl stop smart_plug.service
+
+sudo systemctl status smart_plug_data_download.service
+sudo systemctl status smart_plug.service
+
+sudo systemctl restart smart_plug_data_download.service
+sudo systemctl restart smart_plug.service
+
+######################

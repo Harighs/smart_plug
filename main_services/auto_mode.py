@@ -56,6 +56,7 @@ class Auto_Mode:
 
     def turn_on_turn_off(self):
         # TODO: get DB data and change to dataframe
+        # check whether the relay 1 or 2 is on Auto mode then turn on and turn off automatically
 
         current_time = datetime.datetime.now()
         # Check if current time is within any interval
@@ -74,8 +75,3 @@ if __name__ == "__main__":
     auto_mode.auto_mode()
     #auto_mode.turn_on_turn_off()
     #print(auto_mode.future_df)
-
-""""
-    Calcualte the Escalation value with 1.33 static value
-    Update this service
-"""

@@ -11,6 +11,7 @@ import sqlite3
 
 from external_services.awattar_services import AwattarServices
 from external_services.smartmeter_services import SmartMeterServices
+from database.db_manager import DatabaseManager
 
 
 import time
@@ -30,6 +31,7 @@ class AutoServices:
 
        # self.awattar_data_path = 'dataset/awattar_data.csv'
        # self.smart_meter_data_path = 'dataset/smart_meter_data.csv'
+       return
 
     def create_master_df(self):
         Master_Data_Path = 'dataset/master_data.csv'
@@ -83,11 +85,11 @@ class AutoServices:
         Master_Data.to_sql('datacache', conn, index=False, if_exists='append')
         return True
     
-    def calculateAutoModeValue():
+    def calculateAutoModeValue(self):
 
-        conn = sqlite3.connect("database/pythonsqlite.db")
-        last_24hrs_usage = conn.read_datacache_last_24hrs_consumption()[0][0] # A
-        relay1PowerNeeded = conn.read_relaysettings_table()[0][2] # B
+        db = DatabaseManager()
+        last_24hrs_usage = db.read_datacache_last_24hrs_consumption()[0][0] # A
+        relay1PowerNeeded = db.read_relaysettings_table()[0][2] # B
         # relay2PowerNeeded = conn.read_relaysettings_table()[0][3] #future use
         """
         Formula to calculate auto_mode value
@@ -99,7 +101,7 @@ class AutoServices:
                    = 4 times (this we have to turn on and turn off the relay automatically)
         """
         no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relay1PowerNeeded)
-        conn.insert_automode(last_24hrs_usage, 1, no_of_times_to_activate_automode)
+        db.insert_automode(last_24hrs_usage, 1, round(no_of_times_to_activate_automode))
 
         return True
 

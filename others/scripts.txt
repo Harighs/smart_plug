@@ -1,0 +1,19 @@
+  GNU nano 5.4  
+  # sudo nano /etc/systemd/system/smart_plug_data_download.service                                                         /etc/systemd/system/smart_plug_data_download.service                                                                    
+# /etc/systemd/system/smart_plug.service
+
+[Unit]
+Description=Smart Plug Service is Running - download master data
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/smart_plug/main_services/masterdata_services.py
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+
+######################
+
+

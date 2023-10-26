@@ -79,6 +79,14 @@ class AutoServices:
         conn = sqlite3.connect("../database/pythonsqlite.db")
         Master_Data.to_sql('datacache', conn, index=False, if_exists='append')
         return True
+    
+    def calculateAutoModeValue():
+        current_datetime = datetime.now() - timedelta(hours=24)
+        current_unix_timestamp = current_datetime.timestamp()
+        conn = sqlite3.connect("../database/pythonsqlite.db")
+        # TODO read the datacache table and query the last
+        # TODO 
+        return True
 
 
 if __name__ == '__main__':

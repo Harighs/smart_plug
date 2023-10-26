@@ -1,6 +1,5 @@
 import sys
 
-from main_services.common_utils import common_utils 
 sys.path.append('/home/pi/smart_plug/')
 import os
 import schedule
@@ -13,6 +12,7 @@ from external_services.awattar_services import AwattarServices
 from pi_controller.relay_controller import RelayControl
 from external_services.smartmeter_services import SmartMeterServices
 from database.db_manager import DatabaseManager
+from main_services.common_utils import common_utils 
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)

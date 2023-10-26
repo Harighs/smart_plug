@@ -1,14 +1,10 @@
 """
 In this file we have to call both services and store the datasets to the local
 sqlite database
-
-TODO 1: get those two methods from api_services.py (see TODO 5)
-TODO 2: call the awattar and smart meter services 
-TODO 3: store the information to the database table (datacache) and use db_manager().insert(?, ?, ?, ?)
 """
 
 import sys 
-sys.path.append('/home/pi/smart_plug')
+sys.path.append('/home/pi/smart_plug/')
 import os
 import pandas as pd
 import sqlite3
@@ -17,19 +13,26 @@ from external_services.awattar_services import AwattarServices
 from external_services.smartmeter_services import SmartMeterServices
 
 
+import time
+from datetime import datetime
+import timedelta
+
+current_dir = os.getcwd()
+print("Current working directory:", current_dir)
+
 class AutoServices:
     def __init__(self):
-        awattar_services = AwattarServices()
-        smartmeter_services = SmartMeterServices()
+        #awattar_services = AwattarServices()
+        #smartmeter_services = SmartMeterServices()
 
-        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
-        self.smartmeter_df = smartmeter_services.sm_each_date()
+        #self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
+        #self.smartmeter_df = smartmeter_services.sm_each_date()
 
-        self.awattar_data_path = '../dataset/awattar_data.csv'
-        self.smart_meter_data_path = '../dataset/smart_meter_data.csv'
+       # self.awattar_data_path = 'dataset/awattar_data.csv'
+       # self.smart_meter_data_path = 'dataset/smart_meter_data.csv'
 
     def create_master_df(self):
-        Master_Data_Path = '../dataset/master_data.csv'
+        Master_Data_Path = 'dataset/master_data.csv'
 
         if not os.path.exists(Master_Data_Path):
             columns = ['start_timestamp', 'end_timestamp', 'awattar_price', 'smart_meter_consumption', 'R1', 'R2', 'R3',
@@ -76,19 +79,34 @@ class AutoServices:
         Master_Data.to_csv(Master_Data_Path, index=False)
 
         # Feed Master Data CSV to the database
-        conn = sqlite3.connect("../database/pythonsqlite.db")
+        conn = sqlite3.connect("database/pythonsqlite.db")
         Master_Data.to_sql('datacache', conn, index=False, if_exists='append')
         return True
     
     def calculateAutoModeValue():
-        current_datetime = datetime.now() - timedelta(hours=24)
-        current_unix_timestamp = current_datetime.timestamp()
-        conn = sqlite3.connect("../database/pythonsqlite.db")
-        # TODO read the datacache table and query the last
-        # TODO 
+
+        conn = sqlite3.connect("database/pythonsqlite.db")
+        last_24hrs_usage = conn.read_datacache_last_24hrs_consumption()[0][0] # A
+        relay1PowerNeeded = conn.read_relaysettings_table()[0][2] # B
+        # relay2PowerNeeded = conn.read_relaysettings_table()[0][3] #future use
+        """
+        Formula to calculate auto_mode value
+        A = last 24hrs consumption
+        B = Power needed for Relay1 / Relay 2
+        Result = A/B
+        Example: A = 20KW; B = 5KW
+            Result = 20/5 
+                   = 4 times (this we have to turn on and turn off the relay automatically)
+        """
+        no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relay1PowerNeeded)
+        conn.insert_automode(last_24hrs_usage, 1, no_of_times_to_activate_automode)
+
         return True
+
 
 
 if __name__ == '__main__':
     auto_service = AutoServices()
-    auto_service.create_master_df()
+    # auto_service.create_master_df()
+    auto_service.calculateAutoModeValue()
+

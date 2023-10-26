@@ -1,6 +1,6 @@
 # usr/bin/python3
 import sys 
-sys.path.append('/home/pi/smart_plug')
+sys.path.append('/home/pi/smart_plug/')
 
 import datetime
 

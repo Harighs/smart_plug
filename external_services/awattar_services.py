@@ -1,5 +1,5 @@
 import sys 
-sys.path.append('/home/pi/smart_plug')
+sys.path.append('/home/pi/smart_plug/')
 import os
 import pandas as pd
 import requests

@@ -49,7 +49,7 @@ class Auto_Mode:
 
         if len(self.future_df) > 0:
             print("Found matching auto mode for relay:", relayNumber)
-            conn = sqlite3.connect("database/"+common_utils.static_database_filename)
+            conn = sqlite3.connect("database/pythonsqlite.db")
             self.future_df.to_sql('automaterelay', conn, index=False, if_exists='replace') # replace the dataset
             self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
         else:
@@ -64,7 +64,7 @@ class Auto_Mode:
         db = DatabaseManager()
         results = db.read_relaymode_temp(relayNumber) # setting relay number
 
-        conn = sqlite3.connect("database/"+common_utils.static_database_filename)
+        conn = sqlite3.connect("database/pythonsqlite.db")
         query = f"SELECT * from automaterelay where relaynumber={relayNumber}"
         new_dataframe = pd.read_sql_query(query, conn)
         print(new_dataframe)

@@ -95,6 +95,19 @@ class DatabaseManager:
             )
         ''')
 
+        # automaterelay_report - table to record information for turn on and turn off
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS automaterelay_report (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                start_timestamp TEXT NOT NULL,
+                end_timestamp TEXT NOT NULL,
+                marketprice TEXT NOT NULL,
+                unit TEXT NOT NULL,
+                relaynumber INTEGER NOT NULL,
+                triggerstatus BOOLEAN
+            )
+        ''')
+
         # relaysettings - table to record app settings
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS relaysettings (
@@ -190,7 +203,6 @@ class DatabaseManager:
     def read_relaymode_temp(self, relayNumber):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-            
         # Get the current datetime
         current_datetime = datetime.now()
 

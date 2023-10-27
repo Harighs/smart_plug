@@ -33,7 +33,7 @@ class AutoServices:
         self.smart_meter_data_path = 'dataset/'+common_utils.static_smartmeter_filename
 
     def create_master_df(self):
-        Master_Data_Path = 'dataset/master_data.csv'
+        Master_Data_Path = 'dataset/'+common_utils.static_master_service
 
         if not os.path.exists(Master_Data_Path):
             columns = ['start_timestamp', 'end_timestamp', 'awattar_price', 'smart_meter_consumption', 'R1', 'R2', 'R3',
@@ -91,7 +91,7 @@ class AutoServices:
 
         last_24hrs_usage = db.read_datacache_last_24hrs_consumption()[0][0] # A
         relay1PowerNeeded = db.read_relaysettings_table()[0][2] # B
-        # relay2PowerNeeded = db.read_relaysettings_table()[0][3] # additional relay 2
+        relay2PowerNeeded = db.read_relaysettings_table()[0][3] # additional relay 2
         """
         Formula to calculate auto_mode value
         A = last 24hrs consumption
@@ -108,9 +108,15 @@ class AutoServices:
         if(last_24hrs_usage >= last_48hrs_usage):
             no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relay1PowerNeeded)
             db.insert_automode(last_24hrs_usage, 1, round(no_of_times_to_activate_automode)) # relay 1
+
+            no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relay2PowerNeeded)
+            db.insert_automode(last_24hrs_usage, 2, round(no_of_times_to_activate_automode)) # relay 2
         else:
             no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relay1PowerNeeded)
             db.insert_automode(last_24hrs_usage, 1, round(no_of_times_to_activate_automode)) # relay 1
+
+            no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relay2PowerNeeded)
+            db.insert_automode(last_24hrs_usage, 2, round(no_of_times_to_activate_automode)) # relay 2
 
 
         return True

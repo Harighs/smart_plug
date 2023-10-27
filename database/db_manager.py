@@ -190,8 +190,17 @@ class DatabaseManager:
     def read_relaymode_temp(self, relayNumber):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        
-        query = "SELECT * FROM relaymode_temp WHERE relaynumber=? AND status=1 AND datetime BETWEEN datetime('now', '-30 minutes') AND datetime('now', '+1 hour');"
+            
+        # Get the current datetime
+        current_datetime = datetime.now()
+
+        # Calculate a datetime that is 30 minutes ago
+        datetime_30_minutes_ago = current_datetime - timedelta(minutes=30)
+
+        # Calculate a datetime that is 1 hour in the future
+        datetime_1_hour_in_future = current_datetime + timedelta(hours=1)
+
+        query = f"SELECT * FROM relaymode_temp WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{datetime_30_minutes_ago}' AND '{datetime_1_hour_in_future}';"
         cursor.execute(query, (relayNumber,))
         
         rows = cursor.fetchall()

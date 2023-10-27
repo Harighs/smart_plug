@@ -51,12 +51,15 @@ class Auto_Mode:
         else:
             print("No matching auto mode")
 
+        self.turn_on_turn_off()
 
         return self.future_df
 
     def turn_on_turn_off(self):
         # TODO: get DB data and change to dataframe
         # check whether the relay 1 or 2 is on Auto mode then turn on and turn off automatically
+        db = DatabaseManager()
+        db.checkRelayisOnAutoMode(start_timestamp, end_timestamp, relaynumber, status)
         print(self.future_df)
         current_time = datetime.datetime.now()
         # Check if current time is within any interval
@@ -73,5 +76,5 @@ class Auto_Mode:
 if __name__ == "__main__":
     auto_mode = Auto_Mode()
     auto_mode.auto_mode()
-    auto_mode.turn_on_turn_off()
+    #auto_mode.turn_on_turn_off()
     #print(auto_mode.future_df)

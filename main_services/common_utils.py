@@ -7,6 +7,7 @@ class common_utils:
     # csv file names
     static_awattar_filename = "awattar_data.csv"
     static_smartmeter_filename = "smart_meter_data.csv"
+    static_master_service = "master_data.csv"
     static_database_filename = "pythonsqlite.db"
     
     # Smart meter information

@@ -47,7 +47,8 @@ class Auto_Mode:
             print("Found matching auto mode")
              # Feed Master Data CSV to the database
             conn = sqlite3.connect("database/"+common_utils.static_database_filename)
-            self.future_df.to_sql('automaterelay', conn, index=False, if_exists='append')
+            self.future_df.to_sql('automaterelay', conn, index=False, if_exists='replace') # replace the dataset
+            self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
         else:
             print("No matching auto mode")
 
@@ -56,22 +57,37 @@ class Auto_Mode:
         return self.future_df
 
     def turn_on_turn_off(self):
-        # TODO: get DB data and change to dataframe
         # check whether the relay 1 or 2 is on Auto mode then turn on and turn off automatically
         db = DatabaseManager()
-        db.checkRelayisOnAutoMode(start_timestamp, end_timestamp, relaynumber, status)
-        print(self.future_df)
-        current_time = datetime.datetime.now()
-        # Check if current time is within any interval
-        while True:
-            for index, row in self.future_df.iterrows():
-                if not row['start_timestamp'] <= current_time <= row['end_timestamp']:
-                    # Turn On
-                    RelayControl().relayController(relayNumber=1, relayStatus=1)
-                else:
-                    # Turn OFF
-                    RelayControl().relayController(relayNumber=1, relayStatus=0)
-
+        results1 = db.read_relaymode_temp(1) # setting relay1 
+        results2 = db.read_relaymode_temp(2) # setting relay2
+        if len(results1) > 0: # check whether relay1 is on Auto Mode
+                print(self.future_df)
+                current_time = datetime.datetime.now()
+                # Check if current time is within any interval
+                while True:
+                    for index, row in self.future_df.iterrows():
+                        if not row['start_timestamp'] <= current_time <= row['end_timestamp']:
+                            # Turn On
+                            RelayControl().relayController(relayNumber=1, relayStatus=1)
+                        else:
+                            # Turn OFF
+                            RelayControl().relayController(relayNumber=1, relayStatus=0)
+        elif len(results2) > 0: # check whether relay2 is on Auto Mode
+                print(self.future_df)
+                current_time = datetime.datetime.now()
+                # Check if current time is within any interval
+                while True:
+                    for index, row in self.future_df.iterrows():
+                        if not row['start_timestamp'] <= current_time <= row['end_timestamp']:
+                            # Turn On
+                            RelayControl().relayController(relayNumber=2, relayStatus=1)
+                        else:
+                            # Turn OFF
+                            RelayControl().relayController(relayNumber=2, relayStatus=0)
+    
+        else:
+            return
 
 if __name__ == "__main__":
     auto_mode = Auto_Mode()

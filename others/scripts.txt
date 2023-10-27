@@ -18,13 +18,29 @@ WantedBy=multi-user.target
 ######################
 # This service is used to communicate with the api and pi 
   GNU nano 5.4    
-# /etc/systemd/system/smart_plug.service
+# /etc/systemd/system/smart_plug_data_download.service
 
 [Unit]
 Description=Smart Plug Service is Running
 
 [Service]
 ExecStart=/usr/bin/python3 /home/pi/smart_plug/main_services/api_services.py
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+
+######################
+  GNU nano 5.4                                                                               
+# /etc/systemd/system/smart_plug_data_download.service
+
+[Unit]
+Description=Smart Plug - Auto mode - Service is Running
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/smart_plug/main_services/auto_mode.py
 Restart=always
 User=pi
 
@@ -40,14 +56,54 @@ Commands
 
 sudo systemctl start smart_plug_data_download.service
 sudo systemctl start smart_plug.service
+sudo systemctl start smart_plug_auto_mode.service
 
 sudo systemctl stop smart_plug_data_download.service
 sudo systemctl stop smart_plug.service
+sudo systemctl stop smart_plug_auto_mode.service
+
 
 sudo systemctl status smart_plug_data_download.service
 sudo systemctl status smart_plug.service
+sudo systemctl status smart_plug_auto_mode.service
+
 
 sudo systemctl restart smart_plug_data_download.service
 sudo systemctl restart smart_plug.service
+sudo systemctl restart smart_plug_auto_mode.service
+
+
+watch -n 1 sudo systemctl status smart_plug.service
+journalctl -xe | grep smart_plug_auto_mode.service
+
+pi@raspberrypi:~/smart_plug $ sudo nano /etc/systemd/system/smart_plug_data_download.service
+pi@raspberrypi:~/smart_plug $ sudo nano /etc/systemd/system/smart_plug_auto_mode.service
+pi@raspberrypi:~/smart_plug $ sudo nano /etc/systemd/system/smart_plug.service
+######################
+
+
+crontab -e
+
+
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+
+# This task restarts the "Auto mode" service every 30 minutes
+*/30 * * * * sudo service smart_plug_auto_mode restart && echo "Service smart_plug_auto_mode restarted at $(date)" >> /var/log/smart_plug_auto_mode-restart.log
+
+
+# This task restarts the "Master data download" service every 28 hours
+0 */28 * * * sudo service smart_plug_data_download restart  && echo "Service smart_plug_data_download restarted at $(date)" >> /var/log/smart_plug_data_download-restart.l>
+
+
+# This task restarts the "API" service every 48 hours
+0 0 */2 * * sudo service smart_plug restart && echo "Service smart_plug restarted at $(date)" >> /var/log/smart_plug-restart.log
+
+
+# Testing the service to restart every minute 
+# * * * * * sudo service smart_plug restart
+
 
 ######################

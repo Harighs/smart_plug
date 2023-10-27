@@ -107,3 +107,16 @@ crontab -e
 
 
 ######################
+  GNU nano 5.4                                         /tmp/crontab.4BC13D/crontab *                                                 
+# This task restarts the "Auto mode" service every 30 minutes
+*/30 * * * * sudo systemctl restart smart_plug_auto_mode
+
+# This task restarts the "Master data download" service every 28 hours
+0 */28 * * * sudo systemctl restart smart_plug_data_download
+
+# This task restarts the "API" service every 48 hours
+0 0 */2 * * sudo systemctl restart smart_plug
+
+
+# Testing the service to restart every minute
+# * * * * * sudo service smart_plug restart

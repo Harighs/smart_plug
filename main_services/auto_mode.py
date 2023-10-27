@@ -15,7 +15,7 @@ from main_services.common_utils import common_utils
 class Auto_Mode:
     def __init__(self):
         self.future_df = None
-        pass
+        return None
 
     def auto_mode(self, relayNumber):
         db = DatabaseManager()
@@ -46,7 +46,7 @@ class Auto_Mode:
 
         if len(self.future_df) > 0:
             print("Found matching auto mode for relay:", relayNumber)
-            conn = sqlite3.connect("database/pythonsqlite.db")
+            conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
             self.future_df.to_sql('automaterelay', conn, index=False, if_exists='replace') # replace the dataset
             self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
             conn.close()
@@ -55,13 +55,14 @@ class Auto_Mode:
 
         self.turn_on_turn_off(relayNumber)
 
+        return
 
     def turn_on_turn_off(self, relayNumber):
         # check whether the relay 1 or 2 is on Auto mode then turn on and turn off automatically
         db = DatabaseManager()
         results = db.read_relaymode_temp(relayNumber) # setting relay number
 
-        conn = sqlite3.connect("database/pythonsqlite.db")
+        conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
         query = f"SELECT * from automaterelay where relaynumber={relayNumber}"
         new_dataframe = pd.read_sql_query(query, conn)
         print(new_dataframe)

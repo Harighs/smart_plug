@@ -129,7 +129,7 @@ class DatabaseManager:
         cursor = conn.cursor()
 
         current_datetime = datetime.now() - timedelta(hours=24)
-
+        current_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
         # this data will be inserted every day at 04:00 AM (E-value)
         cursor.execute("INSERT INTO automode(datetime, last_24hrs_usage, relaynumber, times_to_turnon, status) VALUES(?, ?, ?, ?, ?)",
                        (current_datetime, last_24hrs_usage, relayNumber, times_to_turnon, True))
@@ -200,7 +200,8 @@ class DatabaseManager:
         conn.commit()
         cursor.close()
 
-    def read_relaymode_temp(self, relayNumber):
+
+    def read_relay_while_onauto_temp(self, relayNumber):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         # Get the current datetime
@@ -213,6 +214,23 @@ class DatabaseManager:
         datetime_1_hour_in_future = current_datetime + timedelta(hours=1)
 
         query = f"SELECT * FROM relaymode_temp WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{datetime_30_minutes_ago}' AND '{datetime_1_hour_in_future}';"
+        cursor.execute(query, (relayNumber,))
+        
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            # print(row)
+            result_list.append(row)
+        
+        cursor.close()
+        return result_list
+    
+
+    def read_relaymode_temp(self, relayNumber):
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+    
+        query = "SELECT * FROM relaymode_temp WHERE relaynumber=? AND status=1 ORDER BY id DESC"
         cursor.execute(query, (relayNumber,))
         
         rows = cursor.fetchall()

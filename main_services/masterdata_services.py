@@ -88,8 +88,8 @@ class AutoServices:
         # Note: this auto mode is only configured for Relay 1
         db = DatabaseManager()
         last_48hrs_usage = db.read_datacache_last_48hrs_consumption()[0][0]
-
         last_24hrs_usage = db.read_datacache_last_24hrs_consumption()[0][0] # A
+        
         relay1PowerNeeded = db.read_relaysettings_table()[0][2] # B
         relay2PowerNeeded = db.read_relaysettings_table()[0][3] # additional relay 2
         """

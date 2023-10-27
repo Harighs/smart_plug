@@ -1,16 +1,13 @@
 # usr/bin/python3
 import sys 
 sys.path.append('/home/pi/smart_plug/')
-
+import os
 import datetime
 import sqlite3
 import pandas as pd
 
 from external_services.awattar_services import AwattarServices
 from database.db_manager import DatabaseManager
-
-# Add the directory to sys.path
-sys.path.append('..')
 from pi_controller.relay_controller import RelayControl
 from main_services.common_utils import common_utils 
 
@@ -52,12 +49,12 @@ class Auto_Mode:
             conn = sqlite3.connect("database/pythonsqlite.db")
             self.future_df.to_sql('automaterelay', conn, index=False, if_exists='replace') # replace the dataset
             self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
+            conn.close()
         else:
             print("No matching auto mode")
 
         self.turn_on_turn_off(relayNumber)
 
-        return self.future_df
 
     def turn_on_turn_off(self, relayNumber):
         # check whether the relay 1 or 2 is on Auto mode then turn on and turn off automatically
@@ -78,11 +75,11 @@ class Auto_Mode:
                         enddatetime = pd.to_datetime(row['end_timestamp'])
                         if startdatetime <= current_time <= enddatetime:
                             # Turn On
-                            RelayControl().relayController(relayNumber=1, relayStatus=1)
+                            RelayControl().relayController(relayNumber, 1)
                             print(f"Relay {relayNumber} turned on in AutoMode")
                         else:
                             # Turn OFF
-                            RelayControl().relayController(relayNumber=1, relayStatus=0)
+                            RelayControl().relayController(relayNumber, 0)
                             print(f"Relay {relayNumber} turned off in AutoMode")
                     break
         else:

@@ -47,9 +47,9 @@ class Auto_Mode:
         if len(self.future_df) > 0:
             print("Found matching auto mode for relay:", relayNumber)
             conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
-            # self.delete_automate_relay()
-            # self.future_df.to_sql('automaterelay', conn, index=False, if_exists='append') # replace the dataset
-            # self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
+            self.delete_automate_relay()
+            self.future_df.to_sql('automaterelay', conn, index=False, if_exists='append') # replace the dataset
+            self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
             conn.close()
         else:
             print("No matching auto mode")

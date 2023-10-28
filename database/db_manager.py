@@ -146,7 +146,7 @@ class DatabaseManager:
         start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
 
-        query = f"SELECT times_to_turnon FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}';"
+        query = f"SELECT times_to_turnon FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC;"
         cursor.execute(query, (relayNumber,))
         
         rows = cursor.fetchall()

@@ -29,11 +29,11 @@ class AutoServices:
         self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
         self.smartmeter_df = smartmeter_services.sm_each_date()
 
-        self.awattar_data_path = 'dataset/'+common_utils.static_awattar_filename
-        self.smart_meter_data_path = 'dataset/'+common_utils.static_smartmeter_filename
+        self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
+        self.smart_meter_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
 
     def create_master_df(self):
-        Master_Data_Path = 'dataset/'+common_utils.static_master_service
+        Master_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_master_service
 
         if not os.path.exists(Master_Data_Path):
             columns = ['start_timestamp', 'end_timestamp', 'awattar_price', 'smart_meter_consumption', 'R1', 'R2', 'R3',
@@ -80,7 +80,7 @@ class AutoServices:
         Master_Data.to_csv(Master_Data_Path, index=False)
 
         # Feed Master Data CSV to the database
-        conn = sqlite3.connect("database/"+common_utils.static_database_filename)
+        conn = sqlite3.connect("/home/pi/smart_plug/database/"+common_utils.static_database_filename)
         Master_Data.to_sql('datacache', conn, index=False, if_exists='append')
         return True
     

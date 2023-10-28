@@ -120,3 +120,33 @@ crontab -e
 
 # Testing the service to restart every minute
 # * * * * * sudo service smart_plug restart
+
+
+
+######################
+ /etc/systemd/system/smart_plug_auto_mode.timer  
+ [Unit]
+Description=Run smart_plug_auto_mode every 5 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
+
+
+
+######################
+sudo systemctl status smart_plug_auto_mode.timer
+
+
+
+######################
+
+
+
+
+######################
+
+

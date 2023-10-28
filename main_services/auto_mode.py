@@ -15,7 +15,6 @@ from main_services.common_utils import common_utils
 class Auto_Mode:
     def __init__(self):
         self.future_df = None
-        return None
 
     def auto_mode(self, relayNumber):
         db = DatabaseManager()
@@ -23,10 +22,8 @@ class Auto_Mode:
         if not times_toturn_on:
             return
         else:
-            pass
+            times_toturn_on = int(times_toturn_on[0][0])
         
-        times_toturn_on = int(times_toturn_on[0][0])
-
         self.future_df = AwattarServices().AWATTAR_FUTURE_PRICE()
 
         self.date_time = datetime.datetime.now()
@@ -47,7 +44,8 @@ class Auto_Mode:
         if len(self.future_df) > 0:
             print("Found matching auto mode for relay:", relayNumber)
             conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
-            self.future_df.to_sql('automaterelay', conn, index=False, if_exists='replace') # replace the dataset
+            self.delete_automate_relay()
+            self.future_df.to_sql('automaterelay', conn, index=False, if_exists='append') # replace the dataset
             self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
             conn.close()
         else:
@@ -55,7 +53,16 @@ class Auto_Mode:
 
         self.turn_on_turn_off(relayNumber)
 
-        return
+    
+    def delete_automate_relay(self):
+            conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+            cursor = conn.cursor()
+            delete_query = "DELETE from automaterelay"
+            cursor.execute(delete_query)
+            conn.commit()
+            conn.close()
+
+
 
     def turn_on_turn_off(self, relayNumber):
         # check whether the relay 1 or 2 is on Auto mode then turn on and turn off automatically
@@ -70,21 +77,17 @@ class Auto_Mode:
         if len(results) > 0: # check whether relay is on Auto Mode
                 current_time = datetime.datetime.now()
                 # Check if current time is within any interval
-                while True:
-                    for index, row in new_dataframe.iterrows():
-                        startdatetime = pd.to_datetime(row['start_timestamp'])
-                        enddatetime = pd.to_datetime(row['end_timestamp'])
-                        if startdatetime <= current_time <= enddatetime:
-                            # Turn On
-                            RelayControl().relayController(relayNumber, 1)
-                            print(f"Relay {relayNumber} turned on in AutoMode")
-                        else:
-                            # Turn OFF
-                            RelayControl().relayController(relayNumber, 0)
-                            print(f"Relay {relayNumber} turned off in AutoMode")
-                    break
-        else:
-            return
+                for index, row in new_dataframe.iterrows():
+                    startdatetime = pd.to_datetime(row['start_timestamp'])
+                    enddatetime = pd.to_datetime(row['end_timestamp'])
+                    if startdatetime <= current_time <= enddatetime:
+                        # Turn On
+                        RelayControl().relayController(relayNumber, 1)
+                        print(f"Relay {relayNumber} turned on in AutoMode")
+                    else:
+                        # Turn OFF
+                        RelayControl().relayController(relayNumber, 0)
+                        print(f"Relay {relayNumber} turned off in AutoMode")
 
 if __name__ == "__main__":
     auto_mode = Auto_Mode()

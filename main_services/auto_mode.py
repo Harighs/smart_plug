@@ -2,7 +2,7 @@
 import sys 
 sys.path.append('/home/pi/smart_plug/')
 import os
-import datetime
+from datetime import datetime, timedelta
 import sqlite3
 import pandas as pd
 
@@ -25,10 +25,13 @@ class Auto_Mode:
             times_toturn_on = int(times_toturn_on[0][0])
         
         self.future_df = AwattarServices().AWATTAR_FUTURE_PRICE()
+        print("Data from BEFORE modification", self.future_df)
 
-        self.date_time = datetime.datetime.now()
+        self.date_time = datetime.now()
+        print(self.date_time)
+
         # delete past values from future_df
-        self.future_df = self.future_df[self.future_df['start_timestamp'] > self.date_time.now()]
+        # self.future_df = self.future_df[self.future_df['start_timestamp'] >= self.date_time.now()]
 
         # find min 2 values of future_df
         self.future_df.sort_values(by=['marketprice'], inplace=True)
@@ -39,14 +42,14 @@ class Auto_Mode:
         self.future_df['unit'] = "kWh"
         self.future_df['relaynumber'] = relayNumber
 
-        print(self.future_df)
+        print("Data from AFTER modification", self.future_df)
 
         if len(self.future_df) > 0:
             print("Found matching auto mode for relay:", relayNumber)
             conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
-            self.delete_automate_relay()
-            self.future_df.to_sql('automaterelay', conn, index=False, if_exists='append') # replace the dataset
-            self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
+            # self.delete_automate_relay()
+            # self.future_df.to_sql('automaterelay', conn, index=False, if_exists='append') # replace the dataset
+            # self.future_df.to_sql('automaterelay_report', conn, index=False, if_exists='append') # for report purpose
             conn.close()
         else:
             print("No matching auto mode")
@@ -68,18 +71,30 @@ class Auto_Mode:
         # check whether the relay 1 or 2 is on Auto mode then turn on and turn off automatically
         db = DatabaseManager()
         results = db.read_relaymode_temp(relayNumber) # setting relay number
+                
+        current_datetime = datetime.now()
+        current_datetime = current_datetime.strftime('%Y-%m-%dT%H:00:00')
+
+        buffer_datetime = datetime.now() + timedelta(hours=1)
+        buffer_datetime = buffer_datetime.strftime('%Y-%m-%dT%H:00:00')
 
         conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
-        query = f"SELECT * from automaterelay where relaynumber={relayNumber}"
+        query = f"SELECT * from automaterelay where relaynumber={relayNumber} and start_timestamp BETWEEN '{current_datetime}' and '{buffer_datetime}'"
         new_dataframe = pd.read_sql_query(query, conn)
+
+        print(query)
         print(new_dataframe)
 
         if len(results) > 0: # check whether relay is on Auto Mode
-                current_time = datetime.datetime.now()
+                current_time = datetime.now()
                 # Check if current time is within any interval
                 for index, row in new_dataframe.iterrows():
                     startdatetime = pd.to_datetime(row['start_timestamp'])
                     enddatetime = pd.to_datetime(row['end_timestamp'])
+                    print("startdatetime", startdatetime)
+                    print("enddatetime", enddatetime)
+                    print("current_time", current_time)
+
                     if startdatetime <= current_time <= enddatetime:
                         # Turn On
                         RelayControl().relayController(relayNumber, 1)

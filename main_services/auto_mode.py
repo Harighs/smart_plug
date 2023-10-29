@@ -24,6 +24,7 @@ class Auto_Mode:
         else:
             times_toturn_on = int(times_toturn_on[0][0])
         
+        print("No of times to turn on the relay", times_toturn_on)
         self.future_df = AwattarServices().AWATTAR_FUTURE_PRICE()
         print("Data from BEFORE modification", self.future_df)
 
@@ -99,6 +100,7 @@ class Auto_Mode:
                         # Turn On
                         RelayControl().relayController(relayNumber, 1)
                         print(f"Relay {relayNumber} turned on in AutoMode")
+                        break
                     else:
                         # Turn OFF
                         RelayControl().relayController(relayNumber, 0)

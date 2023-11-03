@@ -48,6 +48,26 @@ class DatabaseManager:
             )
         ''')
 
+        # datacache_report - table to store the master records from (Awattar service and Smartmeter) used later for reports
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS datacache_report (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                start_timestamp TEXT NOT NULL,
+                end_timestamp TEXT NOT NULL,
+                awattar_price TEXT NOT NULL,
+                smart_meter_consumption TEXT NOT NULL,
+                awattar_unit TEXT NOT NULL,
+                smart_meter_unit TEXT NOT NULL,
+                R1 TEXT NOT NULL,
+                R2 TEXT NOT NULL,
+                R3 TEXT NOT NULL,
+                R4 TEXT NOT NULL,
+                R5 TEXT NOT NULL,
+                status BOOLEAN,
+                mode TEXT NULL
+            )
+        ''')
+
         # relaymode_report - table to record information when relay is ON / OFF / AUTO
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS relaymode_report (

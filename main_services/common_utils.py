@@ -1,6 +1,7 @@
 class common_utils:
     
     # api service static variables
+    # static_ipaddress = "192.168.86.33"
     static_ipaddress = "192.168.1.240"
     static_port = 8080
 

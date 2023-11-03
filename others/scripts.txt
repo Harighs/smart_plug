@@ -147,6 +147,117 @@ sudo systemctl status smart_plug_auto_mode.timer
 
 
 
+##########################################################################################################################
+########################################################################################################################
+
+
+NEW SCRIPTS:
+03.11.23
+
+
 ######################
+
+  GNU nano 5.4                                                    /etc/systemd/system/smart_plug.timer                                                             
+[Unit]
+Description=Run smart_plug every 48 hours
+
+[Timer]
+OnBootSec=48h
+OnUnitActiveSec=48h
+
+[Install]
+WantedBy=timers.target
+
+######################
+
+
+  GNU nano 5.4                                             /etc/systemd/system/smart_plug_data_download.timer *                                                    
+[Unit]
+Description=Run smart_plug_data_download every 12 hours
+
+[Timer]
+OnBootSec=12h
+OnUnitActiveSec=12h
+
+[Install]
+WantedBy=timers.target
+
+
+
+######################
+
+  GNU nano 5.4                                               /etc/systemd/system/smart_plug_auto_mode.timer                                                        
+[Unit]
+Description=Run smart_plug_auto_mode every 30 minutes
+
+[Timer]
+OnBootSec=30min
+OnUnitActiveSec=30min
+
+[Install]
+WantedBy=timers.target
+
+##########################################################################################################################
+########################################################################################################################
+
+  GNU nano 5.4                                            /etc/systemd/system/smart_plug_data_download.service *                                                   
+# /etc/systemd/system/smart_plug.service
+
+[Unit]
+Description=Smart Plug Service - To Download Awattar and Smart-meter data
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/smart_plug/main_services/masterdata_services.py
+Restart=on-failure
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+######################
+
+  GNU nano 5.4                                              /etc/systemd/system/smart_plug_auto_mode.service                                                       
+# /etc/systemd/system/smart_plug_auto_mode.service
+
+[Unit]
+Description=Smart Plug - Auto mode
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/smart_plug/main_services/auto_mode.py
+Restart=on-failure
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+
+######################
+
+  GNU nano 5.4                                                   /etc/systemd/system/smart_plug.service                                                            
+# /etc/systemd/system/smart_plug.service
+
+[Unit]
+Description=Smart Plug - API Service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/smart_plug/main_services/api_services.py
+Restart=on-failure
+User=pi
+
+[Install]
+WantedBy=multi-user.target
+
+##########################################################################################################################
+########################################################################################################################
+
+
+
+
+
+
+
 
 

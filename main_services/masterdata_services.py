@@ -81,17 +81,23 @@ class AutoServices:
 
         # Feed Master Data CSV to the database
         conn = sqlite3.connect("/home/pi/smart_plug/database/"+common_utils.static_database_filename)
-        Master_Data.to_sql('datacache', conn, index=False, if_exists='append')
+        Master_Data.to_sql('datacache', conn, index=False, if_exists='replace')
+        Master_Data.to_sql('datacache_report', conn, index=False, if_exists='append')
         return True
     
-    def calculateAutoModeValue(self):
-        # Note: this auto mode is only configured for Relay 1
+    def calculateAutoModeValue(self, relayNumber):
         db = DatabaseManager()
-        last_48hrs_usage = db.read_datacache_last_48hrs_consumption()[0][0]
+
+        if(relayNumber == 1):
+            relayPower = db.read_relaysettings_table()[0][2] # relay 1 power
+        elif(relayNumber == 2):
+            relayPower = db.read_relaysettings_table()[0][3] # relay 2 power
+        
+        last_known_times_toturn_on = db.read_automode_24hrs_before(relayNumber)
+
+        last_known_times_toturn_on = int(last_known_times_toturn_on) * int(relayPower)
         last_24hrs_usage = db.read_datacache_last_24hrs_consumption()[0][0] # A
         
-        relay1PowerNeeded = db.read_relaysettings_table()[0][2] # B
-        relay2PowerNeeded = db.read_relaysettings_table()[0][3] # additional relay 2
         """
         Formula to calculate auto_mode value
         A = last 24hrs consumption
@@ -105,18 +111,13 @@ class AutoServices:
       
         # Logic for Escalation --> 1.3 default value
         # Higher the demand higher the turn on time
-        if(last_24hrs_usage >= last_48hrs_usage):
-            no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relay1PowerNeeded)
-            db.insert_automode(last_24hrs_usage, 1, round(no_of_times_to_activate_automode)) # relay 1
+        if(last_24hrs_usage >= last_known_times_toturn_on):
+            no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relayPower)
+            db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) # relay 1
 
-            no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relay2PowerNeeded)
-            db.insert_automode(last_24hrs_usage, 2, round(no_of_times_to_activate_automode)) # relay 2
         else:
-            no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relay1PowerNeeded)
-            db.insert_automode(last_24hrs_usage, 1, round(no_of_times_to_activate_automode)) # relay 1
-
-            no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relay2PowerNeeded)
-            db.insert_automode(last_24hrs_usage, 2, round(no_of_times_to_activate_automode)) # relay 2
+            no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relayPower)
+            db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
 
 
         return True
@@ -125,6 +126,8 @@ class AutoServices:
 
 if __name__ == '__main__':
     auto_service = AutoServices()
-    auto_service.create_master_df()
-    auto_service.calculateAutoModeValue()
+    # auto_service.create_master_df()
+    auto_service.calculateAutoModeValue(1)
+    auto_service.calculateAutoModeValue(2)
+
 

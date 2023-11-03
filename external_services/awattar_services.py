@@ -111,7 +111,7 @@ class AwattarServices:
     def AWATTAR_ONE_DAY_PERIOD(self):
         # This return the datetime timestamp before 24hours
         # Replace this with your Unix timestamp
-        current_datetime = datetime.now() - timedelta(hours=72)
+        current_datetime = datetime.now() - timedelta(hours=24)
         unix_timestamp = current_datetime.timestamp()
         start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(unix_timestamp)
 

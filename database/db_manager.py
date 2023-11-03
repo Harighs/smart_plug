@@ -166,7 +166,7 @@ class DatabaseManager:
         start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
 
-        query = f"SELECT times_to_turnon FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC;"
+        query = f"SELECT COALESCE(SUM(times_to_turnon), 0) AS result FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC;"
         cursor.execute(query, (relayNumber,))
         
         rows = cursor.fetchall()
@@ -328,7 +328,7 @@ class DatabaseManager:
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         cursor.execute(
-            f"SELECT sum(smart_meter_consumption) as consumption, smart_meter_unit as unit FROM datacache WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}'")
+            f"SELECT COALESCE(SUM(smart_meter_consumption), 0) AS consumption, smart_meter_unit as unit FROM datacache WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY 'index' DESC LIMIT 25")
         rows = cursor.fetchall()
         result_list = []
         for row in rows:
@@ -359,7 +359,7 @@ class DatabaseManager:
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         cursor.execute(
-            f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC")
+            f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC LIMIT 25")
         rows = cursor.fetchall()
 
         result_list = []

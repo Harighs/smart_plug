@@ -26,8 +26,8 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
 
-        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
-        self.smartmeter_df = smartmeter_services.sm_each_date()
+       # self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
+       # self.smartmeter_df = smartmeter_services.sm_each_date()
 
         self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
         self.smart_meter_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
@@ -77,12 +77,12 @@ class AutoServices:
 
         if os.path.exists(Master_Data_Path):
             os.remove(Master_Data_Path)
-        Master_Data.to_csv(Master_Data_Path, index=False)
+        Master_Data.to_csv(Master_Data_Path, index=True)
 
         # Feed Master Data CSV to the database
         conn = sqlite3.connect("/home/pi/smart_plug/database/"+common_utils.static_database_filename)
-        Master_Data.to_sql('datacache', conn, index=False, if_exists='replace')
-        Master_Data.to_sql('datacache_report', conn, index=False, if_exists='append')
+        Master_Data.to_sql('datacache', conn, index=True, if_exists='replace')
+        Master_Data.to_sql('datacache_report', conn, index=True, if_exists='append')
         return True
     
     def calculateAutoModeValue(self, relayNumber):
@@ -94,7 +94,7 @@ class AutoServices:
             relayPower = db.read_relaysettings_table()[0][3] # relay 2 power
         
         last_known_times_toturn_on = db.read_automode_24hrs_before(relayNumber)
-        last_known_times_toturn_on = int(last_known_times_toturn_on) * int(relayPower)
+        last_known_times_toturn_on = int(last_known_times_toturn_on[0][0]) * int(relayPower)
         last_24hrs_usage = db.read_datacache_last_24hrs_consumption()[0][0] # A
         
         """
@@ -115,7 +115,7 @@ class AutoServices:
       
         # Logic for Escalation --> 1.3 default value
         # Higher the demand higher the turn on time
-        if(last_24hrs_usage >= last_known_times_toturn_on):
+        if(last_known_times_toturn_on >= last_24hrs_usage):
             no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relayPower)
             db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
         else:

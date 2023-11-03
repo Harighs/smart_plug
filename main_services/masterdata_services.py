@@ -94,31 +94,33 @@ class AutoServices:
             relayPower = db.read_relaysettings_table()[0][3] # relay 2 power
         
         last_known_times_toturn_on = db.read_automode_24hrs_before(relayNumber)
-
         last_known_times_toturn_on = int(last_known_times_toturn_on) * int(relayPower)
         last_24hrs_usage = db.read_datacache_last_24hrs_consumption()[0][0] # A
         
         """
         Formula to calculate auto_mode value
-        A = last 24hrs consumption
+        A = Last 24hrs consumption
         B = Power needed for Relay1 or Relay 2
         Result = A/B
 
         Example: A = 20KW; B = 5KW
             Result = 20/5 
                    = 4 times (this we have to turn on and turn off the relay automatically)
+
+        Escalation Example:
+            Lets say times_turnon=6*Relay power (20kwh)
+                E old = 6*20 = 120 kwh 
+            If the last 24hrs consumption is greater or equal to (E Old) then multiply with escalation value
         """
       
         # Logic for Escalation --> 1.3 default value
         # Higher the demand higher the turn on time
         if(last_24hrs_usage >= last_known_times_toturn_on):
             no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relayPower)
-            db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) # relay 1
-
+            db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
         else:
             no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relayPower)
             db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
-
 
         return True
 

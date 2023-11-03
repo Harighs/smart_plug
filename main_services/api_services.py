@@ -118,15 +118,15 @@ def relayController(relayNumber, relayStatus):
     # check if the relay is in auto mode
     db = DatabaseManager()
     if(relayStatus == 0):
-        print("inrealystatus 2 off mode")
+        print("when its on relay 2 off mode")
         db.insert_relaymode_report(relayNumber, "Off")
         db.delete_relaymode_temp(relayNumber)
     elif(relayStatus == 1):
-        print("inrealystatus 2 on mode")
+        print("when its on relay 2 on mode")
         db.insert_relaymode_report(relayNumber, "On")
         db.delete_relaymode_temp(relayNumber)
     elif(relayStatus == 2):
-        print("inrealystatus 2 auto mode")
+        print("when its on relay 2 auto mode")
         db.insert_relaymode_report(relayNumber, "Auto")
         db.insert_relaymode_temp(relayNumber, "Auto")
 

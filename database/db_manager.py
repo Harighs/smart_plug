@@ -13,9 +13,6 @@ class DatabaseManager:
         print("init called")
         self.create_connection()
         self.create_table()
-        # self.insert_datacache_table("2023-09-18 01:00:00", "2023-09-18 02:00:00", "5.50", "100", "0", "0", "0")  # TODO pass it from services
-        # self.read_datacache_table()
-        # self.delete_datacache_table()
 
     def create_connection(self):
         try:
@@ -81,14 +78,14 @@ class DatabaseManager:
 
         # relaymode_temp - table to record the relay mode temporarly
         cursor.execute('''
-        CREATE TABLE IF NOT EXISTS relaymode_temp (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            datetime TEXT NOT NULL,
-            relaynumber INTEGER NOT NULL,
-            relayMode TEXT NOT NULL,
-            status BOOLEAN
-        )
-    ''')
+            CREATE TABLE IF NOT EXISTS relaymode_temp (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                datetime TEXT NOT NULL,
+                relaynumber INTEGER NOT NULL,
+                relayMode TEXT NOT NULL,
+                status BOOLEAN
+            )
+        ''')
 
         # automode - table to record 24hr auto (E) value 
         cursor.execute('''
@@ -141,6 +138,7 @@ class DatabaseManager:
             )
         ''')
 
+        conn.commit()
         cursor.close()
 
         ##### automode TABLE
@@ -328,7 +326,7 @@ class DatabaseManager:
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         cursor.execute(
-            f"SELECT COALESCE(SUM(smart_meter_consumption), 0) AS consumption, smart_meter_unit as unit FROM datacache WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY 'index' DESC LIMIT 25")
+            f"SELECT COALESCE(SUM(smart_meter_consumption), 0) AS consumption, smart_meter_unit as unit FROM datacache WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 25")
         rows = cursor.fetchall()
         result_list = []
         for row in rows:

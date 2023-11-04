@@ -26,8 +26,8 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
 
-       # self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
-       # self.smartmeter_df = smartmeter_services.sm_each_date()
+        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
+        self.smartmeter_df = smartmeter_services.sm_each_date()
 
         self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
         self.smart_meter_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
@@ -77,12 +77,15 @@ class AutoServices:
 
         if os.path.exists(Master_Data_Path):
             os.remove(Master_Data_Path)
-        Master_Data.to_csv(Master_Data_Path, index=True)
+        Master_Data.to_csv(Master_Data_Path, index=False)
 
         # Feed Master Data CSV to the database
         conn = sqlite3.connect("/home/pi/smart_plug/database/"+common_utils.static_database_filename)
-        Master_Data.to_sql('datacache', conn, index=True, if_exists='replace')
-        Master_Data.to_sql('datacache_report', conn, index=True, if_exists='append')
+        # Reset the index to use auto-incrementing values
+        Master_Data.reset_index(drop=True, inplace=True)
+        Master_Data.to_sql('datacache', conn, if_exists='replace', index_label='id')
+        Master_Data.to_sql('datacache_report', conn, if_exists='append', index_label='id')
+        
         return True
     
     def calculateAutoModeValue(self, relayNumber):
@@ -128,7 +131,7 @@ class AutoServices:
 
 if __name__ == '__main__':
     auto_service = AutoServices()
-    # auto_service.create_master_df()
+    auto_service.create_master_df()
     auto_service.calculateAutoModeValue(1)
     auto_service.calculateAutoModeValue(2)
 

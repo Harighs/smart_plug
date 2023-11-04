@@ -63,6 +63,46 @@ def postRelaySettings():
     return jsonify({"status": "true"}), 200
  
 # TODO add extra api methods to get the datacache
+@app.route('/api/datacache', methods=['GET'])
+def getDataCache():
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+        cursor = conn.cursor()
+
+        df = pd.read_sql_query("SELECT * FROM datacache_report", conn)
+
+        # Check if the DataFrame is not empty
+        if not df.empty:
+            # Plot the DataFrame as a table
+
+            # Calculate the figure size based on the number of rows and columns
+            num_rows, num_cols = df.shape
+            fig_width = num_cols * 2  # Adjust the multiplier as needed
+            fig_height = num_rows * 0.2  # Adjust the multiplier as needed
+
+            # Plot the DataFrame as a table
+            fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+            ax.axis('tight')
+            ax.axis('off')
+            table = ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center')
+            image_file = io.BytesIO()
+            plt.savefig(image_file, format='png', bbox_inches='tight')
+            image_file.seek(0)
+            plt.close()
+            if image_file:
+                return send_file(image_file, mimetype='image/png')
+            return jsonify({"status": "No data found"}), 404
+            
+        return None
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"status": "Error"}), 500
+
+    finally:
+        conn.close()
+
 # TODO add extra api methods to get the automode
 
 # Define a function to get live relay status

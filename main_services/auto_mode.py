@@ -85,7 +85,14 @@ class Auto_Mode:
         print(query)
         print(new_dataframe)
 
+
         if len(results) > 0: # check whether relay is on Auto Mode
+                # check if new_dataframe is empty then turn off the relay
+                if(new_dataframe.empty):
+                     # Turn OFF
+                    RelayControl().relayController(relayNumber, 0)
+                    print(f"Relay {relayNumber} turned off in AutoMode")
+
                 current_time = datetime.now()
                 # Check if current time is within any interval
                 for index, row in new_dataframe.iterrows():

@@ -27,6 +27,7 @@ from main_services.auto_mode import Auto_Mode
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
 
+
 app = Flask(__name__)
 
 @app.route('/api/', methods=['GET'])
@@ -62,30 +63,36 @@ def postRelaySettings():
     return jsonify({"status": "true"}), 200
 
 
-def getLiveRelayStatus():
+# Define a function to get live relay status
+def get_live_auto_relay_status():
     try:
-            # Connect to the SQLite database
-            db = DatabaseManager()
-            
-            conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
-            cursor = conn.cursor()
+        # Connect to the SQLite database
+        conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+        cursor = conn.cursor()
 
-            df = pd.read_sql_query("SELECT start_timestamp, end_timestamp, marketprice, unit, relaynumber FROM automaterelay", conn)
+        df = pd.read_sql_query("SELECT start_timestamp, end_timestamp, marketprice, unit, relaynumber FROM automaterelay", conn)
 
-            # Check if the DataFrame is not empty
-            if not df.empty:
-                # Plot the DataFrame as a table
-                fig, ax = plt.subplots(figsize=(8, 6))
-                ax.axis('tight')
-                ax.axis('off')
-                table = ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center')
-                image_file = io.BytesIO()
-                plt.savefig(image_file, format='png', bbox_inches='tight')
-                image_file.seek(0)
-                plt.close()
-                return image_file
-            return None
-               
+        # Check if the DataFrame is not empty
+        if not df.empty:
+            # Plot the DataFrame as a table
+
+            # Calculate the figure size based on the number of rows and columns
+            num_rows, num_cols = df.shape
+            fig_width = num_cols * 2  # Adjust the multiplier as needed
+            fig_height = num_rows * 0.2  # Adjust the multiplier as needed
+
+            # Plot the DataFrame as a table
+            fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+            ax.axis('tight')
+            ax.axis('off')
+            table = ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center')
+            image_file = io.BytesIO()
+            plt.savefig(image_file, format='png', bbox_inches='tight')
+            image_file.seek(0)
+            plt.close()
+            return image_file
+        return None
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({"status": "Error"}), 500
@@ -93,10 +100,10 @@ def getLiveRelayStatus():
     finally:
         conn.close()
 
-
-@app.route('/api/liveRelayStatus', methods=['GET'])
-def getLiveRelayStatus():
-    image_data = getLiveRelayStatus()
+# Define the API endpoint to get live relay status
+@app.route('/api/liveAutoModeStatus', methods=['GET'])
+def api_get_live_auto_relay_status():
+    image_data = get_live_auto_relay_status()
     if image_data:
         return send_file(image_data, mimetype='image/png')
     return jsonify({"status": "No data found"}), 404

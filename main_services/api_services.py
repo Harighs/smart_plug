@@ -61,7 +61,9 @@ def postRelaySettings():
 
 
     return jsonify({"status": "true"}), 200
-
+ 
+# TODO add extra api methods to get the datacache
+# TODO add extra api methods to get the automode
 
 # Define a function to get live relay status
 def get_live_auto_relay_status():

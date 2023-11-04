@@ -28,12 +28,12 @@ class DatabaseManager:
         # datacache - table to store the master records from (Awattar service and Smartmeter)
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS datacache (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 start_timestamp TEXT NOT NULL,
                 end_timestamp TEXT NOT NULL,
-                awattar_price TEXT NOT NULL,
-                smart_meter_consumption TEXT NOT NULL,
-                awattar_unit TEXT NOT NULL,
+                awattar_price TEXT,
+                smart_meter_consumption TEXT,
+                awattar_unit TEXT,
                 smart_meter_unit TEXT NOT NULL,
                 R1 TEXT NOT NULL,
                 R2 TEXT NOT NULL,
@@ -48,12 +48,12 @@ class DatabaseManager:
         # datacache_report - table to store the master records from (Awattar service and Smartmeter) used later for reports
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS datacache_report (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 start_timestamp TEXT NOT NULL,
                 end_timestamp TEXT NOT NULL,
-                awattar_price TEXT NOT NULL,
-                smart_meter_consumption TEXT NOT NULL,
-                awattar_unit TEXT NOT NULL,
+                awattar_price TEXT,
+                smart_meter_consumption TEXT,
+                awattar_unit TEXT,
                 smart_meter_unit TEXT NOT NULL,
                 R1 TEXT NOT NULL,
                 R2 TEXT NOT NULL,
@@ -147,8 +147,15 @@ class DatabaseManager:
         cursor = conn.cursor()
 
         current_datetime = datetime.now() - timedelta(hours=24)
-        current_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S.%f')
-        # this data will be inserted every day at 04:00 AM (E-value)
+       
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+
+        cursor.execute(f"DELETE FROM automode where datetime between '{start_of_day}' AND '{end_of_day}' and relaynumber={relayNumber}")
+        conn.commit()
+        
+        current_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+
         cursor.execute("INSERT INTO automode(datetime, last_24hrs_usage, relaynumber, times_to_turnon, status) VALUES(?, ?, ?, ?, ?)",
                        (current_datetime, last_24hrs_usage, relayNumber, times_to_turnon, True))
         
@@ -164,7 +171,7 @@ class DatabaseManager:
         start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
 
-        query = f"SELECT COALESCE(SUM(times_to_turnon), 0) AS result FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC;"
+        query = f"SELECT COALESCE(SUM(times_to_turnon), 0) AS result FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 1;"
         cursor.execute(query, (relayNumber,))
         
         rows = cursor.fetchall()
@@ -325,8 +332,8 @@ class DatabaseManager:
 
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
-        cursor.execute(
-            f"SELECT COALESCE(SUM(smart_meter_consumption), 0) AS consumption, smart_meter_unit as unit FROM datacache WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 25")
+        query = f"SELECT COALESCE(SUM(smart_meter_consumption), 0) AS consumption, smart_meter_unit as unit FROM datacache_report WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 25"
+        cursor.execute(query)
         rows = cursor.fetchall()
         result_list = []
         for row in rows:
@@ -352,12 +359,27 @@ class DatabaseManager:
         cursor.close()
         return result_list
 
+    def checkif_datacache_isavailable(self):
+        current_datetime = datetime.now()
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        cursor.execute(
+            f"SELECT COUNT(*) FROM datacache_report WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}'")
+        rows = cursor.fetchall()
+        result_list = []
+        for row in rows:
+            result_list.append(row)
+        cursor.close()
+        return result_list
+
 
     def read_datacache_withdate_table(self, fromDate, toDate):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
         cursor.execute(
-            f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC LIMIT 25")
+            f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC")
         rows = cursor.fetchall()
 
         result_list = []

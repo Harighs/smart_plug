@@ -26,8 +26,8 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
 
-        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
-        self.smartmeter_df = smartmeter_services.sm_each_date()
+        #self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
+        #self.smartmeter_df = smartmeter_services.sm_each_date()
 
         self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
         self.smart_meter_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
@@ -81,13 +81,15 @@ class AutoServices:
 
         # Feed Master Data CSV to the database
         conn = sqlite3.connect("/home/pi/smart_plug/database/"+common_utils.static_database_filename)
-        # Reset the index to use auto-incrementing values
-        Master_Data.reset_index(drop=True, inplace=True)
-        Master_Data.to_sql('datacache', conn, if_exists='replace', index_label='id')
-
-        Master_Data.reset_index(drop=True, inplace=True)
-        Master_Data.to_sql('datacache_report', conn, if_exists='append', index_label='id')
+        Master_Data.to_sql('datacache', conn, if_exists='replace', index=True, index_label='id')
         
+
+        db = DatabaseManager()
+        datacache_report_check = db.checkif_datacache_isavailable()
+        if int(datacache_report_check[0][0]) == 0:
+            # Insert to report only when the data is not available - this is to avoid duplicate
+            Master_Data.to_sql('datacache_report', conn, if_exists='append', index=False)
+            
         return True
     
     def calculateAutoModeValue(self, relayNumber):

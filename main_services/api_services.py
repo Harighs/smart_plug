@@ -137,6 +137,7 @@ def relayController(relayNumber, relayStatus):
  Main Python API service starts here
 """
 if __name__ == '__main__':
+    DatabaseManager()
     custom_ip = common_utils.static_ipaddress
     custom_port = common_utils.static_port
     app.run(host=custom_ip, port=custom_port, debug=True)

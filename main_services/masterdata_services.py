@@ -76,7 +76,7 @@ class AutoServices:
         Master_Data[['R1', 'R2', 'R3', 'R4', 'R5']] = Master_Data[['R1', 'R2', 'R3', 'R4', 'R5']].fillna(0)
 
         if os.path.exists(Master_Data_Path):
-            os.remove(Master_Data_Path)
+            os.remove(Master_Data_Path) 
         Master_Data.to_csv(Master_Data_Path, index=False)
 
         # Feed Master Data CSV to the database
@@ -84,6 +84,8 @@ class AutoServices:
         # Reset the index to use auto-incrementing values
         Master_Data.reset_index(drop=True, inplace=True)
         Master_Data.to_sql('datacache', conn, if_exists='replace', index_label='id')
+
+        Master_Data.reset_index(drop=True, inplace=True)
         Master_Data.to_sql('datacache_report', conn, if_exists='append', index_label='id')
         
         return True

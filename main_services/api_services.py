@@ -3,10 +3,19 @@ import sys
 sys.path.append('/home/pi/smart_plug/')
 import os
 import schedule
-import time
+import time 
+
+import sqlite3
+from sqlite3 import Error
+
 from datetime import datetime
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
+ 
+from PIL import Image
+import io
+import pandas as pd
+import matplotlib.pyplot as plt
 
 from external_services.awattar_services import AwattarServices
 from pi_controller.relay_controller import RelayControl
@@ -50,6 +59,46 @@ def postRelaySettings():
 
 
     return jsonify({"status": "true"}), 200
+
+
+def getLiveRelayStatus():
+    try:
+            # Connect to the SQLite database
+            db = DatabaseManager()
+            
+            conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+            cursor = conn.cursor()
+
+            df = pd.read_sql_query("SELECT start_timestamp, end_timestamp, marketprice, unit, relaynumber FROM automaterelay", conn)
+
+            # Check if the DataFrame is not empty
+            if not df.empty:
+                # Plot the DataFrame as a table
+                fig, ax = plt.subplots(figsize=(8, 6))
+                ax.axis('tight')
+                ax.axis('off')
+                table = ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center')
+                image_file = io.BytesIO()
+                plt.savefig(image_file, format='png', bbox_inches='tight')
+                image_file.seek(0)
+                plt.close()
+                return image_file
+            return None
+               
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"status": "Error"}), 500
+
+    finally:
+        conn.close()
+
+
+@app.route('/api/liveRelayStatus', methods=['GET'])
+def getLiveRelayStatus():
+    image_data = getLiveRelayStatus()
+    if image_data:
+        return send_file(image_data, mimetype='image/png')
+    return jsonify({"status": "No data found"}), 404
 
 
 # New method to get all the reports from the database

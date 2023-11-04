@@ -22,6 +22,7 @@ from pi_controller.relay_controller import RelayControl
 from external_services.smartmeter_services import SmartMeterServices
 from database.db_manager import DatabaseManager
 from main_services.common_utils import common_utils 
+from main_services.auto_mode import Auto_Mode
 
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
@@ -179,6 +180,8 @@ def relayController(relayNumber, relayStatus):
         db.insert_relaymode_report(relayNumber, "Auto")
         db.insert_relaymode_temp(relayNumber, "Auto")
 
+    auto_mode = Auto_Mode()
+    auto_mode.turn_on_turn_off(relayNumber)
     return jsonify({"status": str(bool(relay_trigger_status))}), 200
 
 

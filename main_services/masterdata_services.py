@@ -26,8 +26,8 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
 
-        #self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
-        #self.smartmeter_df = smartmeter_services.sm_each_date()
+        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
+        self.smartmeter_df = smartmeter_services.sm_each_date()
 
         self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
         self.smart_meter_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename

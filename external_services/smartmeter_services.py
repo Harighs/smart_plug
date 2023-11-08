@@ -145,6 +145,16 @@ class SmartMeterServices:
         if os.path.exists(self.dataset_path):
             os.remove(self.dataset_path)
         new_data.to_csv(self.dataset_path, index=False)
+
+        # Logout the smart meter service
+        # https://smartmeter.netz-noe.at/orchestration/Authentication/Logout
+        auth_logout_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Logout'
+        auth_response = requests.get(auth_logout_url, headers=headers)
+        if auth_response.status_code == 200:
+            print("Logout success.")
+        else:
+            print("Logout failed.")
+
         return new_data
 
     def saving_SmartMeter_Data_Each_day(self):

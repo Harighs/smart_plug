@@ -4,12 +4,13 @@ sys.path.append('/home/pi/smart_plug/')
 import os
 import schedule
 import time 
+import subprocess
 
 import sqlite3
 from sqlite3 import Error
 
 from datetime import datetime
-
+import json
 from flask import Flask, jsonify, request, send_file
  
 from PIL import Image
@@ -233,6 +234,191 @@ def relayController(relayNumber, relayStatus):
     auto_mode.turn_on_turn_off(relayNumber)
     return jsonify({"status": str(bool(relay_trigger_status))}), 200
 
+"""
+The following methods are used to restart the services
+"""
+
+@app.route('/api/restartApiService', methods=['GET'])
+def restartApiService(): 
+    command1 = "sudo systemctl restart smart_plug.service"
+    command2 = "sudo systemctl restart smart_plug.timer"
+
+    result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+    formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
+
+    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
+
+    response_data = {
+            "status": "True",
+            "message": [formatted_output1,formatted_output2]
+            }
+    formatted_response = json.dumps(response_data, indent=4)
+
+    if result1.returncode == 0:
+        print("Command output:")
+
+        return jsonify(json.loads(formatted_response)), 200
+
+    else:
+        print("Command failed with error:")
+        return jsonify(json.loads(formatted_response)), 200
+   
+
+@app.route('/api/restartDataDownloadService', methods=['GET'])
+def restartDatDownloadService():
+    command1 = "sudo systemctl restart smart_plug_data_download.service"
+    command2 = "sudo systemctl restart smart_plug_data_download.timer"
+
+    result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+    formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
+
+    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
+
+    response_data = {
+            "status": "True",
+            "message": [formatted_output1,formatted_output2]
+            }
+    formatted_response = json.dumps(response_data, indent=4)
+
+    if result1.returncode == 0:
+        print("Command output:")
+
+        return jsonify(json.loads(formatted_response)), 200
+
+    else:
+        print("Command failed with error:")
+        return jsonify(json.loads(formatted_response)), 404
+   
+
+@app.route('/api/restartAutoModeService', methods=['GET'])
+def restartAutoModeService():
+    command1 = "sudo systemctl restart smart_plug_auto_mode.service"
+    command2 = "sudo systemctl restart smart_plug_auto_mode.timer"
+
+    result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+    formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
+
+    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
+
+    response_data = {
+            "status": "True",
+            "message": [formatted_output1,formatted_output2]
+            }
+    formatted_response = json.dumps(response_data, indent=4)
+
+    if result1.returncode == 0:
+        print("Command output:")
+
+        return jsonify(json.loads(formatted_response)), 200
+
+    else:
+        print("Command failed with error:")
+        return jsonify(json.loads(formatted_response)), 404
+   
+"""
+The following method assists to check the status of the services
+"""
+@app.route('/api/getApiServiceStatus', methods=['GET'])
+def getApiServiceStatus(): 
+    command1 = "sudo systemctl status smart_plug.service"
+    command2 = "sudo systemctl status smart_plug.timer"
+
+    result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+    formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
+
+    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
+    
+    response_data = {
+            "status": "True",
+            "message": [formatted_output1,formatted_output2]
+            }
+    formatted_response = json.dumps(response_data, indent=4)
+
+    if result1.returncode == 0:
+        print("Command output:")
+
+        return jsonify(json.loads(formatted_response)), 200
+
+    else:
+        print("Command failed with error:")
+        return jsonify(json.loads(formatted_response)), 404
+   
+    
+@app.route('/api/getDataDownloadServiceStatus', methods=['GET'])
+def getDatDownloadServiceStatus():
+    command1 = "sudo systemctl status smart_plug_data_download.service"
+    command2 = "sudo systemctl status smart_plug_data_download.timer"
+
+    result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+    formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
+
+    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
+
+    response_data = {
+            "status": "True",
+            "message": [formatted_output1,formatted_output2]
+            }
+    formatted_response = json.dumps(response_data, indent=4)
+
+    if result1.returncode == 0:
+        print("Command output:")
+
+        return jsonify(json.loads(formatted_response)), 200
+
+    else:
+        print("Command failed with error:")
+        return jsonify(json.loads(formatted_response)), 404
+   
+
+@app.route('/api/getAutoModeServiceStatus', methods=['GET'])
+def getAutoModeServiceStatus():
+    command1 = "sudo systemctl status smart_plug_auto_mode.service"
+    command2 = "sudo systemctl status smart_plug_auto_mode.timer"
+
+    result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+    formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
+
+    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
+    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
+    
+    response_data = {
+            "status": "True",
+            "message": [formatted_output1,formatted_output2]
+            }
+    formatted_response = json.dumps(response_data, indent=4)
+
+    if result1.returncode == 0:
+        print("Command output:")
+
+        return jsonify(json.loads(formatted_response)), 200
+
+    else:
+        print("Command failed with error:")
+        return jsonify(json.loads(formatted_response)), 404
+    
 
 """
  Main Python API service starts here

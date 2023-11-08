@@ -26,8 +26,8 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
 
-        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
-        self.smartmeter_df = smartmeter_services.sm_each_date()
+        # self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
+       # self.smartmeter_df = smartmeter_services.sm_each_date()
 
         self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
         self.smart_meter_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
@@ -36,8 +36,8 @@ class AutoServices:
         Master_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_master_service
 
         if not os.path.exists(Master_Data_Path):
-            columns = ['start_timestamp', 'end_timestamp', 'awattar_price', 'smart_meter_consumption', 'R1', 'R2', 'R3',
-                       'R4', 'R5', 'status', 'mode']
+            columns = ['start_timestamp', 'end_timestamp', 'awattar_price', 'smart_meter_consumption', 'R1', 
+                       'R4', 'status', 'mode']
             pd.DataFrame(columns=columns).to_csv(Master_Data_Path, index=False)
 
         Master_Data = pd.read_csv(Master_Data_Path)
@@ -54,7 +54,7 @@ class AutoServices:
 
         Master_Data['start_timestamp'] = awattar_data['start_timestamp']
         Master_Data['end_timestamp'] = awattar_data['end_timestamp']
-        Master_Data['awattar_price'] = awattar_data['marketprice'] / 1000  # Converting mWh to kWh
+        Master_Data['awattar_price'] = awattar_data['marketprice']  # Converting mWh to kWh
         Master_Data['smart_meter_consumption'] = smart_meter_data['meteredValues']
         Master_Data['awattar_unit'] = awattar_data['unit']
         Master_Data['smart_meter_unit'] = "kWh"
@@ -62,18 +62,19 @@ class AutoServices:
         Master_Data['R1'] = smart_meter_data['meteredValues']
         # R4
         Master_Data['R4'] = awattar_data['marketprice']
-        # R2
-        Master_Data['R2'] = Master_Data['R1'] * Master_Data['R4']  # R2 = R1 * R4
-        # R5
-        Master_Data['R5'] = Master_Data['R2'] - Master_Data['R1'] * Master_Data['R4']  # R5 = (R2 - R1) * R4
+        # R2 Not in use
+        # Master_Data['R2'] = Master_Data['R1'] * Master_Data['R4']  # R2 = R1 * R4
+        # R5 Not in use
+        # Master_Data['R5'] = Master_Data['R2'] - Master_Data['R1'] * Master_Data['R4']  # R5 = (R2 - R1) * R4
 
         # R3
-        Master_Data[['R1', 'R2']].replace(0, 0.0001, inplace=True)
-        Master_Data[['R1', 'R2']].fillna(0.0001, inplace=True)
-        Master_Data['R3'] = Master_Data['R2'] / Master_Data['R1']  # R3 = R2 / R1
+        Master_Data[['R1', 'R4']].replace(0, 0.0001, inplace=True)
+        Master_Data[['R1', 'R4']].fillna(0.0001, inplace=True)
+        # Not in use
+        # Master_Data['R3'] = Master_Data['R2'] / Master_Data['R1']  # R3 = R2 / R1
 
         # fill NaN on chosen columns with 0
-        Master_Data[['R1', 'R2', 'R3', 'R4', 'R5']] = Master_Data[['R1', 'R2', 'R3', 'R4', 'R5']].fillna(0)
+        Master_Data[['R1', 'R4']] = Master_Data[['R1', 'R4']].fillna(0)
 
         if os.path.exists(Master_Data_Path):
             os.remove(Master_Data_Path) 
@@ -135,6 +136,10 @@ class AutoServices:
 
 if __name__ == '__main__':
     auto_service = AutoServices()
+    # Delete the master csv before creation
+    Master_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_master_service
+    if os.path.exists(Master_Data_Path):
+        os.remove(Master_Data_Path)
     auto_service.create_master_df()
     auto_service.calculateAutoModeValue(1)
     auto_service.calculateAutoModeValue(2)

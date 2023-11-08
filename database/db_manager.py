@@ -36,10 +36,7 @@ class DatabaseManager:
                 awattar_unit TEXT,
                 smart_meter_unit TEXT NOT NULL,
                 R1 TEXT NOT NULL,
-                R2 TEXT NOT NULL,
-                R3 TEXT NOT NULL,
                 R4 TEXT NOT NULL,
-                R5 TEXT NOT NULL,
                 status BOOLEAN,
                 mode TEXT NULL
             )
@@ -56,10 +53,7 @@ class DatabaseManager:
                 awattar_unit TEXT,
                 smart_meter_unit TEXT NOT NULL,
                 R1 TEXT NOT NULL,
-                R2 TEXT NOT NULL,
-                R3 TEXT NOT NULL,
                 R4 TEXT NOT NULL,
-                R5 TEXT NOT NULL,
                 status BOOLEAN,
                 mode TEXT NULL
             )

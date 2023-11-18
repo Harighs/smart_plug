@@ -202,6 +202,7 @@ class SmartMeterServices:
         :return:
         """
         path_to_file = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
+        
         # Define the start_date and end_date
         start_date = pd.to_datetime(start_date_time)
         end_date = pd.to_datetime(end_date_time)

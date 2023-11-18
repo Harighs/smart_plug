@@ -119,6 +119,11 @@ class SmartMeterServices:
 
     # New func written on 22-09-2023
     def sm_each_date(self):
+        # Delete the smartmeter_data csv before creation
+        SmartMeter_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
+        if os.path.exists(SmartMeter_Data_Path):
+            os.remove(SmartMeter_Data_Path)
+
         auth_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Login'
         auth_payload = {"user": common_utils.static_smart_meter_username, "pwd": common_utils.static_smart_meter_password}
         auth_response = requests.post(auth_url, json=auth_payload)
@@ -202,7 +207,7 @@ class SmartMeterServices:
         :return:
         """
         path_to_file = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
-        
+
         # Define the start_date and end_date
         start_date = pd.to_datetime(start_date_time)
         end_date = pd.to_datetime(end_date_time)

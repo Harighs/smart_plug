@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import requests
 from datetime import datetime, timedelta
+from main_services.common_utils import common_utils 
 
 class AwattarServices:
     def __init__(self):
@@ -109,6 +110,11 @@ class AwattarServices:
             resulting_df.to_csv(self.dataset_path, index=True)
 
     def AWATTAR_ONE_DAY_PERIOD(self):
+        # Delete the awattar_data csv before creation
+        Awattar_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
+        if os.path.exists(Awattar_Data_Path):
+            os.remove(Awattar_Data_Path)
+
         # This return the datetime timestamp before 24hours
         # Replace this with your Unix timestamp
         current_datetime = datetime.now() - timedelta(hours=24)

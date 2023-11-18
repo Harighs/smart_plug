@@ -117,7 +117,8 @@ class SmartMeterServices:
             raise Exception("Data request failed with status code: Smartmeter_service line 92",
                             data_response.status_code)
 
-    # New func written on 22-09-2023
+    # Currently used to download the smart-meter data
+    # update 18.11.23
     def sm_each_date(self):
         # Delete the smartmeter_data csv before creation
         SmartMeter_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename

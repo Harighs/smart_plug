@@ -1,0 +1,104 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electromizer</title>
+    <!-- Add Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Add a theme (e.g., Bootswatch theme) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/simplex/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+
+    <img src="/static/logo.png" alt="Logo" class="img-fluid mx-auto d-block mb-3"  style="max-width: 100px;">
+
+
+    <!-- INDEX.HTML INTRODUCTION SECTION -->
+    <div class="card border-primary mb-5">
+        <div class="card-header"><h1>Introducing Electromizer</h1></div>
+        <div class="card-body">
+            <p>Welcome to Electromizer, an innovative project designed to revolutionize home electronics automation
+                based on electricity prices. At the heart of this initiative is the goal to optimize power usage
+                by seamlessly adapting to fluctuating electric prices. When prices are low, Electromizer ensures
+                your system operates at full capacity, maximizing efficiency. Conversely, during periods of high
+                prices, the system intelligently minimizes usage, providing both cost savings and environmental
+                benefits.</p>
+
+            <p><strong>Project Owner:</strong> Mag.Dr. Peter Sommerer, Vienna, Austria</p>
+
+            <h6><strong>Developers:</strong></h6>
+            <ul>
+                <li><strong>Muthukumar Neelamegam</strong>
+                    <ul>
+                        <li>Qualifications: B.E, MBA, MS.</li>
+                        <li>Location: Vienna, Austria</li>
+                    </ul>
+                </li>
+                <li><strong>Hari Shankar G</strong>
+                    <ul>
+                        <li>Qualifications: B.E, MS.</li>
+                        <li>Location: Linz, Austria</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- INDEX.HTML SYSTEM STATUS SECTION -->
+    <div class="card border-primary mb-5">
+        <div class="card-header"><h1>Electromizer System Status</h1></div>
+        <div class="card-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td><h2>1. View Last 7 Days Data Cache</h2></td>
+                        <td>
+                            <div class="container mt-3">
+                                <a href="{{ url_for('infodatatable') }}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h2>2. View Live Auto Mode Status</h2></td>
+                        <td>
+                            <div class="container mt-3">
+                                <a href="{{ url_for('infoautomode') }}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h2>3. Show API Service Status</h2></td>
+                        <td><!-- Add content or button for API Service Status --></td>
+                    </tr>
+                    <tr>
+                        <td><h2>4. Show Data Download Service Status</h2></td>
+                        <td><!-- Add content or button for Data Download Service Status --></td>
+                    </tr>
+                    <tr>
+                        <td><h2>5. Show Auto Mode Service Status</h2></td>
+                        <td><!-- Add content or button for Auto Mode Service Status --></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    
+
+    <!-- Add Bootstrap JS and Popper.js scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+</body>
+</html>

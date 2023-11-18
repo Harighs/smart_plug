@@ -11,8 +11,11 @@ from sqlite3 import Error
 
 from datetime import datetime
 import json
-from flask import Flask, jsonify, request, send_file
- 
+
+from flask import Flask, jsonify, request, send_file, render_template
+
+import requests
+
 from PIL import Image
 import io
 import pandas as pd
@@ -28,9 +31,66 @@ from main_services.auto_mode import Auto_Mode
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
 
-
 app = Flask(__name__)
 
+
+"""
+The following methods are used to display the html website
+"""
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/infodatatable')
+def infodatatable():
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/datatable'
+    try:
+        response = requests.get(api_url)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the JSON content of the response
+            parsed_data = response.json()
+        else:
+            # Handle other status codes (e.g., render an error template)
+            return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        # Handle request exceptions (e.g., render an error template)
+        return render_template('error.html', error=str(e))
+
+    # Assuming the 'details.html' template expects a variable named 'data'
+    return render_template('info_datatable.html', data=parsed_data)
+
+
+
+@app.route('/infoautomode')
+def infoautomode():
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/automodestatus'
+    try:
+        response = requests.get(api_url)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the JSON content of the response
+            parsed_data = response.json()
+        else:
+            # Handle other status codes (e.g., render an error template)
+            return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        # Handle request exceptions (e.g., render an error template)
+        return render_template('error.html', error=str(e))
+
+    # Assuming the 'details.html' template expects a variable named 'data'
+    return render_template('info_automode.html', data=parsed_data)
+
+
+
+
+"""
+The following methods are used to serve the api  
+"""
 @app.route('/api/', methods=['GET'])
 def api_home():
     return jsonify({"message": "Welcome to Enermizer API Services"}), 200
@@ -62,8 +122,51 @@ def postRelaySettings():
 
 
     return jsonify({"status": "true"}), 200
+
+@app.route('/api/datatable', methods=['GET'])
+def getDataTable():
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+
+        df = pd.read_sql_query("SELECT * FROM datacache_report WHERE start_timestamp>=date('now', '-7 days')", conn)
+        
+        # Convert DataFrame to JSON
+        json_data = df.to_json(orient='records')
+
+        # Return JSON response
+        return json_data
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"status": "Error"}), 500
+
+    finally:
+        conn.close()
+
+@app.route('/api/automodestatus', methods=['GET'])
+def getAutoModeStatus():
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+
+        df = pd.read_sql_query("SELECT start_timestamp, end_timestamp, marketprice, unit, relaynumber FROM automaterelay", conn)
+
+        
+        # Convert DataFrame to JSON
+        json_data = df.to_json(orient='records')
+
+        # Return JSON response
+        return json_data
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"status": "Error"}), 500
+
+    finally:
+        conn.close()
+
  
-# TODO add extra api methods to get the datacache
 @app.route('/api/datacache', methods=['GET'])
 def getDataCache():
     try:
@@ -71,7 +174,7 @@ def getDataCache():
         conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
         cursor = conn.cursor()
 
-        df = pd.read_sql_query("SELECT * FROM datacache_report", conn)
+        df = pd.read_sql_query("SELECT * FROM datacache_report WHERE start_timestamp>=date('now', '-7 days')", conn)
 
         # Check if the DataFrame is not empty
         if not df.empty:

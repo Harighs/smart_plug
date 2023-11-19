@@ -58,7 +58,7 @@
                         <td><h2>1. View Last 7 Days Data Cache</h2></td>
                         <td>
                             <div class="container mt-3">
-                                <a href="{{ url_for('infodatatable') }}" class="btn btn-primary">View Details</a>
+                                <a href="{{ url_for('infodatatable') }}" class="btn btn-success">View Details</a>
                             </div>
                         </td>
                     </tr>
@@ -66,21 +66,36 @@
                         <td><h2>2. View Live Auto Mode Status</h2></td>
                         <td>
                             <div class="container mt-3">
-                                <a href="{{ url_for('infoautomode') }}" class="btn btn-primary">View Details</a>
+                                <a href="{{ url_for('infoautomode') }}" class="btn btn-success">View Details</a>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td><h2>3. Show API Service Status</h2></td>
-                        <td><!-- Add content or button for API Service Status --></td>
+                        <td> <div class="container mt-3">
+                            <p class="btn {% if status == 'True' %}btn-success{% else %}btn-primary{% endif %}">
+                                Status: {{ status }}
+                            </p>
+                        </div>
+                        </td>
                     </tr>
                     <tr>
                         <td><h2>4. Show Data Download Service Status</h2></td>
-                        <td><!-- Add content or button for Data Download Service Status --></td>
+                        <td> <div class="container mt-3">
+                            <p class="btn {% if status2 == 'True' %}btn-success{% else %}btn-primary{% endif %}">
+                                Status: {{ status2 }}
+                            </p>
+                        </div>
+                        </td>
                     </tr>
                     <tr>
                         <td><h2>5. Show Auto Mode Service Status</h2></td>
-                        <td><!-- Add content or button for Auto Mode Service Status --></td>
+                        <td> <div class="container mt-3">
+                            <p class="btn {% if status3 == 'True' %}btn-success{% else %}btn-primary{% endif %}">
+                                Status: {{ status3 }}
+                            </p>
+                        </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>

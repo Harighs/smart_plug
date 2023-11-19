@@ -28,6 +28,8 @@ from database.db_manager import DatabaseManager
 from main_services.common_utils import common_utils 
 from main_services.auto_mode import Auto_Mode
 
+from flask_paginate import Pagination, get_page_args
+
 current_dir = os.getcwd()
 print("Current working directory:", current_dir)
 
@@ -39,7 +41,29 @@ The following methods are used to display the html website
 """
 @app.route('/')
 def index():
-    return render_template('index.html')
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getApiServiceStatus'
+    response = requests.get(api_url)
+
+    api_url2 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getDataDownloadServiceStatus'
+    response2 = requests.get(api_url2)
+
+    api_url3 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getAutoModeServiceStatus'
+    response3 = requests.get(api_url3)
+
+
+    if response.status_code == 200:
+        json_data = response.json()
+        status = json_data.get('status', 'Unknown')
+
+        json_data2 = response2.json()
+        status2 = json_data2.get('status', 'Unknown')
+
+        json_data3 = response3.json()
+        status3 = json_data3.get('status', 'Unknown')
+
+        return render_template('index.html', status=status, status2=status2, status3=status3)
+    else:
+        return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
 
 @app.route('/infodatatable')
 def infodatatable():
@@ -59,8 +83,15 @@ def infodatatable():
         # Handle request exceptions (e.g., render an error template)
         return render_template('error.html', error=str(e))
 
+           # Paginate the data
+    page, per_page, offset = get_page_args()
+    paginated_data = parsed_data[offset: offset + 20]
+
+    pagination = Pagination(page=page, per_page=per_page, total=len(parsed_data), css_framework='bootstrap4')
+
+
     # Assuming the 'details.html' template expects a variable named 'data'
-    return render_template('info_datatable.html', data=parsed_data)
+    return render_template('info_datatable.html', data=paginated_data, pagination=pagination)
 
 
 
@@ -82,8 +113,15 @@ def infoautomode():
         # Handle request exceptions (e.g., render an error template)
         return render_template('error.html', error=str(e))
 
+           # Paginate the data
+    page, per_page, offset = get_page_args()
+    paginated_data = parsed_data[offset: offset + 20]
+
+    pagination = Pagination(page=page, per_page=per_page, total=len(parsed_data), css_framework='bootstrap4')
+
+
     # Assuming the 'details.html' template expects a variable named 'data'
-    return render_template('info_automode.html', data=parsed_data)
+    return render_template('info_automode.html', data=paginated_data, pagination=pagination)
 
 
 
@@ -129,7 +167,7 @@ def getDataTable():
         # Connect to the SQLite database
         conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
 
-        df = pd.read_sql_query("SELECT * FROM datacache_report WHERE start_timestamp>=date('now', '-7 days')", conn)
+        df = pd.read_sql_query("SELECT * FROM datacache_report WHERE start_timestamp>=date('now', '-7 days') ORDER BY id DESC", conn)
         
         # Convert DataFrame to JSON
         json_data = df.to_json(orient='records')
@@ -447,10 +485,17 @@ def getApiServiceStatus():
     formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
     formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
     
-    response_data = {
+    if result1.returncode == 0:
+        response_data = {
             "status": "True",
             "message": [formatted_output1,formatted_output2]
             }
+    else:
+         response_data = {
+            "status": "False",
+            "message": [formatted_output1,formatted_output2]
+            }
+
     formatted_response = json.dumps(response_data, indent=4)
 
     if result1.returncode == 0:
@@ -477,13 +522,20 @@ def getDatDownloadServiceStatus():
     formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
     formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
 
-    response_data = {
+    if result2.returncode == 0:
+        response_data = {
             "status": "True",
             "message": [formatted_output1,formatted_output2]
             }
+    else:
+         response_data = {
+            "status": "False",
+            "message": [formatted_output1,formatted_output2]
+            }
+
     formatted_response = json.dumps(response_data, indent=4)
 
-    if result1.returncode == 0:
+    if result2.returncode == 0:
         print("Command output:")
 
         return jsonify(json.loads(formatted_response)), 200
@@ -507,13 +559,20 @@ def getAutoModeServiceStatus():
     formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
     formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
     
-    response_data = {
+    if result2.returncode == 0:
+        response_data = {
             "status": "True",
             "message": [formatted_output1,formatted_output2]
             }
+    else:
+         response_data = {
+            "status": "False",
+            "message": [formatted_output1,formatted_output2]
+            }
+
     formatted_response = json.dumps(response_data, indent=4)
 
-    if result1.returncode == 0:
+    if result2.returncode == 0:
         print("Command output:")
 
         return jsonify(json.loads(formatted_response)), 200

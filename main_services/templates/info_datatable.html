@@ -23,6 +23,11 @@
 
     
     <h1>Last 7 Days Data Cache</h1>
+
+    <!-- Add pagination links below the table -->
+    {{ pagination.info }}
+    {{ pagination.links }}
+
     <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
@@ -35,6 +40,8 @@
             </tr>
         </thead>
         <tbody>
+            {% if data %}
+
             {% for item in data %}
                 <tr>
                     <td>{{ item.id }}</td>
@@ -44,8 +51,16 @@
                     <td>{{ item.smart_meter_consumption }}</td>
                 </tr>
             {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5">No data available</td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
+    <!-- Add pagination links below the table -->
+    {{ pagination.info }}
+    {{ pagination.links }}
     </div>
     <!-- Add Bootstrap JS and Popper.js scripts -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

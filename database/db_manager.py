@@ -372,6 +372,9 @@ class DatabaseManager:
     def read_datacache_withdate_table(self, fromDate, toDate):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
+
+        #
+
         cursor.execute(
             f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC")
         rows = cursor.fetchall()

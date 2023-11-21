@@ -373,19 +373,31 @@ class DatabaseManager:
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
 
-        #
+        # R1 - Energy consumed over a period of time (kWh)
+        R1_query = f"SELECT sum(R1) as report1 FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC;"
+        cursor.execute(R1_query)
+        result1 = cursor.fetchone()
+        R1 = result1[0] if result1 and len(result1) > 0 else None
 
-        cursor.execute(
-            f"SELECT sum(R1) as report1, sum(R2) as report2, sum(R3) as report3, sum(R4) as report4, sum(R5) as report5  FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC")
-        rows = cursor.fetchall()
+        # R2 - Costs of energy consumed
+        R2_query = f"SELECT sum(R1)*sum(R4) as report2 FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC;"
+        cursor.execute(R2_query)
+        result2 = cursor.fetchone()
+        R2 = result2[0] if result2 and len(result2) > 0 else None
 
-        result_list = []
-        for row in rows:
-            # print(row)
-            result_list.append(row)
+        # R3 - Sum of R2 / Sum of R1
+        R3 = R2 / R1
 
-            # Convert the list to JSON
-        # json_data = json.dumps(result_list, indent=2)
+        # R4 - Average awattar price over period
+        R4_query = f"SELECT avg(R4) as report4 FROM datacache_report WHERE start_timestamp BETWEEN '{fromDate}' AND '{toDate}' ORDER BY id DESC;"
+        cursor.execute(R4_query)
+        result4 = cursor.fetchone()
+        R4 = result4[0] if result4 and len(result4) > 0 else None
+ 
+        # R5 - Sum of R2 - (Sum of R1 * R4)
+        R5 = R2 - (R1*R4)
+
+        result_list = [R1, R2, R3, R4, R5]
 
         cursor.close()
 

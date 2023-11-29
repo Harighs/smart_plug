@@ -145,8 +145,28 @@ class SmartMeterServices:
             print("The status code is 200 (OK).")
         else:
             raise ValueError(f"HTTP request is failing see this code with status code {data_response.status_code}.")
+        
+        # Datetime
+        # Get the current date
+        current_date = str(datetime.date.today() - datetime.timedelta(days=1))
 
+        # Combine with the time '00:00:00'
+        combined_datetime = pd.to_datetime(current_date + ' 00:00:00')
+        """ 
+                # Default dataset
+                default_data = {'meteredValues': [0],
+                        'peakDemandTimes': [combined_datetime]}
+
+                # Create a DataFrame from the default dataset
+                default_df = pd.DataFrame(default_data)
+        """
+        
         new_data = pd.DataFrame(json.loads(data_response.content))[['meteredValues', 'peakDemandTimes']]
+        # Convert 'peakDemandTimes' to datetime and add 1 hour
+        new_data['peakDemandTimes'] = pd.to_datetime(new_data['peakDemandTimes']) + pd.Timedelta(hours=1)
+
+        # Concatenate the default data and the loaded data
+        # final_data = pd.concat([default_df, new_data], ignore_index=True)
 
         if os.path.exists(self.dataset_path):
             os.remove(self.dataset_path)

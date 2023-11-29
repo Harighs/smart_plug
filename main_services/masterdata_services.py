@@ -49,7 +49,7 @@ class AutoServices:
         smart_meter_data = pd.read_csv(self.smart_meter_data_path)
 
         smart_meter_data['peakDemandTimes'] = pd.to_datetime(smart_meter_data['peakDemandTimes'])
-        smart_meter_data['hourly_time'] = smart_meter_data['peakDemandTimes'].dt.floor('H')
+        smart_meter_data['hourly_time'] = smart_meter_data['peakDemandTimes'].dt.ceil('H')
         smart_meter_data = smart_meter_data.groupby('hourly_time')['meteredValues'].sum().reset_index()
 
         Master_Data['start_timestamp'] = awattar_data['start_timestamp']

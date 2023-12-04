@@ -217,7 +217,7 @@ def getAutoModeStatus():
         # Connect to the SQLite database
         conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
 
-        df = pd.read_sql_query(f"SELECT start_timestamp, end_timestamp, marketprice, unit, relaynumber FROM automaterelay WHERE start_timestamp BETWEEN '{start_of_day_str}' AND '{end_of_day_str}'", conn)
+        df = pd.read_sql_query(f"SELECT REPLACE(start_timestamp, 'T', ' ') AS start_timestamp, REPLACE(end_timestamp, 'T', ' ') AS end_timestamp, marketprice, unit, relaynumber FROM automaterelay WHERE start_timestamp BETWEEN '{start_of_day_str}' AND '{end_of_day_str}'", conn)
 
         # Convert DataFrame to JSON
         json_data = df.to_json(orient='records')

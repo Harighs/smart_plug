@@ -41,29 +41,7 @@ The following methods are used to display the html website
 """
 @app.route('/')
 def index():
-    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getApiServiceStatus'
-    response = requests.get(api_url)
-
-    api_url2 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getDataDownloadServiceStatus'
-    response2 = requests.get(api_url2)
-
-    api_url3 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getAutoModeServiceStatus'
-    response3 = requests.get(api_url3)
-
-
-    if response.status_code == 200:
-        json_data = response.json()
-        status = json_data.get('status', 'Unknown')
-
-        json_data2 = response2.json()
-        status2 = json_data2.get('status', 'Unknown')
-
-        json_data3 = response3.json()
-        status3 = json_data3.get('status', 'Unknown')
-
-        return render_template('index.html', status=status, status2=status2, status3=status3)
-    else:
-        return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+    return render_template('index.html')
 
 @app.route('/infodatatable')
 def infodatatable():
@@ -93,8 +71,6 @@ def infodatatable():
     # Assuming the 'details.html' template expects a variable named 'data'
     return render_template('info_datatable.html', data=paginated_data, pagination=pagination)
 
-
-
 @app.route('/infoautomode')
 def infoautomode():
     api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/automodestatus'
@@ -122,6 +98,52 @@ def infoautomode():
 
     # Assuming the 'details.html' template expects a variable named 'data'
     return render_template('info_automode.html', data=paginated_data, pagination=pagination)
+
+@app.route('/infoservicestatus1')
+def infoservicestatus1():
+    api_url1 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getApiServiceStatus'
+    try:
+        response = requests.get(api_url1)
+        if response.status_code == 200:
+            parsed_data1 = response.json()
+        else:
+            return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        return render_template('error.html', error=str(e))
+
+    return render_template('info_servicestatus.html', parsed_data1)
+
+@app.route('/infoservicestatus2')
+def infoservicestatus2():
+    api_url2 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getDataDownloadServiceStatus'
+    try:
+        response = requests.get(api_url2)
+        if response.status_code == 200:
+            parsed_data = response.json()
+        else:
+            return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        return render_template('error.html', error=str(e))
+
+    return render_template('info_servicestatus.html', parsed_data)
+
+
+@app.route('/infoservicestatus3')
+def infoservicestatus3():
+    api_url3 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getAutoModeServiceStatus'
+    try:
+        response = requests.get(api_url3)
+        if response.status_code == 200:
+            parsed_data = response.json()
+        else:
+            return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        return render_template('error.html', error=str(e))
+
+    return render_template('info_servicestatus.html', parsed_data)
 
 
 
@@ -185,12 +207,18 @@ def getDataTable():
 @app.route('/api/automodestatus', methods=['GET'])
 def getAutoModeStatus():
     try:
+        current_datetime = datetime.now()
+        start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+        # Format datetime with 'T'
+        start_of_day_str = start_of_day.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+        end_of_day_str = end_of_day.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+
         # Connect to the SQLite database
         conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
 
-        df = pd.read_sql_query("SELECT start_timestamp, end_timestamp, marketprice, unit, relaynumber FROM automaterelay", conn)
+        df = pd.read_sql_query(f"SELECT start_timestamp, end_timestamp, marketprice, unit, relaynumber FROM automaterelay WHERE start_timestamp BETWEEN '{start_of_day_str}' AND '{end_of_day_str}'", conn)
 
-        
         # Convert DataFrame to JSON
         json_data = df.to_json(orient='records')
 
@@ -202,7 +230,8 @@ def getAutoModeStatus():
         return jsonify({"status": "Error"}), 500
 
     finally:
-        conn.close()
+          if 'conn' in locals() and conn:
+            conn.close()
 
  
 @app.route('/api/datacache', methods=['GET'])

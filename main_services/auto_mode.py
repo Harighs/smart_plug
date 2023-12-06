@@ -11,7 +11,7 @@ from database.db_manager import DatabaseManager
 from pi_controller.relay_controller import RelayControl
 from main_services.common_utils import common_utils 
 
-# this service should restart every 30 minutes
+# this service should restart every 15 minutes
 class Auto_Mode:
     def __init__(self):
         self.future_df = None

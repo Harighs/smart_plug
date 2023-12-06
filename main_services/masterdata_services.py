@@ -12,6 +12,7 @@ import sqlite3
 from external_services.awattar_services import AwattarServices
 from external_services.smartmeter_services import SmartMeterServices
 from database.db_manager import DatabaseManager
+from main_services.auto_mode import Auto_Mode
 from main_services.common_utils import common_utils 
 
 import time
@@ -143,5 +144,3 @@ if __name__ == '__main__':
     auto_service.create_master_df()
     auto_service.calculateAutoModeValue(1)
     auto_service.calculateAutoModeValue(2)
-
-

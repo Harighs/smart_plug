@@ -159,7 +159,7 @@ class AwattarServices:
         dt = datetime.utcfromtimestamp(unix_timestamp)
 
         # Start of the day
-        start_of_day = datetime(dt.year, dt.month, dt.day, 0, 0, 0, 0)
+        start_of_day = datetime(dt.year, dt.month, dt.day+1, 0, 0, 0, 0)
 
         # End of the day
         end_of_day = start_of_day + timedelta(days=1) - timedelta(microseconds=1)

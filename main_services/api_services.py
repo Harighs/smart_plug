@@ -41,6 +41,7 @@ The following methods are used to display the html website
 """
 @app.route('/')
 def index():
+
     return render_template('index.html')
 
 @app.route('/infodatatable')
@@ -61,18 +62,11 @@ def infodatatable():
         # Handle request exceptions (e.g., render an error template)
         return render_template('error.html', error=str(e))
 
-           # Paginate the data
-    page, per_page, offset = get_page_args()
-    paginated_data = parsed_data[offset: offset + 20]
-
-    pagination = Pagination(page=page, per_page=per_page, total=len(parsed_data), css_framework='bootstrap4')
-
-
     # Assuming the 'details.html' template expects a variable named 'data'
-    return render_template('info_datatable.html', data=paginated_data, pagination=pagination)
+    return render_template('info_datatable.html', data=parsed_data)
 
-@app.route('/infoautomode')
-def infoautomode():
+@app.route('/infoautomoderelay')
+def infoautomoderelay():
     api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/automodestatus'
     try:
         response = requests.get(api_url)
@@ -89,36 +83,36 @@ def infoautomode():
         # Handle request exceptions (e.g., render an error template)
         return render_template('error.html', error=str(e))
 
-           # Paginate the data
-    page, per_page, offset = get_page_args()
-    paginated_data = parsed_data[offset: offset + 20]
-
-    pagination = Pagination(page=page, per_page=per_page, total=len(parsed_data), css_framework='bootstrap4')
-
-
     # Assuming the 'details.html' template expects a variable named 'data'
-    return render_template('info_automode.html', data=paginated_data, pagination=pagination)
+    return render_template('info_automoderelay.html', data=parsed_data)
 
-@app.route('/infoservicestatus1')
-def infoservicestatus1():
-    api_url1 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getApiServiceStatus'
+@app.route('/infoautomode')
+def infoautomode():
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/automode'
     try:
-        response = requests.get(api_url1)
+        response = requests.get(api_url)
+
+        # Check if the request was successful (status code 200)
         if response.status_code == 200:
-            parsed_data1 = response.json()
+            # Parse the JSON content of the response
+            parsed_data = response.json()
         else:
+            # Handle other status codes (e.g., render an error template)
             return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
 
     except requests.exceptions.RequestException as e:
+        # Handle request exceptions (e.g., render an error template)
         return render_template('error.html', error=str(e))
 
-    return render_template('info_servicestatus.html', parsed_data1)
+    # Assuming the 'details.html' template expects a variable named 'data'
+    return render_template('info_automode.html', data=parsed_data)
 
-@app.route('/infoservicestatus2')
-def infoservicestatus2():
-    api_url2 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getDataDownloadServiceStatus'
+
+@app.route('/infoservicestatus1')
+def infoservicestatus1():
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getApiServiceStatus'
     try:
-        response = requests.get(api_url2)
+        response = requests.get(api_url)
         if response.status_code == 200:
             parsed_data = response.json()
         else:
@@ -127,14 +121,29 @@ def infoservicestatus2():
     except requests.exceptions.RequestException as e:
         return render_template('error.html', error=str(e))
 
-    return render_template('info_servicestatus.html', parsed_data)
+    return render_template('info_servicestatus.html', parsed_data=parsed_data, title="API - Service Status")
+
+@app.route('/infoservicestatus2')
+def infoservicestatus2():
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getDataDownloadServiceStatus'
+    try:
+        response = requests.get(api_url)
+        if response.status_code == 200:
+            parsed_data = response.json()
+        else:
+            return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        return render_template('error.html', error=str(e))
+
+    return render_template('info_servicestatus.html', parsed_data=parsed_data, title="Data Download - Service Status")
 
 
 @app.route('/infoservicestatus3')
 def infoservicestatus3():
-    api_url3 = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getAutoModeServiceStatus'
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/getAutoModeServiceStatus'
     try:
-        response = requests.get(api_url3)
+        response = requests.get(api_url)
         if response.status_code == 200:
             parsed_data = response.json()
         else:
@@ -143,7 +152,7 @@ def infoservicestatus3():
     except requests.exceptions.RequestException as e:
         return render_template('error.html', error=str(e))
 
-    return render_template('info_servicestatus.html', parsed_data)
+    return render_template('info_servicestatus.html', parsed_data=parsed_data, title="AutoMode - Service Status")
 
 
 
@@ -218,6 +227,33 @@ def getAutoModeStatus():
         conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
 
         df = pd.read_sql_query(f"SELECT REPLACE(start_timestamp, 'T', ' ') AS start_timestamp, REPLACE(end_timestamp, 'T', ' ') AS end_timestamp, marketprice, unit, relaynumber FROM automaterelay WHERE start_timestamp BETWEEN '{start_of_day_str}' AND '{end_of_day_str}'", conn)
+
+        # Convert DataFrame to JSON
+        json_data = df.to_json(orient='records')
+
+        # Return JSON response
+        return json_data
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"status": "Error"}), 500
+
+    finally:
+          if 'conn' in locals() and conn:
+            conn.close()
+
+ 
+@app.route('/api/automode', methods=['GET'])
+def getAutoMode():
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+
+        # Assuming you have a SQLite connection named 'conn'
+        df = pd.read_sql_query(
+            "SELECT SUBSTR(datetime, 1, INSTR(datetime, ' ') - 1) AS datetime, last_24hrs_usage, times_to_turnon, relaynumber FROM automode WHERE datetime >= date('now', '-7 days') ORDER BY id DESC",
+            conn
+        )
 
         # Convert DataFrame to JSON
         json_data = df.to_json(orient='records')
@@ -503,26 +539,21 @@ The following method assists to check the status of the services
 @app.route('/api/getApiServiceStatus', methods=['GET'])
 def getApiServiceStatus(): 
     command1 = "sudo systemctl status smart_plug.service"
-    command2 = "sudo systemctl status smart_plug.timer"
 
     result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
     formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
     formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
-
-    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
-    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
     
     if result1.returncode == 0:
         response_data = {
             "status": "True",
-            "message": [formatted_output1,formatted_output2]
+            "message": [formatted_output1]
             }
     else:
          response_data = {
             "status": "False",
-            "message": [formatted_output1,formatted_output2]
+            "message": [formatted_output1]
             }
 
     formatted_response = json.dumps(response_data, indent=4)
@@ -540,76 +571,56 @@ def getApiServiceStatus():
 @app.route('/api/getDataDownloadServiceStatus', methods=['GET'])
 def getDatDownloadServiceStatus():
     command1 = "sudo systemctl status smart_plug_data_download.service"
-    command2 = "sudo systemctl status smart_plug_data_download.timer"
 
     result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
     formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
     formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
 
-    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
-    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
-
-    if result2.returncode == 0:
+    if result1.returncode == 0:
         response_data = {
             "status": "True",
-            "message": [formatted_output1,formatted_output2]
+            "message": [formatted_output1]
             }
     else:
          response_data = {
             "status": "False",
-            "message": [formatted_output1,formatted_output2]
+            "message": [formatted_output1]
             }
 
     formatted_response = json.dumps(response_data, indent=4)
 
-    if result2.returncode == 0:
-        print("Command output:")
+    print("Command output:")
 
-        return jsonify(json.loads(formatted_response)), 200
+    return jsonify(json.loads(formatted_response)), 200
 
-    else:
-        print("Command failed with error:")
-        return jsonify(json.loads(formatted_response)), 404
-   
 
 @app.route('/api/getAutoModeServiceStatus', methods=['GET'])
 def getAutoModeServiceStatus():
     command1 = "sudo systemctl status smart_plug_auto_mode.service"
-    command2 = "sudo systemctl status smart_plug_auto_mode.timer"
 
     result1 = subprocess.run(command1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    result2 = subprocess.run(command2, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
     formatted_output1 = result1.stdout.strip()  # Removes leading/trailing whitespace
     formatted_output1 = formatted_output1.replace('\n', ' ')  # Replaces newlines with spaces
 
-    formatted_output2 = result2.stdout.strip()  # Removes leading/trailing whitespace
-    formatted_output2 = formatted_output2.replace('\n', ' ')  # Replaces newlines with spaces
-    
-    if result2.returncode == 0:
+    if result1.returncode == 0:
         response_data = {
             "status": "True",
-            "message": [formatted_output1,formatted_output2]
+            "message": [formatted_output1]
             }
     else:
          response_data = {
             "status": "False",
-            "message": [formatted_output1,formatted_output2]
+            "message": [formatted_output1]
             }
 
     formatted_response = json.dumps(response_data, indent=4)
 
-    if result2.returncode == 0:
-        print("Command output:")
+    print("Command output:")
 
-        return jsonify(json.loads(formatted_response)), 200
+    return jsonify(json.loads(formatted_response)), 200
 
-    else:
-        print("Command failed with error:")
-        return jsonify(json.loads(formatted_response)), 404
-    
 
 """
  Main Python API service starts here

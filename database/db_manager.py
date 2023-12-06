@@ -173,9 +173,30 @@ class DatabaseManager:
         for row in rows:
             result_list.append(row)
         
-        cursor.close()
-        return result_list
-    
+
+        if int(result_list[0][0]) == 0: # if no results then check 48 hrs before data
+
+            current_datetime = datetime.now() - timedelta(hours=48)
+            start_of_day = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_of_day = current_datetime.replace(hour=23, minute=59, second=59, microsecond=99)
+
+            query = f"SELECT COALESCE(SUM(times_to_turnon), 0) AS result FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 1;"
+            cursor.execute(query, (relayNumber,))
+            
+            rows = cursor.fetchall()
+            result_list = []
+            for row in rows:
+                result_list.append(row)
+
+
+            cursor.close()
+
+            return result_list
+        else:
+            cursor.close()
+            return result_list
+
+        
     def read_automode_48hrs_before(self, relayNumber):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()

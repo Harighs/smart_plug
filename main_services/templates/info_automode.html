@@ -23,19 +23,16 @@
     </div>
 
 
-    <h1>Live Auto Mode Status</h1>
-        <!-- Add pagination links below the table -->
-        {{ pagination.info }}
-        {{ pagination.links }}
-        
+    <h1>View Auto Mode Calculated Data</h1>
+      
     <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
             <tr class="table-success">
                 <th scope="row">#</th>
-                <th scope="row">Start datetime</th>
-                <th scope="row">End datetime</th>
-                <th scope="row">Awattar Price(Eur/kWh)</th>
+                <th scope="row">Date Time</th>
+                <th scope="row">Last 24hrs Usage</th>
+                <th scope="row">Times to Turn On</th>
                 <th scope="row">Relay Number</th>
             </tr>
         </thead>
@@ -44,9 +41,9 @@
             {% for item in data %}
                 <tr>
                     <th scope="row">{{ loop.index }}</th>
-                    <td>{{ item.start_timestamp }}</td>
-                    <td>{{ item.end_timestamp }}</td>
-                    <td>{{ item.marketprice }}</td>
+                    <td>{{ item.datetime }}</td>
+                    <td>{{ item.last_24hrs_usage }}</td>
+                    <td>{{ item.times_to_turnon }}</td>
                     <td>{{ item.relaynumber }}</td>
                 </tr>
             {% endfor %}
@@ -57,11 +54,7 @@
             {% endif %}
         </tbody>
     </table>
-
-        <!-- Add pagination links below the table -->
-        {{ pagination.info }}
-        {{ pagination.links }}
-        
+ 
     </div>
     <!-- Add Bootstrap JS and Popper.js scripts -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

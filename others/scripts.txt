@@ -257,7 +257,12 @@ WantedBy=multi-user.target
 
 
 
+# Restart all the Electromizer Services
+0 3 * * * sudo systemctl restart smart_plug_data_download.service
 
+3 3 * * * sudo systemctl restart smart_plug_auto_mode.service
+
+5 3 * * * sudo systemctl restart smart_plug.service
 
 
 

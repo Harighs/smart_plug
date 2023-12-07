@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 from datetime import datetime, timedelta
 from main_services.common_utils import common_utils 
+import pytz
 
 class AwattarServices:
     def __init__(self):
@@ -135,10 +136,19 @@ class AwattarServices:
         return awattar_json_response
 
     def AWATTAR_FUTURE_PRICE(self):
+
+        # Set the timezone to Central European Time (CET)
+        austria_timezone = pytz.timezone('Europe/Vienna')
+
+        # Get the current time in Austria's timezone
+        current_datetime_austria = datetime.now(austria_timezone)
+
+        print("Current Date and Time in Austria:", current_datetime_austria)
+
         # This return the datetime timestamp before 24hours
         # Replace this with your Unix timestamp
-        current_datetime = datetime.now()
-        unix_timestamp = current_datetime.timestamp()
+        # current_datetime = datetime.now()
+        unix_timestamp = current_datetime_austria.timestamp()
         start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(unix_timestamp)
 
         # Get Awattar Data
@@ -159,7 +169,7 @@ class AwattarServices:
         dt = datetime.utcfromtimestamp(unix_timestamp)
 
         # Start of the day
-        start_of_day = datetime(dt.year, dt.month, dt.day+1, 0, 0, 0, 0)
+        start_of_day = datetime(dt.year, dt.month, dt.day, 0, 0, 0, 0)
 
         # End of the day
         end_of_day = start_of_day + timedelta(days=1) - timedelta(microseconds=1)

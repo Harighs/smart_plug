@@ -264,5 +264,18 @@ WantedBy=multi-user.target
 
 5 3 * * * sudo systemctl restart smart_plug.service
 
+########################################################################################################################
+
+Delete all tables
+delete from automaterelay;
+delete from automaterelay_report;
+delete from automode;
+delete from datacache;
+delete from datacache_report;
+delete from relaymode_report;
+
+
+########################################################################################################################
+
 
 

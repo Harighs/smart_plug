@@ -8,6 +8,7 @@ sys.path.append('/home/pi/smart_plug/')
 import os
 import pandas as pd
 import sqlite3
+import math
 
 from external_services.awattar_services import AwattarServices
 from external_services.smartmeter_services import SmartMeterServices
@@ -126,10 +127,14 @@ class AutoServices:
         # Higher the demand higher the turn on time
         if(last_known_times_toturn_on >= last_24hrs_usage):
             no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relayPower)
-            db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
+            ## db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
+            db.insert_automode(last_24hrs_usage, relayNumber,  math.ceil(no_of_times_to_activate_automode)) 
+
         else:
             no_of_times_to_activate_automode = int(last_24hrs_usage) / int(relayPower)
-            db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
+            ## db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
+            db.insert_automode(last_24hrs_usage, relayNumber,  math.ceil(no_of_times_to_activate_automode)) 
+
 
         return True
 

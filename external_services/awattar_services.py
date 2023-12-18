@@ -145,15 +145,13 @@ class AwattarServices:
 
         print("Current Date and Time in Austria:", current_datetime_austria)
 
-        # This return the datetime timestamp before 24hours
-        # Replace this with your Unix timestamp
-        # current_datetime = datetime.now()
         unix_timestamp = current_datetime_austria.timestamp()
         start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(unix_timestamp)
 
         # Get Awattar Data
         json_url = self.awattar_json_url.format(int(start_of_day.timestamp() * 1000),
                                                 int(end_of_day.timestamp() * 1000))
+        
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
         awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=1)
@@ -164,12 +162,13 @@ class AwattarServices:
         awattar_json_response.to_csv(self.dataset_path, index=False)
         return awattar_json_response
 
+  
     def get_start_and_end_of_day(unix_timestamp):
         # Convert Unix timestamp to datetime
         dt = datetime.utcfromtimestamp(unix_timestamp)
 
         # Start of the day
-        start_of_day = datetime(dt.year, dt.month, dt.day, 0, 0, 0, 0)
+        start_of_day = datetime(dt.year, dt.month, dt.day+1, 0, 0, 0, 0)
 
         # End of the day
         end_of_day = start_of_day + timedelta(days=1) - timedelta(microseconds=1)

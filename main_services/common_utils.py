@@ -15,6 +15,6 @@ class common_utils:
     static_smart_meter_service_link = "https://smartmeter.netz-noe.at/"
     static_smart_meter_username = "SommererPrivatstiftung"
     static_smart_meter_password = "SpS*1996"
-    static_smart_meter_meter_id = "AT0020000000000000000000020826368"
-
+    # static_smart_meter_meter_id = "AT0020000000000000000000020826368"
+    static_smart_meter_meter_id = "AT0020000000000000000000100443242"
     # Add static url later

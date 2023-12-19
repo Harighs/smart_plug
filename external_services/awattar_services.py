@@ -6,6 +6,7 @@ import requests
 from datetime import datetime, timedelta
 from main_services.common_utils import common_utils 
 import pytz
+import time 
 
 class AwattarServices:
     def __init__(self):
@@ -137,20 +138,15 @@ class AwattarServices:
 
     def AWATTAR_FUTURE_PRICE(self):
 
-        # Set the timezone to Central European Time (CET)
-        austria_timezone = pytz.timezone('Europe/Vienna')
+        timezone = 'Europe/Vienna'  # Replace with your desired timezone
 
-        # Get the current time in Austria's timezone
-        current_datetime_austria = datetime.now(austria_timezone)
+        start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(timezone)
 
-        print("Current Date and Time in Austria:", current_datetime_austria)
-
-        unix_timestamp = current_datetime_austria.timestamp()
-        start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(unix_timestamp)
+        print(f"Awattar After Start of the day: {start_of_day}")
+        print(f"Awattar After End of the day: {end_of_day}")
 
         # Get Awattar Data
-        json_url = self.awattar_json_url.format(int(start_of_day.timestamp() * 1000),
-                                                int(end_of_day.timestamp() * 1000))
+        json_url = self.awattar_json_url.format(start_of_day, end_of_day)
         
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
@@ -161,16 +157,28 @@ class AwattarServices:
             os.remove(self.dataset_path)
         awattar_json_response.to_csv(self.dataset_path, index=False)
         return awattar_json_response
+    
 
-  
-    def get_start_and_end_of_day(unix_timestamp):
-        # Convert Unix timestamp to datetime
-        dt = datetime.utcfromtimestamp(unix_timestamp)
+    def get_start_and_end_of_day(timezone='CET'):
+        timestamp = time.time() * 1000  # Current timestamp in milliseconds
 
-        # Start of the day
-        start_of_day = datetime(dt.year, dt.month, dt.day+1, 0, 0, 0, 0)
+        # Convert timestamp to datetime object
+        dt_object = datetime.utcfromtimestamp(timestamp / 1000)
 
-        # End of the day
-        end_of_day = start_of_day + timedelta(days=1) - timedelta(microseconds=1)
+        # Set the timezone
+        dt_object_utc = pytz.timezone('CET').localize(dt_object)
+        dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))
 
-        return start_of_day, end_of_day
+        # Get the start and end of the day
+        start_of_day = dt_object_local.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+        # Convert datetime objects to Unix timestamps in milliseconds
+        start_timestamp = int(start_of_day.timestamp()) * 1000
+        end_timestamp = int(end_of_day.timestamp()) * 1000
+        
+        print(f"Awattar Before Start of the day: {start_of_day}")
+        print(f"Awattar Befoe End of the day: {end_of_day}")
+
+        return start_timestamp, end_timestamp
+

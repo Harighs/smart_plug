@@ -165,8 +165,10 @@ class AwattarServices:
         # Convert timestamp to datetime object
         dt_object = datetime.utcfromtimestamp(timestamp / 1000)
 
-        # Set the timezone
-        dt_object_utc = pytz.timezone('CET').localize(dt_object)
+        # Set the timezone to UTC
+        dt_object_utc = pytz.timezone('UTC').localize(dt_object)
+
+        # Convert UTC to the specified local time zone
         dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))
 
         # Get the start and end of the day
@@ -177,8 +179,8 @@ class AwattarServices:
         start_timestamp = int(start_of_day.timestamp()) * 1000
         end_timestamp = int(end_of_day.timestamp()) * 1000
         
-        print(f"Awattar Before Start of the day: {start_of_day}")
-        print(f"Awattar Befoe End of the day: {end_of_day}")
+        print(f"Start of the day: {start_of_day}")
+        print(f"End of the day: {end_of_day}")
 
         return start_timestamp, end_timestamp
 

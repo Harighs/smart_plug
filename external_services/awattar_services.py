@@ -163,9 +163,13 @@ class AwattarServices:
         start_of_day = dt_object_local.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
 
+        # Get the start of the next day
+        start_of_next_day = start_of_day + timedelta(days=1)
+
         # Convert datetime objects to Unix timestamps in milliseconds
         start_timestamp = int(start_of_day.timestamp()) * 1000
-        end_timestamp = int(end_of_day.timestamp()) * 1000
+        end_timestamp = int(start_of_next_day.timestamp()) * 1000 - 1  # Subtract 1 millisecond
+
         
         print(f"Start of the day: {start_of_day}")
         print(f"End of the day: {end_of_day}")
@@ -212,10 +216,13 @@ class AwattarServices:
         start_of_day = dt_object_local.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
 
+        # Get the start of the next day
+        start_of_next_day = start_of_day + timedelta(days=1)
+
         # Convert datetime objects to Unix timestamps in milliseconds
         start_timestamp = int(start_of_day.timestamp()) * 1000
-        end_timestamp = int(end_of_day.timestamp()) * 1000
-        
+        end_timestamp = int(start_of_next_day.timestamp()) * 1000 - 1  # Subtract 1 millisecond
+
         print(f"Start of the day: {start_of_day}")
         print(f"End of the day: {end_of_day}")
 

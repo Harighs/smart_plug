@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en" style="
 background-color: black">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,18 +10,35 @@ background-color: black">
     <title>Electromizer</title>
     <!-- Add Bootstrap CSS link -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Add a theme (e.g., Bootswatch theme) -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/simplex/bootstrap.min.css">
+    <style>
+        .statusImage {
+            width: 40px; /* Set your desired width */
+            height: 40px; /* Set your desired height */
+        }
+        .custom-card {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .custom-container {
+            width: 18%; /* Adjust the width as needed */
+        }
+    </style>
 </head>
+
 <body class="container mt-5">
 
-    <img src="/static/logo.png" alt="Logo" class="img-fluid mx-auto d-block mb-3"  style="max-width: 100px;">
+    <img src="/static/logo.png" alt="Logo" class="img-fluid mx-auto d-block mb-3" style="max-width: 100px;">
 
 
     <!-- INDEX.HTML INTRODUCTION SECTION -->
     <div class="card border-primary mb-5">
-        <div class="card-header"><h1>Introducing Electromizer</h1></div>
+        <div class="card-header">
+            <h1>Introducing Electromizer</h1>
+        </div>
         <div class="card-body">
             <p>Welcome to Electromizer, an innovative project designed to revolutionize home electronics automation
                 based on electricity prices. At the heart of this initiative is the goal to optimize power usage
@@ -49,17 +67,50 @@ background-color: black">
         </div>
     </div>
 
+    <!-- INDEX.HTML RELAY STATUS SECTION -->
+    <div class="card border-primary mb-5">
+        <div class="card-header">
+            <h1>Relay Status</h1>
+        </div>
+        <div class="card-body custom-card">
+            <div class="container mt-3 custom-container">
+                <div class="row align-items-center"> <!-- Center items vertically -->
+                    <div class="col-12 col-sm-6">
+                        <h4 class="mb-3 mb-sm-0">R1</h4> <!-- Adjust margin on small screens -->
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <img id="statusImage1" src="/static/turned_off.png" alt="Status Image" class="img-fluid statusImage">
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-3 custom-container">
+                <div class="row align-items-center">
+                    <div class="col-12 col-sm-6">
+                        <h4 class="mb-3 mb-sm-0">R2</h4>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <img id="statusImage2" src="/static/turned_off.png" alt="Status Image" class="img-fluid statusImage">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
     <!-- INDEX.HTML SYSTEM STATUS SECTION -->
     <div class="card border-primary mb-5">
-        <div class="card-header"><h1>Electromizer System Status</h1></div>
+        <div class="card-header">
+            <h1>Electromizer System Status</h1>
+        </div>
         <div class="card-body">
             <table class="table">
                 <tbody>
-                   
-                    
-                   
+
                     <tr>
-                        <td><h2>1. View Last 7 Days Data Cache</h2></td>
+                        <td>
+                            <h2>1. View Last 7 Days Data Cache</h2>
+                        </td>
                         <td>
                             <div class="container mt-3">
                                 <a href="{{ url_for('infodatatable') }}" class="btn btn-success">View Details</a>
@@ -67,7 +118,9 @@ background-color: black">
                         </td>
                     </tr>
                     <tr>
-                        <td><h2>2. View Live Auto Mode Status</h2></td>
+                        <td>
+                            <h2>2. View Live Auto Mode Status</h2>
+                        </td>
                         <td>
                             <div class="container mt-3">
                                 <a href="{{ url_for('infoautomoderelay') }}" class="btn btn-success">View Details</a>
@@ -75,7 +128,9 @@ background-color: black">
                         </td>
                     </tr>
                     <tr>
-                        <td><h2>3. View Auto Mode Calculated Data</h2></td>
+                        <td>
+                            <h2>3. View Auto Mode Calculated Data</h2>
+                        </td>
                         <td>
                             <div class="container mt-3">
                                 <a href="{{ url_for('infoautomode') }}" class="btn btn-success">View Details</a>
@@ -83,24 +138,23 @@ background-color: black">
                         </td>
                     </tr>
                     <tr>
-                        <td><h2>4. Show API Service Status</h2></td>
-                        <td> <div class="container mt-3">
-                            <a href="{{ url_for('infoservicestatus1') }}" class="btn btn-success">View Details</a>
-                        </div>
+                        <td>
+                            <h2>4. Show API Service Status</h2>
+                        </td>
+                        <td>
+                            <div class="container mt-3">
+                                <a href="{{ url_for('infoservicestatus1') }}" class="btn btn-success">View Details</a>
+                            </div>
                         </td>
                     </tr>
                     <tr>
-                        <td><h2>5. Show Data Download Service Status</h2></td>
-                        <td> <div class="container mt-3">
-                            <a href="{{ url_for('infoservicestatus2') }}" class="btn btn-success">View Details</a>
-                        </div>
+                        <td>
+                            <h2>5. Show Auto Mode Service Status</h2>
                         </td>
-                    </tr>
-                    <tr>
-                        <td><h2>6. Show Auto Mode Service Status</h2></td>
-                        <td> <div class="container mt-3">
-                            <a href="{{ url_for('infoservicestatus3') }}" class="btn btn-success">View Details</a>
-                        </div>
+                        <td>
+                            <div class="container mt-3">
+                                <a href="{{ url_for('infoservicestatus3') }}" class="btn btn-success">View Details</a>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -109,17 +163,52 @@ background-color: black">
     </div>
 
 
-    
+
 
     <!-- Add Bootstrap JS and Popper.js scripts -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-            crossorigin="anonymous"></script>
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-            crossorigin="anonymous"></script>
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-            crossorigin="anonymous"></script>
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+        <script>
+                
+            // Use the data as needed
+            var parsed_data1 = JSON.parse('{{ parsed_data1|tojson|safe }}');
+            var parsed_data2 = JSON.parse('{{ parsed_data2|tojson|safe }}');
+           
+            
+            // Use the data as needed
+            console.log('Parsed Data 1:', parsed_data1);
+            console.log('Parsed Data 2:', parsed_data2);
+            
+            function updateStatusImage(jsonData, imageId) {
+                console.log(jsonData)
+                
+                var statusImage = document.getElementById(imageId);
+                var status = jsonData.status ? jsonData.status.toLowerCase() : '';
+                if (status === 'true') {
+                    statusImage.src = '/static/turned_on.png'; // Change to your green image URL
+                } else {
+                    statusImage.src = '/static/turned_off.png'; // Change to your red image URL
+                }
+                
+            }
+            var statusImage1 = document.getElementById('statusImage1');
+            statusImage1.classList.add('statusImage'); 
+            
+            var statusImage2 = document.getElementById('statusImage2');
+            statusImage2.classList.add('statusImage'); 
+
+            updateStatusImage(parsed_data1, 'statusImage1');
+            updateStatusImage(parsed_data2, 'statusImage2');
+        </script>
+        
 </body>
+
 </html>

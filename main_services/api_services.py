@@ -39,10 +39,35 @@ app = Flask(__name__)
 """
 The following methods are used to display the html website
 """
+
+def get_relay_status(api_url):
+    try:
+        response = requests.post(api_url)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the JSON content of the response
+            parsed_data = response.json()
+            return parsed_data
+        else:
+            # Handle other status codes (e.g., raise an exception)
+            raise Exception(f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        # Handle request exceptions (e.g., raise an exception)
+        raise Exception(str(e))
+
+
 @app.route('/')
 def index():
+    try:
+        parsed_data1 = get_relay_status(f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/relaystatus/1')
+        parsed_data2 = get_relay_status(f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/relaystatus/2')
 
-    return render_template('index.html')
+    except Exception as e:
+        # Handle exceptions (e.g., render an error template or log the error)
+        print(f"Error: {e}")
+    return render_template('index.html', parsed_data1=parsed_data1, parsed_data2=parsed_data2)
 
 @app.route('/infodatatable')
 def infodatatable():

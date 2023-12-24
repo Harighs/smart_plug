@@ -196,6 +196,13 @@ def api_home():
 def rest_api():
     return jsonify({"status": "true"}), 200
 
+# New method to get the status if the services
+@app.route('/api/smartmeterdata', methods=['GET'])
+def smartMeterData():
+    smartMeter = SmartMeterServices()
+    data = smartMeter.getSmartMeterDataFromYesterday()
+    return str(data), 200
+
 
 # New method to insert the relay settings from app to database
 @app.route('/api/postRelaySettings', methods=['POST'])

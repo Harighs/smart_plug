@@ -21,10 +21,11 @@ class SmartMeterServices:
         Usage:
             smartmeter = SmartMeter() --> Returns a SmartMeter object as Dataframe which can be stored
         """
-        self.auth_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Login'
-        self.auth_payload = {"user": common_utils.static_smart_meter_username, "pwd": common_utils.static_smart_meter_password}
-        self.auth_cookie, self.auth_xsrf_token, self.nsc_wt = self.post_request(self)
+        # self.auth_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Login'
+        # self.auth_payload = {"user": common_utils.static_smart_meter_username, "pwd": common_utils.static_smart_meter_password}
+        # self.auth_cookie, self.auth_xsrf_token, self.nsc_wt = self.post_request(self)
         self.dataset_path = '/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename
+
         return None
 
     # This method return the sum of consumed electricity data in Kwh
@@ -130,6 +131,8 @@ class SmartMeterServices:
         auth_response = requests.post(auth_url, json=auth_payload)
         auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
+        nsc_wt = auth_response.cookies['NSC_WT_TWYUXFCQ-TTM']
+
         current_date = str(
             datetime.date.today() - datetime.timedelta(days=1))  # last 24hrs data
         # TODO remove the hardcoded meter id or id
@@ -137,7 +140,7 @@ class SmartMeterServices:
         #data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=41151064&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
         #data_url =  "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=41151064&day=2023-12-22"
         headers = {
-            'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
+            'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}; NSC_WT_TWYUXFCQ-TTM={};'.format(auth_cookie, auth_xsrf_token, nsc_wt),
         }
 
         data_response = requests.get(data_url, headers=headers)
@@ -242,3 +245,66 @@ class SmartMeterServices:
             (smart_meter_data[u'peakDemandTimes'] >= start_date) & (smart_meter_data[u'peakDemandTimes'] <= end_date)]
         # Calculate the mean of 'meteredValues' for the filtered rows
         return filtered_df['meteredValues'].mean()
+
+
+    def getSmartMeterDataFromYesterday(self):
+        ## SMART METER STEP1: Login into smart-meter
+        auth_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Login'
+        auth_payload = {"user": common_utils.static_smart_meter_username, "pwd": common_utils.static_smart_meter_password}
+        auth_response = None
+
+        auth_cookie, auth_xsrf_token, nsc_wt = None, None, None
+        auth_response = requests.post(auth_url, json=auth_payload)
+        all_cookies = None
+
+        if auth_response.status_code == 200:
+            print("The status code is 200 (OK).")
+            print("Smart meter - Authentication successful...")
+            all_cookies = auth_response.cookies
+            auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
+            auth_xsrf_token = auth_response.cookies['XSRF-Token']
+            nsc_wt = auth_response.cookies['NSC_WT_TWYUXFCQ-TTM']
+        else:
+            raise Exception("Authentication failed with status code: getSmartMeterDataFromYesterday",auth_response.status_code)
+
+
+        headers = {
+            'Cookie': f'__Host-go4DavidSecurityToken={auth_cookie};XSRF-Token={auth_xsrf_token};NSC_WT_TWYUXFCQ-TTM={nsc_wt};',
+        }
+
+        ## SMART METER STEP2: Get data from smart-meter reading
+        yesterday = str(datetime.date.today() - datetime.timedelta(days=1))
+    
+        data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={yesterday}"
+        data_response = requests.get(data_url, headers=headers)
+        outputData = None
+
+        if data_response.status_code == 200:
+            outputData = pd.DataFrame(json.loads(data_response.content))[['meteredValues', 'peakDemandTimes']]
+             # Convert 'peakDemandTimes' to datetime and add 1 hour
+            outputData['peakDemandTimes'] = pd.to_datetime(outputData['peakDemandTimes']) + pd.Timedelta(hours=1)
+            print(outputData)
+
+            ## Export to CSV
+            if os.path.exists(self.dataset_path):
+                os.remove(self.dataset_path)
+            outputData.to_csv(self.dataset_path, index=False)
+
+        else:
+            print("Data request failed with status code:", 'DATA FAILURE')
+            raise Exception("Data request failed with status code: Smartmeter_service2", data_response.status_code)
+
+        # Logout the smart meter service
+        # https://smartmeter.netz-noe.at/orchestration/Authentication/Logout
+        auth_logout_url = common_utils.static_smart_meter_service_link+'orchestration/Authentication/Logout'
+        auth_response = requests.get(auth_logout_url, headers=headers)
+        if auth_response.status_code == 200:
+            print("Logout success.")
+        else:
+            print("Logout failed.")
+
+        return outputData
+
+#if __name__ == '__main__':
+    #smartMeterServices = SmartMeterServices()
+    #smartMeterServices.getSmartMeterDataFromYesterday()

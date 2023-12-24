@@ -134,7 +134,8 @@ class SmartMeterServices:
             datetime.date.today() - datetime.timedelta(days=1))  # last 24hrs data
         # TODO remove the hardcoded meter id or id
         data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={current_date}&__Host-go4DavidSecurityToken={auth_cookie}"
-        # data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=40565569&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
+        #data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=41151064&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
+        #data_url =  "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=41151064&day=2023-12-22"
         headers = {
             'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
         }

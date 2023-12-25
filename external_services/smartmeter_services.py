@@ -303,8 +303,13 @@ class SmartMeterServices:
         else:
             print("Logout failed.")
 
-        return outputData
 
-#if __name__ == '__main__':
-    #smartMeterServices = SmartMeterServices()
-    #smartMeterServices.getSmartMeterDataFromYesterday()
+        if len(outputData) > 0:
+            return outputData
+        else:
+            raise Exception("Data request failed with status code: Smartmeter_service2", 404)
+
+
+if __name__ == '__main__':
+    smartMeterServices = SmartMeterServices()
+    smartMeterServices.getSmartMeterDataFromYesterday()

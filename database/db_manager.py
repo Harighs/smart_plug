@@ -167,7 +167,7 @@ class DatabaseManager:
 
         query = f"SELECT COALESCE(SUM(times_to_turnon), 0) AS result FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 1;"
         cursor.execute(query, (relayNumber,))
-        
+        print("read_automode_24hrs_before: ", query)
         rows = cursor.fetchall()
         result_list = []
         for row in rows:
@@ -182,7 +182,7 @@ class DatabaseManager:
 
             query = f"SELECT COALESCE(SUM(times_to_turnon), 0) AS result FROM automode WHERE relaynumber=? AND status=1 AND datetime BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 1;"
             cursor.execute(query, (relayNumber,))
-
+            print("read_automode_48hrs_before: ", query)
             
             rows = cursor.fetchall()
             result_list = []
@@ -348,6 +348,7 @@ class DatabaseManager:
         cursor = conn.cursor()
         query = f"SELECT COALESCE(SUM(smart_meter_consumption), 0) AS consumption, smart_meter_unit as unit FROM datacache_report WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 25"
         cursor.execute(query)
+        print("read_datacache_last_24hrs_consumption: ", query)
         rows = cursor.fetchall()
         result_list = []
         for row in rows:
@@ -362,7 +363,7 @@ class DatabaseManager:
 
             query = f"SELECT COALESCE(SUM(smart_meter_consumption), 0) AS consumption, smart_meter_unit as unit FROM datacache_report WHERE start_timestamp BETWEEN '{start_of_day}' AND '{end_of_day}' ORDER BY id DESC LIMIT 25"
             cursor.execute(query)
-            
+            print("read_datacache_last_48hrs_consumption: ", query)
             rows = cursor.fetchall()
             result_list = []
             for row in rows:

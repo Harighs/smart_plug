@@ -111,7 +111,7 @@ class AwattarServices:
             resulting_df = pd.concat([old_df, new_df], ignore_index=True)
             resulting_df.to_csv(self.dataset_path, index=True)
 
-    def AWATTAR_ONE_DAY_PERIOD(self):
+    def GET_AWATTAR_PAST_DATA(self):
         # Delete the awattar_data csv before creation
         Awattar_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
         if os.path.exists(Awattar_Data_Path):
@@ -121,10 +121,7 @@ class AwattarServices:
         # Replace this with your Unix timestamp
         timezone = 'Europe/Vienna'  # Replace with your desired timezone
 
-        start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day2(timezone)
-
-        print(f"Awattar After Start of the day: {start_of_day}")
-        print(f"Awattar After End of the day: {end_of_day}")
+        start_of_day, end_of_day = AwattarServices.pastStartAndEndDateForAwattar(timezone)
     
         # current_datetime = datetime.now() - timedelta(hours=24)
         # unix_timestamp = current_datetime.timestamp()
@@ -132,6 +129,8 @@ class AwattarServices:
  
         # Get Awattar Data
         json_url = self.awattar_json_url.format(start_of_day, end_of_day)
+
+        print("Awattar Link", json_url)
 
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
@@ -144,11 +143,11 @@ class AwattarServices:
         return awattar_json_response
 
 
-    def get_start_and_end_of_day2(timezone='CET'):
+    def pastStartAndEndDateForAwattar(timezone='CET'):
 
         current_timestamp = time.time() * 1000
 
-        timestamp = current_timestamp - (24 * 60 * 60 * 1000)
+        timestamp = current_timestamp  - (24 * 60 * 60 * 1000)
 
         # Convert timestamp to datetime object
         dt_object = datetime.utcfromtimestamp(timestamp / 1000)
@@ -170,22 +169,24 @@ class AwattarServices:
         start_timestamp = int(start_of_day.timestamp()) * 1000
         end_timestamp = int(start_of_next_day.timestamp()) * 1000 - 1  # Subtract 1 millisecond
 
-        
+        print("*******************************")
+        print("**pastStartAndEndDateForAwattar**")
         print(f"Start of the day: {start_of_day}")
         print(f"End of the day: {end_of_day}")
+        print("*******************************")
 
         return start_timestamp, end_timestamp
 
 
-    def AWATTAR_FUTURE_PRICE(self):
+    def AWATTAR_FUTURE_PRICE_AUTOMODE(self):
 
         timezone = 'Europe/Vienna'  # Replace with your desired timezone
 
         start_of_day, end_of_day = AwattarServices.get_start_and_end_of_day(timezone)
-
+        print("*******************************")
         print(f"Awattar After Start of the day: {start_of_day}")
         print(f"Awattar After End of the day: {end_of_day}")
-
+        print("*******************************")
         # Get Awattar Data
         json_url = self.awattar_json_url.format(start_of_day, end_of_day)
         
@@ -197,6 +198,9 @@ class AwattarServices:
         if os.path.exists(self.dataset_path):
             os.remove(self.dataset_path)
         awattar_json_response.to_csv(self.dataset_path, index=False)
+        print("*******************************")
+        print("awattar_json_response", awattar_json_response)
+        print("*******************************")
         return awattar_json_response
     
 
@@ -227,4 +231,3 @@ class AwattarServices:
         print(f"End of the day: {end_of_day}")
 
         return start_timestamp, end_timestamp
-

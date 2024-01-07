@@ -28,7 +28,7 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
 
-        self.awattar_df = awattar_services.AWATTAR_ONE_DAY_PERIOD()
+        self.awattar_df = awattar_services.GET_AWATTAR_PAST_DATA()
         self.smartmeter_df = smartmeter_services.getSmartMeterDataFromYesterday()
 
         self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
@@ -125,7 +125,7 @@ class AutoServices:
       
         # Logic for Escalation --> 1.3 default value
         # Higher the demand higher the turn on time
-        last_24hrs_usage = int(last_24hrs_usage)
+    
         if(last_known_times_toturn_on >= last_24hrs_usage):
             no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relayPower)
             ## db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 

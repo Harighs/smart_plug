@@ -274,16 +274,18 @@ class SmartMeterServices:
 
         ## SMART METER STEP2: Get data from smart-meter reading
         yesterday = str(datetime.date.today() - datetime.timedelta(days=1))
-    
+        print("SMART METER STEP2: Get data from smart-meter reading:", yesterday)
+
         data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={yesterday}"
         data_response = requests.get(data_url, headers=headers)
         outputData = None
+        print("SMART METER :", data_url)
 
         if data_response.status_code == 200:
             outputData = pd.DataFrame(json.loads(data_response.content))[['meteredValues', 'peakDemandTimes']]
              # Convert 'peakDemandTimes' to datetime and add 1 hour
             outputData['peakDemandTimes'] = pd.to_datetime(outputData['peakDemandTimes']) + pd.Timedelta(hours=1)
-            print(outputData)
+            print("Output Data From SmartMeter:", outputData)
 
             ## Export to CSV
             if os.path.exists(self.dataset_path):
@@ -305,6 +307,7 @@ class SmartMeterServices:
 
 
         if len(outputData) > 0:
+            print("Data fetch success.")
             return outputData
         else:
             raise Exception("Data request failed with status code: Smartmeter_service2", 404)

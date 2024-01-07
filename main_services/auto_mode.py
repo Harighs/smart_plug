@@ -26,7 +26,7 @@ class Auto_Mode:
             times_toturn_on = int(times_toturn_on[0][0])
         
         print("No of times to turn on the relay", times_toturn_on)
-        self.future_df = AwattarServices().AWATTAR_FUTURE_PRICE()
+        self.future_df = AwattarServices().AWATTAR_FUTURE_PRICE_AUTOMODE()
         print("Data from BEFORE modification", self.future_df)
 
         self.date_time = datetime.now()

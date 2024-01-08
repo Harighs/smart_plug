@@ -125,8 +125,9 @@ class AutoServices:
       
         # Logic for Escalation --> 1.3 default value
         # Higher the demand higher the turn on time
-    
-        if(last_known_times_toturn_on >= last_24hrs_usage):
+        # New change from Peter on 08.01.24
+        last_known_times_toturn_on =  int(last_known_times_toturn_on * 0.9)
+        if(last_24hrs_usage >= last_known_times_toturn_on):
             no_of_times_to_activate_automode = last_24hrs_usage * 1.3 / int(relayPower)
             ## db.insert_automode(last_24hrs_usage, relayNumber, round(no_of_times_to_activate_automode)) 
             db.insert_automode(last_24hrs_usage, relayNumber,  math.ceil(no_of_times_to_activate_automode)) 

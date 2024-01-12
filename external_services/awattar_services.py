@@ -11,6 +11,7 @@ import time
 class AwattarServices:
     def __init__(self):
         self.dataset_path = '/home/pi/smart_plug/dataset/awattar_data.csv'
+        self.dataset_path_automode = '/home/pi/smart_plug/dataset/awattar_data_automode.csv'
         self.awattar_json_url = "https://api.awattar.at/v1/marketdata?start={}&end={}"
         # self.download_awattar_data()
         # if not os.path.isfile(self.dataset_path):
@@ -195,9 +196,9 @@ class AwattarServices:
         awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=1)
         awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=1)
 
-        if os.path.exists(self.dataset_path):
-            os.remove(self.dataset_path)
-        awattar_json_response.to_csv(self.dataset_path, index=False)
+        if os.path.exists(self.dataset_path_automode):
+            os.remove(self.dataset_path_automode)
+        awattar_json_response.to_csv(self.dataset_path_automode, index=False)
         print("*******************************")
         print("awattar_json_response", awattar_json_response)
         print("*******************************")

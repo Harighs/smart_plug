@@ -1,3 +1,26 @@
+17.01.2024 crontab -e or crontab -l
+################
+# Restart Auto Mode service at 12:01
+# Restart at 12:05 - Auto mode service
+1 0 * * * sudo systemctl restart smart_plug_auto_mode.service
+################
+
+# Restart all the Electromizer Services
+# Restart at 03:00 - Data download service
+30 4 * * * /usr/bin/python3 /home/pi/smart_plug/main_services/masterdata_services.py >> /home/pi/smart_plug/main_services/masterdata_services.log 2>&1
+
+# Restart at 03:05 - Auto mode service
+35 4 * * * sudo systemctl restart smart_plug_auto_mode.service
+################
+
+# Restart auto mode service every 15 minutes and update turnon/turnoff relays
+*/15 * * * * sudo systemctl restart smart_plug_auto_mode.service
+################
+
+# Test python script whether its running
+30 4 * * * /usr/bin/python3 /home/pi/smart_plug/main_services/helloworld.py >> /home/pi/smart_plug/main_services/helloworld.log 2>&1
+
+
 ######################
   # This service is used to download the data from awattar and smartmeter
   GNU nano 5.4  

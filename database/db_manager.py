@@ -338,6 +338,17 @@ class DatabaseManager:
         cursor.close()
 
 
+    def check_automode_table(self):
+        current_datetime = datetime.now()
+        current_date = current_datetime.date()
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        query = f"SELECT count(*) as result FROM automode WHERE datetime LIKE '{current_date}%'"
+        cursor.execute(query)
+        result_count = cursor.fetchall()[0]  # Directly get the count from the first row
+        cursor.close()
+        return result_count
+
     def read_datacache_last_24hrs_consumption(self):
         current_datetime = datetime.now() - timedelta(hours=24)
         print(current_datetime.date())

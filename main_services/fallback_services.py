@@ -41,7 +41,7 @@ class FallbackServices:
                 auto_service.create_master_df()
                 auto_service.calculateAutoModeValue(1)
                 auto_service.calculateAutoModeValue(2)
-                pint("Fallback call initiated...")
+                print("Fallback call initiated...")
         else:
                 print("Fallback is not necessary today! Data already downloaded...")
             

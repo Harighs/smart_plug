@@ -132,6 +132,28 @@ def infoautomode():
     # Assuming the 'details.html' template expects a variable named 'data'
     return render_template('info_automode.html', data=parsed_data)
 
+@app.route('/inforeports')
+def inforeports():
+    api_url = f'http://{common_utils.static_ipaddress}:{common_utils.static_port}/api/reports'
+    try:
+        response = requests.get(api_url)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the JSON content of the response
+            parsed_data = response.json()
+        else:
+            # Handle other status codes (e.g., render an error template)
+            return render_template('error.html', error=f"Unexpected status code: {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        # Handle request exceptions (e.g., render an error template)
+        return render_template('error.html', error=str(e))
+
+    # Assuming the 'details.html' template expects a variable named 'data'
+    return render_template('info_reports.html', data=parsed_data)
+
+
 
 @app.route('/infoservicestatus1')
 def infoservicestatus1():
@@ -291,6 +313,102 @@ def getAutoMode():
 
         # Convert DataFrame to JSON
         json_data = df.to_json(orient='records')
+
+        # Return JSON response
+        return json_data
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"status": "Error"}), 500
+
+    finally:
+          if 'conn' in locals() and conn:
+            conn.close()
+
+@app.route('/api/reports', methods=['GET'])
+def getLast7DaysReport():
+    try:
+        # Connect to the SQLite database
+        conn = sqlite3.connect("/home/pi/smart_plug/database/pythonsqlite.db")
+
+        # Assuming you have a SQLite connection named 'conn'
+        df = pd.read_sql_query(
+            "SELECT * FROM datacache_report WHERE start_timestamp>=date('now', '-7 days') ORDER BY id DESC",
+            conn
+        )
+
+            # Awattar Prices
+        # Assuming you have a DataFrame named 'df' with the provided columns
+        # Convert 'start_timestamp' and 'end_timestamp' columns to datetime objects
+        df['start_timestamp'] = pd.to_datetime(df['start_timestamp'])
+        df['end_timestamp'] = pd.to_datetime(df['end_timestamp'])
+
+        # Calculate the duration of each period in hours
+        df['duration_hours'] = (df['end_timestamp'] - df['start_timestamp']).dt.total_seconds() / 3600
+
+        # Convert 'awattar_price' to numeric (in case it's not already)
+        df['awattar_price'] = pd.to_numeric(df['awattar_price'], errors='coerce')
+
+        # Calculate the sum of aWattar prices over the specified periods
+        total_awattar_price = df['awattar_price'].sum()
+
+        # Calculate the total duration in hours
+        total_duration_hours = df['duration_hours'].sum()
+
+        # Calculate the average aWattar price
+        average_awattar_price = total_awattar_price / total_duration_hours
+
+        print("V1: Sum total of all aWattar prices over periods: ", total_awattar_price)
+        # print("Total duration in hours:", total_duration_hours)
+        print("V2: Calculation of average aWattar prices of this period (T): ", average_awattar_price)
+
+        # Smart Meter Data
+        # Assuming you have a DataFrame named 'df' with the provided columns
+        # Convert 'start_timestamp' and 'end_timestamp' columns to datetime objects
+        df['start_timestamp'] = pd.to_datetime(df['start_timestamp'])
+        df['end_timestamp'] = pd.to_datetime(df['end_timestamp'])
+
+        # Calculate the duration of each period in hours
+        df['duration_hours'] = (df['end_timestamp'] - df['start_timestamp']).dt.total_seconds() / 3600
+
+        # Convert 'awattar_price' to numeric (in case it's not already)
+        df['smart_meter_consumption'] = pd.to_numeric(df['smart_meter_consumption'], errors='coerce')
+
+        # Calculate the sum of aWattar prices over the specified periods
+        total_smartmeter_consumption = df['smart_meter_consumption'].sum()
+
+        # Calculate the total duration in hours
+        total_duration_hours = df['duration_hours'].sum()
+
+        # Calculate the average aWattar price
+        average_smartmeter_consumption = total_smartmeter_consumption / total_duration_hours
+    
+        print("V3: Calculation of energy consumed over period T: ", total_smartmeter_consumption)
+
+
+        cref = average_awattar_price * total_smartmeter_consumption / 1000
+        print("Cref: Calculation of aWattar reference costs Cref: ", cref)
+    
+        df['result'] = df['awattar_price'] * df['smart_meter_consumption'] / 1000
+        
+        C = df['result'].sum()
+        print("C: Calculation of sum of hourly energy costs: ", C)
+
+        print("S€: Calculation of average savings in €: ", cref - C)
+
+        print("S%: Calculation of average savings in %: ", (cref - C) / cref * 100)
+
+        json_data = {
+                "r1": str("{:.2f}".format(total_awattar_price)),
+                "r2": str("{:.2f}".format(average_awattar_price)),
+                "r3": str("{:.2f}".format(total_smartmeter_consumption)),
+                "r4": str("{:.2f}".format(cref)),
+                "r5": str("{:.2f}".format(C)),
+                "r6": str("{:.2f}".format(cref - C)),
+                "r7": str("{:.2f}".format((cref - C) / cref * 100))
+            }
+        # Convert DataFrame to JSON
+        # json_data = df.to_json(orient='records')
 
         # Return JSON response
         return json_data

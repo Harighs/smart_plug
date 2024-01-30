@@ -29,7 +29,7 @@ print("Current working directory:", current_dir)
 class FallbackServices:
     def __init__(self):
         db = DatabaseManager()
-        result = db.check_automode_table()
+        result = db.check_datacache_table()
         print(result[0])
         result0 = result[0]
         if(result0 == 0): # Data download not yet done then run the masterdata service

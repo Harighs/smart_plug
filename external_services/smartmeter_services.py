@@ -1,6 +1,6 @@
 import sys 
 sys.path.append('/home/pi/smart_plug/')
-import datetime
+from datetime import datetime, timedelta
 import json
 import os
 import pandas as pd
@@ -134,7 +134,7 @@ class SmartMeterServices:
         nsc_wt = auth_response.cookies['NSC_WT_TWYUXFCQ-TTM']
 
         current_date = str(
-            datetime.date.today() - datetime.timedelta(days=1))  # last 24hrs data
+            datetime.today() - timedelta(days=1))  # last 24hrs data
         # TODO remove the hardcoded meter id or id
         data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={current_date}&__Host-go4DavidSecurityToken={auth_cookie}"
         #data_url = "https://smartmeter.netz-noe.at/orchestration/ConsumptionRecord/BalanceDay?pointOfConsumption=41151064&day={}&__Host-go4DavidSecurityToken={}".format(current_date,auth_cookie)
@@ -152,7 +152,7 @@ class SmartMeterServices:
         
         # Datetime
         # Get the current date
-        current_date = str(datetime.date.today() - datetime.timedelta(days=1))
+        current_date = str(datetime.today() - timedelta(days=1))
 
         # Combine with the time '00:00:00'
         combined_datetime = pd.to_datetime(current_date + ' 00:00:00')
@@ -193,7 +193,7 @@ class SmartMeterServices:
         auth_response = requests.post(auth_url, json=auth_payload)
         auth_cookie = auth_response.cookies['__Host-go4DavidSecurityToken']
         auth_xsrf_token = auth_response.cookies['XSRF-Token']
-        current_date = str(datetime.date.today())
+        current_date = str(datetime.today())
         data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={current_date}&__Host-go4DavidSecurityToken={auth_cookie}"
         headers = {
             'Cookie': '__Host-go4DavidSecurityToken={}; XSRF-Token={}'.format(auth_cookie, auth_xsrf_token),
@@ -215,7 +215,7 @@ class SmartMeterServices:
 
         smart_meter_data = pd.read_csv('/home/pi/smart_plug/dataset/'+common_utils.static_smartmeter_filename)
         smart_meter_data[u'peakDemandTimes'] = pd.to_datetime(smart_meter_data[u'peakDemandTimes'])
-        if smart_meter_data[u'peakDemandTimes'].max().date() < datetime.date.today():
+        if smart_meter_data[u'peakDemandTimes'].max().date() < datetime.today():
             concatinated_data = pd.concat([smart_meter_data, new_data], ignore_index=True)
 
         # saving new data:
@@ -273,19 +273,27 @@ class SmartMeterServices:
         }
 
         ## SMART METER STEP2: Get data from smart-meter reading
-        yesterday = str(datetime.date.today() - datetime.timedelta(days=1))
+        yesterday = str(datetime.today() - timedelta(days=2))
         print("SMART METER STEP2: Get data from smart-meter reading:", yesterday)
 
         data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={yesterday}"
         data_response = requests.get(data_url, headers=headers)
         outputData = None
-        print("SMART METER :", data_url)
 
         if data_response.status_code == 200:
-            outputData = pd.DataFrame(json.loads(data_response.content))[['meteredValues', 'peakDemandTimes']]
-             # Convert 'peakDemandTimes' to datetime and add 1 hour
-            outputData['peakDemandTimes'] = pd.to_datetime(outputData['peakDemandTimes']) + pd.Timedelta(hours=1)
-            print("Output Data From SmartMeter:", outputData)
+            # Load JSON data
+            data = json.loads(data_response.content)
+
+            # Extract meteredValues and peakDemandTimes
+            metered_values = data[0]['meteredValues']
+            peak_demand_times = data[0]['peakDemandTimes']
+
+
+            # Convert peakDemandTimes to datetime format and add 1 hour
+            peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") + timedelta(hours=1) for time in peak_demand_times]
+
+            # Create DataFrame
+            outputData = pd.DataFrame({'meteredValues': metered_values, 'peakDemandTimes': peak_demand_times})
 
             ## Export to CSV
             if os.path.exists(self.dataset_path):

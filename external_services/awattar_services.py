@@ -143,23 +143,23 @@ class AwattarServices:
         awattar_json_response.to_csv(self.dataset_path, index=False)
         return awattar_json_response
 
+    def pastStartAndEndDateForAwattar(timezone='Europe/Vienna'):
+        # Get current timestamp in seconds
+        current_timestamp = time.time()
 
-    def pastStartAndEndDateForAwattar(timezone='CET'):
-
-        current_timestamp = time.time() * 1000
-
-        timestamp = current_timestamp  - (24 * 60 * 60 * 1000)
+        # Calculate the timestamp for 24 hours ago
+        past_timestamp = current_timestamp - (24 * 60 * 60)
 
         # Convert timestamp to datetime object
-        dt_object = datetime.utcfromtimestamp(timestamp / 1000)
+        dt_object = datetime.utcfromtimestamp(past_timestamp)
 
         # Set the timezone to UTC
-        dt_object_utc = pytz.timezone('UTC').localize(dt_object)
+        dt_object_utc = pytz.utc.localize(dt_object)
 
         # Convert UTC to the specified local time zone
         dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))
 
-        # Get the start and end of the day
+        # Get the start and end of the day 24 hours ago
         start_of_day = dt_object_local.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
 
@@ -190,11 +190,12 @@ class AwattarServices:
         print("*******************************")
         # Get Awattar Data
         json_url = self.awattar_json_url.format(start_of_day, end_of_day)
+        print(json_url)
         
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
-        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=1)
-        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=1)
+        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms')
+        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms')
 
         if os.path.exists(self.dataset_path_automode):
             os.remove(self.dataset_path_automode)
@@ -205,14 +206,15 @@ class AwattarServices:
         return awattar_json_response
     
 
-    def get_start_and_end_of_day(timezone='CET'):
-        timestamp = time.time() * 1000  # Current timestamp in milliseconds
+    def get_start_and_end_of_day(timezone='Europe/Vienna'):
+        # Get current timestamp in seconds
+        timestamp = time.time()
 
         # Convert timestamp to datetime object
-        dt_object = datetime.utcfromtimestamp(timestamp / 1000)
+        dt_object = datetime.utcfromtimestamp(timestamp)
 
         # Set the timezone to UTC
-        dt_object_utc = pytz.timezone('UTC').localize(dt_object)
+        dt_object_utc = pytz.utc.localize(dt_object)
 
         # Convert UTC to the specified local time zone
         dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))

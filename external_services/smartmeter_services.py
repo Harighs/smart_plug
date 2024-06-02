@@ -5,6 +5,7 @@ import json
 import os
 import pandas as pd
 import requests
+import pytz
 
 from main_services.common_utils import common_utils 
 
@@ -277,6 +278,8 @@ class SmartMeterServices:
         print("SMART METER STEP2: Get data from smart-meter reading:", yesterday)
 
         data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={yesterday}"
+        print(data_url)
+
         data_response = requests.get(data_url, headers=headers)
         outputData = None
 
@@ -290,7 +293,7 @@ class SmartMeterServices:
 
 
             # Convert peakDemandTimes to datetime format and add 1 hour
-            peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") + timedelta(hours=1) for time in peak_demand_times]
+            peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") + timedelta(hours=2) for time in peak_demand_times]
 
             # Create DataFrame
             outputData = pd.DataFrame({'meteredValues': metered_values, 'peakDemandTimes': peak_demand_times})

@@ -274,7 +274,7 @@ class SmartMeterServices:
         }
 
         ## SMART METER STEP2: Get data from smart-meter reading
-        yesterday = str(datetime.today() - timedelta(days=2))
+        yesterday = str(datetime.today() - timedelta(days=1))
         print("SMART METER STEP2: Get data from smart-meter reading:", yesterday)
 
         data_url = f"{common_utils.static_smart_meter_service_link}orchestration/ConsumptionRecord/Day?meterId={common_utils.static_smart_meter_meter_id}&day={yesterday}"

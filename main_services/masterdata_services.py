@@ -28,7 +28,9 @@ class AutoServices:
         awattar_services = AwattarServices()
         smartmeter_services = SmartMeterServices()
 
+        # Get past data from awattar data
         self.awattar_df = awattar_services.GET_AWATTAR_PAST_DATA()
+        # Get past data from smart meter data
         self.smartmeter_df = smartmeter_services.getSmartMeterDataFromYesterday()
 
         self.awattar_data_path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename

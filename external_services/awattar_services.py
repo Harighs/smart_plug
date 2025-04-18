@@ -112,6 +112,11 @@ class AwattarServices:
             resulting_df = pd.concat([old_df, new_df], ignore_index=True)
             resulting_df.to_csv(self.dataset_path, index=True)
 
+    """ 
+    Retrieves the past awattar price and generates the dataset
+    Updated: 28.10.2024
+    """
+    # Get past data from awattar data
     def GET_AWATTAR_PAST_DATA(self):
         # Delete the awattar_data csv before creation
         Awattar_Data_Path = '/home/pi/smart_plug/dataset/'+common_utils.static_awattar_filename
@@ -144,41 +149,36 @@ class AwattarServices:
         return awattar_json_response
 
     def pastStartAndEndDateForAwattar(timezone='Europe/Vienna'):
-        # Get current timestamp in seconds
-        current_timestamp = time.time()
+            # Get current timestamp in seconds
+            timestamp = time.time()
 
-        # Calculate the timestamp for 24 hours ago
-        past_timestamp = current_timestamp - (24 * 60 * 60)
+            # Convert timestamp to datetime object
+            dt_object = datetime.utcfromtimestamp(timestamp)
 
-        # Convert timestamp to datetime object
-        dt_object = datetime.utcfromtimestamp(past_timestamp)
+            # Set the timezone to UTC
+            dt_object_utc = pytz.utc.localize(dt_object)
 
-        # Set the timezone to UTC
-        dt_object_utc = pytz.utc.localize(dt_object)
+            # Convert UTC to the specified local time zone
+            dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))
 
-        # Convert UTC to the specified local time zone
-        dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))
+            # Calculate the start of the previous day
+            start_of_day = (dt_object_local - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        # Get the start and end of the day 24 hours ago
-        start_of_day = dt_object_local.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
+            # Convert datetime objects to Unix timestamps in milliseconds
+            start_timestamp = int(start_of_day.timestamp()) * 1000
+            end_timestamp = int(end_of_day.timestamp()) * 1000
 
-        # Get the start of the next day
-        start_of_next_day = start_of_day + timedelta(days=1)
+            print(f"Start of the previous day: {start_of_day}")
+            print(f"End of the previous day: {end_of_day}")
 
-        # Convert datetime objects to Unix timestamps in milliseconds
-        start_timestamp = int(start_of_day.timestamp()) * 1000
-        end_timestamp = int(start_of_next_day.timestamp()) * 1000 - 1  # Subtract 1 millisecond
-
-        print("*******************************")
-        print("**pastStartAndEndDateForAwattar**")
-        print(f"Start of the day: {start_of_day}")
-        print(f"End of the day: {end_of_day}")
-        print("*******************************")
-
-        return start_timestamp, end_timestamp
+            return start_timestamp, end_timestamp
 
 
+    """ 
+    Retrieves the future awattar price and generates the AutoMode
+    Updated: 28.10.2024
+    """
     def AWATTAR_FUTURE_PRICE_AUTOMODE(self):
 
         timezone = 'Europe/Vienna'  # Replace with your desired timezone
@@ -194,9 +194,10 @@ class AwattarServices:
         
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
-        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms')
-        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms')
-
+  
+        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=1)
+        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=1)
+        
         if os.path.exists(self.dataset_path_automode):
             os.remove(self.dataset_path_automode)
         awattar_json_response.to_csv(self.dataset_path_automode, index=False)

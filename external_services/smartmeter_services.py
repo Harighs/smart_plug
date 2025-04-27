@@ -292,9 +292,11 @@ class SmartMeterServices:
             peak_demand_times = data[0]['peakDemandTimes']
 
 
-            # Convert peakDemandTimes to datetime format and add 1 hour
-            # peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") + timedelta(hours=1) for time in peak_demand_times]
-            peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") for time in peak_demand_times]
+            # Convert peakDemandTimes to datetime format and add 1 hour (DAY LIGHT MODE ON)
+            peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") + timedelta(hours=2) for time in peak_demand_times]
+            
+            # Convert peakDemandTimes to datetime format and add 1 hour (DAY LIGHT MODE OFF)
+            # peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") for time in peak_demand_times]
 
             # Create DataFrame
             outputData = pd.DataFrame({'meteredValues': metered_values, 'peakDemandTimes': peak_demand_times})

@@ -6,7 +6,7 @@ import requests
 from datetime import datetime, timedelta
 from main_services.common_utils import common_utils 
 import pytz
-import time 
+import time
 
 class AwattarServices:
     def __init__(self):
@@ -147,33 +147,24 @@ class AwattarServices:
             os.remove(self.dataset_path)
         awattar_json_response.to_csv(self.dataset_path, index=False)
         return awattar_json_response
-
+    
     def pastStartAndEndDateForAwattar(timezone='Europe/Vienna'):
-            # Get current timestamp in seconds
-            timestamp = time.time()
+        # Get current timestamp in the specified timezone
+        local_tz = pytz.timezone(timezone)
+        dt_object_local = datetime.now(local_tz)
 
-            # Convert timestamp to datetime object
-            dt_object = datetime.utcfromtimestamp(timestamp)
+        # Calculate the start of the previous day
+        start_of_day = (dt_object_local - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-            # Set the timezone to UTC
-            dt_object_utc = pytz.utc.localize(dt_object)
+        # Convert datetime objects to Unix timestamps in milliseconds
+        start_timestamp = int(start_of_day.timestamp()) * 1000
+        end_timestamp = int(end_of_day.timestamp()) * 1000
 
-            # Convert UTC to the specified local time zone
-            dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))
+        print(f"Start of the previous day: {start_of_day}")
+        print(f"End of the previous day: {end_of_day}")
 
-            # Calculate the start of the previous day
-            start_of_day = (dt_object_local - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-            end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
-
-            # Convert datetime objects to Unix timestamps in milliseconds
-            start_timestamp = int(start_of_day.timestamp()) * 1000
-            end_timestamp = int(end_of_day.timestamp()) * 1000
-
-            print(f"Start of the previous day: {start_of_day}")
-            print(f"End of the previous day: {end_of_day}")
-
-            return start_timestamp, end_timestamp
-
+        return start_timestamp, end_timestamp
 
     """ 
     Retrieves the future awattar price and generates the AutoMode
@@ -195,8 +186,8 @@ class AwattarServices:
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
   
-        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=1)
-        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=1)
+        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=2)
+        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=2)
         
         if os.path.exists(self.dataset_path_automode):
             os.remove(self.dataset_path_automode)

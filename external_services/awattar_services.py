@@ -3,7 +3,7 @@ sys.path.append('/home/pi/smart_plug/')
 import os
 import pandas as pd
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from main_services.common_utils import common_utils 
 import pytz
 import time
@@ -149,24 +149,39 @@ class AwattarServices:
             os.remove(self.dataset_path)
         awattar_json_response.to_csv(self.dataset_path, index=False)
         return awattar_json_response
-    
-    def pastStartAndEndDateForAwattar(timezone='Europe/Vienna'):
-        # Get current timestamp in the specified timezone
-        local_tz = pytz.timezone(timezone)
-        dt_object_local = datetime.now(local_tz)
+        
+
+    def past_start_and_end_date_for_awattar(timezone_str: str = 'Europe/Vienna') -> tuple[int, int]:
+        """
+        Returns the start and end timestamps (in milliseconds) for the previous day
+        in the specified timezone.
+
+        Args:
+            timezone_str (str): Timezone name. Default is 'Europe/Vienna'.
+
+        Returns:
+            tuple[int, int]: Start and end timestamps of the previous day in milliseconds.
+        """
+        # Get current UTC time (timezone-aware)
+        now_utc = datetime.now(timezone.utc)
+
+        # Convert to the specified local timezone
+        local_tz = pytz.timezone(timezone_str)
+        local_now = now_utc.astimezone(local_tz)
 
         # Calculate the start of the previous day
-        start_of_day = (dt_object_local - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-        end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
+        start_of_prev_day = (local_now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_prev_day = start_of_prev_day.replace(hour=23, minute=59, second=59, microsecond=999999)
 
         # Convert datetime objects to Unix timestamps in milliseconds
-        start_timestamp = int(start_of_day.timestamp()) * 1000
-        end_timestamp = int(end_of_day.timestamp()) * 1000
+        start_timestamp_ms = int(start_of_prev_day.timestamp() * 1000)
+        end_timestamp_ms = int(end_of_prev_day.timestamp() * 1000)
 
-        print(f"Start of the previous day: {start_of_day}")
-        print(f"End of the previous day: {end_of_day}")
+        # Optional: print for debugging
+        print(f"Start of the previous day: {start_of_prev_day}")
+        print(f"End of the previous day: {end_of_prev_day}")
 
-        return start_timestamp, end_timestamp
+        return start_timestamp_ms, end_timestamp_ms
 
     """ 
     Retrieves the future awattar price and generates the AutoMode
@@ -201,31 +216,34 @@ class AwattarServices:
         return awattar_json_response
     
 
-    def get_start_and_end_of_day(timezone='Europe/Vienna'):
-        # Get current timestamp in seconds
-        timestamp = time.time()
+    def get_start_and_end_of_day(timezone_str: str = 'Europe/Vienna') -> tuple[int, int]:
+        """
+        Returns the start and end timestamps (in milliseconds) for the current day
+        in the specified timezone.
 
-        # Convert timestamp to datetime object
-        dt_object = datetime.utcfromtimestamp(timestamp)
+        Args:
+            timezone_str (str): Timezone name. Default is 'Europe/Vienna'.
 
-        # Set the timezone to UTC
-        dt_object_utc = pytz.utc.localize(dt_object)
+        Returns:
+            tuple[int, int]: Start and end timestamps of the day in milliseconds.
+        """
+        # Get current UTC time (timezone-aware)
+        now_utc = datetime.now(timezone.utc)
 
-        # Convert UTC to the specified local time zone
-        dt_object_local = dt_object_utc.astimezone(pytz.timezone(timezone))
+        # Convert to the specified local timezone
+        tz = pytz.timezone(timezone_str)
+        local_now = now_utc.astimezone(tz)
 
-        # Get the start and end of the day
-        start_of_day = dt_object_local.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_of_day = start_of_day.replace(hour=23, minute=59, second=59, microsecond=999999)
-
-        # Get the start of the next day
+        # Define start and end of the local day
+        start_of_day = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
         start_of_next_day = start_of_day + timedelta(days=1)
 
-        # Convert datetime objects to Unix timestamps in milliseconds
-        start_timestamp = int(start_of_day.timestamp()) * 1000
-        end_timestamp = int(start_of_next_day.timestamp()) * 1000 - 1  # Subtract 1 millisecond
+        # Convert to timestamps in milliseconds
+        start_timestamp_ms = int(start_of_day.timestamp() * 1000)
+        end_timestamp_ms = int(start_of_next_day.timestamp() * 1000) - 1  # end of the day (23:59:59.999)
 
+        # Optional: print for debugging
         print(f"Start of the day: {start_of_day}")
-        print(f"End of the day: {end_of_day}")
+        print(f"End of the day: {start_of_next_day - timedelta(microseconds=1)}")
 
-        return start_timestamp, end_timestamp
+        return start_timestamp_ms, end_timestamp_ms

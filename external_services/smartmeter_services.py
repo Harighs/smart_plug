@@ -292,7 +292,7 @@ class SmartMeterServices:
             peak_demand_times = data[0]['peakDemandTimes']
 
 
-            # Convert peakDemandTimes to datetime format and add 1 hour (DAY LIGHT MODE ON)
+            # Convert datetime format and add 2 hour (DAY LIGHT MODE ON)
             peak_demand_times = [datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") + timedelta(hours=2) for time in peak_demand_times]
             
             # Convert peakDemandTimes to datetime format and add 1 hour (DAY LIGHT MODE OFF)

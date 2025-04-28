@@ -114,7 +114,7 @@ class AwattarServices:
 
     """ 
     Retrieves the past awattar price and generates the dataset
-    Updated: 28.10.2024
+    Updated: 29.04.2025
     """
     # Get past data from awattar data
     def GET_AWATTAR_PAST_DATA(self):
@@ -140,8 +140,10 @@ class AwattarServices:
 
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
-        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=1)
-        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=1)
+        
+        # Convert datetime format and add 2 hour (DAY LIGHT MODE ON)
+        awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=2)
+        awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=2)
 
         if os.path.exists(self.dataset_path):
             os.remove(self.dataset_path)
@@ -168,7 +170,7 @@ class AwattarServices:
 
     """ 
     Retrieves the future awattar price and generates the AutoMode
-    Updated: 28.10.2024
+    Updated: 29.04.2025
     """
     def AWATTAR_FUTURE_PRICE_AUTOMODE(self):
 
@@ -186,6 +188,7 @@ class AwattarServices:
         awattar_json_response = requests.get(json_url).json()
         awattar_json_response = pd.json_normalize(awattar_json_response['data'])
   
+        # Convert datetime format and add 2 hour (DAY LIGHT MODE ON)
         awattar_json_response['start_timestamp'] = pd.to_datetime(awattar_json_response['start_timestamp'], unit='ms') + pd.Timedelta(hours=2)
         awattar_json_response['end_timestamp'] = pd.to_datetime(awattar_json_response['end_timestamp'], unit='ms') + pd.Timedelta(hours=2)
         

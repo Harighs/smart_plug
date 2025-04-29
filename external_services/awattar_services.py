@@ -127,7 +127,7 @@ class AwattarServices:
         # Replace this with your Unix timestamp
         timezone = 'Europe/Vienna'  # Replace with your desired timezone
 
-        start_of_day, end_of_day = AwattarServices.pastStartAndEndDateForAwattar(timezone)
+        start_of_day, end_of_day = AwattarServices.past_start_and_end_date_for_awattar(timezone)
     
         # current_datetime = datetime.now() - timedelta(hours=24)
         # unix_timestamp = current_datetime.timestamp()
